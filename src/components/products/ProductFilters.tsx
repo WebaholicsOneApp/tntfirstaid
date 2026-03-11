@@ -1,0 +1,236 @@
+'use client';
+
+import { useState, useCallback } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import type { CategoryWithChildren } from '~/types';
+import { cn } from '~/lib/utils';
+
+interface ProductFiltersProps {
+  categories: CategoryWithChildren[];
+  currentCategorySlug?: string;
+  className?: string;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+function CategoryItem({
+  category,
+  currentCategorySlug,
+  depth,
+}: {
+  category: CategoryWithChildren;
+  currentCategorySlug?: string;
+  depth: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const hasChildren = category.children.length > 0;
+  const slug = slugify(category.categoryName);
+  const isActive = currentCategorySlug === slug;
+
+  return (
+    <li>
+      <div
+        className={cn('flex items-center gap-1', depth > 0 && 'ml-4')}
+      >
+        {hasChildren && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="p-0.5 text-secondary-400 hover:text-secondary-600 transition-colors"
+            aria-label={expanded ? 'Collapse' : 'Expand'}
+          >
+            <svg
+              className={cn('w-3.5 h-3.5 transition-transform', expanded && 'rotate-90')}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
+        <a
+          href={`/shop/${slug}`}
+          className={cn(
+            'flex-1 text-sm py-1 transition-colors',
+            isActive
+              ? 'text-primary-600 font-semibold'
+              : 'text-secondary-600 hover:text-primary-600',
+            !hasChildren && 'ml-5'
+          )}
+        >
+          {category.categoryName}
+          {category.productCount != null && category.productCount > 0 && (
+            <span className="ml-1 text-xs text-secondary-300">
+              ({category.productCount})
+            </span>
+          )}
+        </a>
+      </div>
+      {hasChildren && expanded && (
+        <ul className="mt-0.5">
+          {category.children.map((child) => (
+            <CategoryItem
+              key={child.id}
+              category={child}
+              currentCategorySlug={currentCategorySlug}
+              depth={depth + 1}
+            />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+export default function ProductFilters({
+  categories,
+  currentCategorySlug,
+  className,
+}: ProductFiltersProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') ?? '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? '');
+  const inStock = searchParams.get('inStock') === 'true';
+
+  const applyFilters = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (minPrice) {
+      params.set('minPrice', minPrice);
+    } else {
+      params.delete('minPrice');
+    }
+
+    if (maxPrice) {
+      params.set('maxPrice', maxPrice);
+    } else {
+      params.delete('maxPrice');
+    }
+
+    params.delete('page'); // Reset to page 1
+    router.push(`${pathname}?${params.toString()}`);
+  }, [minPrice, maxPrice, searchParams, pathname, router]);
+
+  const handleInStockToggle = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (inStock) {
+      params.delete('inStock');
+    } else {
+      params.set('inStock', 'true');
+    }
+    params.delete('page');
+    router.push(`${pathname}?${params.toString()}`);
+  }, [inStock, searchParams, pathname, router]);
+
+  const resetFilters = useCallback(() => {
+    setMinPrice('');
+    setMaxPrice('');
+    // Keep only sort param
+    const sort = searchParams.get('sort');
+    const params = new URLSearchParams();
+    if (sort) params.set('sort', sort);
+
+    // If we're on a category page, stay there; otherwise go to /shop
+    router.push(`${pathname}?${params.toString()}`);
+  }, [searchParams, pathname, router]);
+
+  const hasActiveFilters =
+    searchParams.has('minPrice') ||
+    searchParams.has('maxPrice') ||
+    searchParams.has('inStock');
+
+  return (
+    <aside className={cn('space-y-6', className)}>
+      {/* Categories */}
+      <div>
+        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+          Categories
+        </h3>
+        <ul className="space-y-0.5">
+          {categories.map((category) => (
+            <CategoryItem
+              key={category.id}
+              category={category}
+              currentCategorySlug={currentCategorySlug}
+              depth={0}
+            />
+          ))}
+        </ul>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+          Price Range
+        </h3>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400 text-sm">$</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          <span className="text-secondary-300 text-sm">-</span>
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400 text-sm">$</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+        </div>
+        <button
+          onClick={applyFilters}
+          className="mt-2 w-full text-sm py-1.5 bg-primary-500 text-secondary-900 rounded-md hover:bg-primary-400 transition-colors font-medium"
+        >
+          Apply Price
+        </button>
+      </div>
+
+      {/* In Stock Toggle */}
+      <div>
+        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+          Availability
+        </h3>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={inStock}
+            onChange={handleInStockToggle}
+            className="w-4 h-4 rounded border-secondary-300 text-primary-500 focus:ring-primary-300"
+          />
+          <span className="text-sm text-secondary-600">In Stock Only</span>
+        </label>
+      </div>
+
+      {/* Reset */}
+      {hasActiveFilters && (
+        <button
+          onClick={resetFilters}
+          className="w-full text-sm py-2 border border-secondary-200 text-secondary-600 rounded-md hover:bg-secondary-50 transition-colors"
+        >
+          Reset Filters
+        </button>
+      )}
+    </aside>
+  );
+}
