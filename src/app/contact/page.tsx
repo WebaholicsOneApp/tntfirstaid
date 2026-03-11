@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getStoreConfig } from '~/lib/store-config.server';
 import ContactForm from './ContactForm';
@@ -17,8 +18,15 @@ export default async function ContactPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Hero */}
-      <header className="bg-secondary-900 py-16 md:py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
+      <header className="relative py-20 md:py-28 overflow-hidden">
+        <Image
+          src="/images/heroes/contact.jpg"
+          alt="Precision shooting"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/60" />
         <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
           <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
             Reach Out

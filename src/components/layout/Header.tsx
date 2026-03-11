@@ -20,6 +20,7 @@ const navLinks = [
   { href: '/distributors', label: 'Distributors' },
   { href: '/news', label: 'News and Data' },
   { href: '/calculator', label: "Kauber's Wind Constant Calculator" },
+  { href: '/dealer-sign-up', label: 'Dealer Sign Up' },
   { href: '/contact', label: 'Contact' },
 ];
 

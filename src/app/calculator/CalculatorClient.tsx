@@ -1,205 +1,125 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-interface CalculatorInputs {
-  windSpeed: string;
+interface Inputs {
   distance: string;
-  bulletWeight: string;
-  ballisticCoefficient: string;
+  windVelocity: string;
+  softwareMoa: string;
+  fieldConstant: string;
 }
 
-interface CalculatorResult {
-  driftInches: number;
-  driftMoa: number;
+interface Results {
+  trueConstant: number;
+  trueWindDrift: number;
+  fieldConstantDrift: number;
+  deviation: number;
 }
 
-/**
- * Simplified crosswind drift estimation.
- *
- * Uses the approximation:
- *   Drift (inches) = WindSpeed * Range^2 / (BC * BulletWeight * K)
- *
- * where K is a constant tuned to produce reasonable results for typical
- * rifle cartridges. This is a rough estimation -- real drift depends on
- * muzzle velocity, drag model, altitude, temperature, and many other factors.
- *
- * MOA conversion: MOA = (Drift / Range_yards) * (100 / 1.047)
- */
-function calculateWindDrift(
-  windSpeed: number,
-  distanceYards: number,
-  bulletWeight: number,
-  bc: number,
-): CalculatorResult {
-  // Tuning constant to produce reasonable values for common rifle loads
-  const K = 4800;
+function compute(inputs: Inputs): Results | null {
+  const distance = parseFloat(inputs.distance);
+  const windVelocity = parseFloat(inputs.windVelocity);
+  const softwareMoa = parseFloat(inputs.softwareMoa);
+  const fieldConstant = parseFloat(inputs.fieldConstant);
 
-  const driftInches =
-    (windSpeed * distanceYards * distanceYards) / (bc * bulletWeight * K);
+  if (
+    isNaN(distance) || isNaN(windVelocity) || isNaN(softwareMoa) ||
+    distance <= 0 || windVelocity <= 0 || softwareMoa <= 0
+  ) {
+    return null;
+  }
 
-  // Convert to MOA: 1 MOA ~ 1.047 inches per 100 yards
-  const driftMoa = driftInches / ((distanceYards / 100) * 1.047);
+  const yardsInHundreds = distance / 100;
+  const trueConstant = (windVelocity * yardsInHundreds) / softwareMoa;
+  const trueWindDrift = softwareMoa * yardsInHundreds * 1.047;
+  const fc = isNaN(fieldConstant) || fieldConstant <= 0 ? trueConstant : fieldConstant;
+  const fieldMoaCorrection = (windVelocity * yardsInHundreds) / fc;
+  const fieldConstantDrift = fieldMoaCorrection * yardsInHundreds * 1.047;
+  const deviation = fieldConstantDrift - trueWindDrift;
 
   return {
-    driftInches: Math.round(driftInches * 100) / 100,
-    driftMoa: Math.round(driftMoa * 100) / 100,
+    trueConstant: Math.round(trueConstant * 100) / 100,
+    trueWindDrift: Math.round(trueWindDrift * 100) / 100,
+    fieldConstantDrift: Math.round(fieldConstantDrift * 100) / 100,
+    deviation: Math.round(deviation * 100) / 100,
   };
+}
+
+function InputField({ name, value, onChange, placeholder }: {
+  name: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder: string;
+}) {
+  return (
+    <input
+      type="number"
+      name={name}
+      value={value}
+      onChange={onChange}
+      step="any"
+      placeholder={placeholder}
+      className="w-full px-4 py-2.5 bg-white border border-primary-300 rounded-lg text-sm text-center focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20"
+    />
+  );
+}
+
+function OutputField({ value }: { value: string | number }) {
+  return (
+    <div className="w-full px-4 py-2.5 bg-primary-500/15 border border-primary-300 rounded-lg text-sm text-center text-secondary-700 font-medium min-h-[40px]">
+      {value}
+    </div>
+  );
 }
 
 export default function CalculatorClient() {
-  const [inputs, setInputs] = useState<CalculatorInputs>({
-    windSpeed: '',
+  const [inputs, setInputs] = useState<Inputs>({
     distance: '',
-    bulletWeight: '',
-    ballisticCoefficient: '',
+    windVelocity: '',
+    softwareMoa: '',
+    fieldConstant: '',
   });
-  const [result, setResult] = useState<CalculatorResult | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const results = compute(inputs);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputs((prev) => ({ ...prev, [name]: value }));
-    setResult(null);
-  };
+  }, []);
 
-  const handleCalculate = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const windSpeed = parseFloat(inputs.windSpeed);
-    const distance = parseFloat(inputs.distance);
-    const bulletWeight = parseFloat(inputs.bulletWeight);
-    const bc = parseFloat(inputs.ballisticCoefficient);
-
-    if (
-      isNaN(windSpeed) ||
-      isNaN(distance) ||
-      isNaN(bulletWeight) ||
-      isNaN(bc) ||
-      windSpeed <= 0 ||
-      distance <= 0 ||
-      bulletWeight <= 0 ||
-      bc <= 0
-    ) {
-      return;
-    }
-
-    setResult(calculateWindDrift(windSpeed, distance, bulletWeight, bc));
-  };
-
-  const isValid =
-    inputs.windSpeed &&
-    inputs.distance &&
-    inputs.bulletWeight &&
-    inputs.ballisticCoefficient;
+  const rows: { label: string; hint: string; content: React.ReactNode }[] = [
+    { label: 'Distance (Yards)', hint: 'Enter yards in 100 yard increments', content: <InputField name="distance" value={inputs.distance} onChange={handleChange} placeholder="200" /> },
+    { label: 'Wind Velocity (MPH)', hint: 'Enter wind velocity', content: <InputField name="windVelocity" value={inputs.windVelocity} onChange={handleChange} placeholder="10" /> },
+    { label: 'Software Produced MOA Correction', hint: 'Ballistic app MOA correction for above wind', content: <InputField name="softwareMoa" value={inputs.softwareMoa} onChange={handleChange} placeholder="1.1" /> },
+    { label: 'True Constant', hint: 'Will auto-populate', content: <OutputField value={results?.trueConstant ?? ''} /> },
+    { label: 'True Wind Drift (Inches)', hint: 'Will auto-populate', content: <OutputField value={results?.trueWindDrift ?? ''} /> },
+    { label: 'Field Constant', hint: 'Adjust to meet your wind drift deviation limit', content: <InputField name="fieldConstant" value={inputs.fieldConstant} onChange={handleChange} placeholder={results ? String(Math.round(results.trueConstant)) : '18'} /> },
+    { label: 'Field Constant Produced Wind Drift (Inches)', hint: 'Will auto-populate', content: <OutputField value={results?.fieldConstantDrift ?? ''} /> },
+    { label: 'Deviation From True Wind Drift', hint: 'Will auto-populate', content: <OutputField value={results?.deviation ?? ''} /> },
+  ];
 
   return (
     <div>
-      <form onSubmit={handleCalculate} className="space-y-6">
-        <div className="grid sm:grid-cols-2 gap-6">
-          {/* Wind Speed */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
-              Wind Speed (mph)
+      <div className="bg-primary-500 rounded-t-xl px-5 py-3 text-center">
+        <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-secondary-900">
+          Type In Your Metrics Below
+        </h2>
+      </div>
+
+      <div className="bg-primary-500/20 px-5 py-4 space-y-4">
+        {rows.map((row) => (
+          <div key={row.label}>
+            <label className="block text-[10px] font-bold text-secondary-600 uppercase tracking-[0.12em] text-center mb-1.5">
+              {row.label}
             </label>
-            <input
-              type="number"
-              name="windSpeed"
-              value={inputs.windSpeed}
-              onChange={handleChange}
-              min="0"
-              step="0.1"
-              placeholder="10"
-              className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
-            />
-          </div>
-
-          {/* Distance */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
-              Distance (yards)
-            </label>
-            <input
-              type="number"
-              name="distance"
-              value={inputs.distance}
-              onChange={handleChange}
-              min="0"
-              step="1"
-              placeholder="1000"
-              className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
-            />
-          </div>
-
-          {/* Bullet Weight */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
-              Bullet Weight (grains)
-            </label>
-            <input
-              type="number"
-              name="bulletWeight"
-              value={inputs.bulletWeight}
-              onChange={handleChange}
-              min="0"
-              step="0.1"
-              placeholder="140"
-              className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
-            />
-          </div>
-
-          {/* Ballistic Coefficient */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
-              Ballistic Coefficient (G7)
-            </label>
-            <input
-              type="number"
-              name="ballisticCoefficient"
-              value={inputs.ballisticCoefficient}
-              onChange={handleChange}
-              min="0"
-              step="0.001"
-              placeholder="0.310"
-              className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={!isValid}
-          className="w-full py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-colors text-sm uppercase tracking-widest shadow-lg shadow-primary-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Calculate Wind Deflection
-        </button>
-      </form>
-
-      {/* Result */}
-      {result && (
-        <div className="mt-8 bg-secondary-900 rounded-2xl p-8 text-center animate-fade-in">
-          <p className="text-secondary-400 text-xs uppercase tracking-widest mb-6">
-            Estimated Crosswind Deflection
-          </p>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div>
-              <p className="text-4xl font-display font-bold text-primary-500 mb-1">
-                {result.driftInches}&#8243;
-              </p>
-              <p className="text-secondary-400 text-sm">Inches</p>
-            </div>
-            <div>
-              <p className="text-4xl font-display font-bold text-white mb-1">
-                {result.driftMoa}
-              </p>
-              <p className="text-secondary-400 text-sm">MOA</p>
+            <div className="flex items-start gap-3">
+              <div className="flex-1">{row.content}</div>
+              <span className="text-[10px] text-gray-400 leading-tight w-32 pt-2.5 hidden xl:block">
+                {row.hint}
+              </span>
             </div>
           </div>
-          <p className="text-secondary-500 text-xs mt-6">
-            Based on a simplified crosswind drift model. Use as an estimation
-            only.
-          </p>
-        </div>
-      )}
+        ))}
+      </div>
+
+      <div className="bg-primary-500 rounded-b-xl px-5 py-2.5" />
     </div>
   );
 }
