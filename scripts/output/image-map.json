@@ -1,0 +1,806 @@
+[
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/07/Alpha-Box-Reloading-Data.jpg",
+    "localPath": "images/products/AMRC/main.jpg",
+    "sku": "AMRC",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/6GT-Resized.jpg",
+    "localPath": "images/products/AM6mmGT/main.jpg",
+    "sku": "AM6mmGT",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6mmGT/gallery-1.jpeg",
+    "sku": "AM6mmGT",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/09/Rico-Alpha-7mm-SAW-1871-VERT-scaled.jpg",
+    "localPath": "images/products/AM7mmSAW-100-1-1/main.jpg",
+    "sku": "AM7mmSAW-100-1-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM7mmSAW-100-1-1/gallery-1.jpeg",
+    "sku": "AM7mmSAW-100-1-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/E916A12D-6ABA-4289-ACAA-BA63DF7BC4A4-e1648494919370.jpeg",
+    "localPath": "images/products/6mmGT-Tiger-Sticker/main.jpeg",
+    "sku": "6mmGT-Tiger-Sticker",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/Rico-6-PPC-0864-scaled-e1726071617775.jpg",
+    "localPath": "images/products/6PPC-100/main.jpg",
+    "sku": "6PPC-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/6PPC-100/gallery-1.jpeg",
+    "sku": "6PPC-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/Rico-6-PPC-0864-Horz-scaled-e1726071640413.jpg",
+    "localPath": "images/products/6PPC-100/gallery-2.jpg",
+    "sku": "6PPC-100",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-260-REM-LRP-8601.jpg",
+    "localPath": "images/products/AM260REMLRP-100-1/main.jpg",
+    "sku": "AM260REMLRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM260REMLRP-100-1/gallery-1.jpeg",
+    "sku": "AM260REMLRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-260-REM-SRP-8639-2.jpg",
+    "localPath": "images/products/AM260REMSRP-100-1/main.jpg",
+    "sku": "AM260REMSRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM260REMSRP-100-1/gallery-1.jpeg",
+    "sku": "AM260REMSRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2023/02/CENTAUR-e1676315199587.png",
+    "localPath": "images/products/308Centaur-Sticker/main.png",
+    "sku": "308Centaur-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/12/ALPHA-COMIC-COVER_PRINT-scaled.jpg",
+    "localPath": "images/products/A308WINGhost/main.jpg",
+    "sku": "A308WINGhost",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-308-Win-LRP-8636.jpg",
+    "localPath": "images/products/AM308WINLRP-100-1/main.jpg",
+    "sku": "AM308WINLRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM308WINLRP-100-1/gallery-1.jpeg",
+    "sku": "AM308WINLRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-308-WIN-SRP-8667.jpg",
+    "localPath": "images/products/AM308WINSRP-100-1/main.jpg",
+    "sku": "AM308WINSRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM308WINSRP-100-1/gallery-1.jpeg",
+    "sku": "AM308WINSRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/01/ALPHA-MUNITIONS-STICKER_22-ARC_PRINT-FILE_V2.png",
+    "localPath": "images/products/22ARCWolf/main.png",
+    "sku": "22ARCWolf",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/Rico-22-ARC-0835-scaled.jpg",
+    "localPath": "images/products/22ARC-100/main.jpg",
+    "sku": "22ARC-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/22ARC-100/gallery-1.jpeg",
+    "sku": "22ARC-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/Rico-22-ARC-0835-Horz-scaled-e1726093912416.jpg",
+    "localPath": "images/products/22ARC-100/gallery-2.jpg",
+    "sku": "22ARC-100",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/11/Prairie-Dog-e1668726356878.png",
+    "localPath": "images/products/PDogvarminthunter-1/main.png",
+    "sku": "PDogvarminthunter-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-22-CMDR-LRP-8629.jpg",
+    "localPath": "images/products/AM22-1/main.jpg",
+    "sku": "AM22-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM22-1/gallery-1.jpeg",
+    "sku": "AM22-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-22-CDMR-SRP-8685-2.jpg",
+    "localPath": "images/products/AM22100-SRP/main.jpg",
+    "sku": "AM22100-SRP",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM22100-SRP/gallery-1.jpeg",
+    "sku": "AM22100-SRP",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2021/04/IMG_4207-scaled.jpeg",
+    "localPath": "images/products/AM22mmGT/main.jpeg",
+    "sku": "AM22mmGT",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM22mmGT/gallery-1.jpeg",
+    "sku": "AM22mmGT",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/E916A12D-6ABA-4289-ACAA-BA63DF7BC4A4-e1648494919370.jpeg",
+    "localPath": "images/products/6mmGT-Tiger-Sticker/main.jpeg",
+    "sku": "6mmGT-Tiger-Sticker",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2026/03/hf_20260203_011435_0802c7ec-5a9a-4870-bd2e-7a4303d3ca6e-scaled.jpg",
+    "localPath": "images/products/AmmoBox100/main.jpg",
+    "sku": "AmmoBox100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2026/03/EG0A7808-scaled.jpeg",
+    "localPath": "images/products/AmmoBox100/gallery-1.jpeg",
+    "sku": "AmmoBox100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/10/RESIZED-Rico-Alpha-6mm-Dasher-0537-Vert-2.jpeg",
+    "localPath": "images/products/AM6Dasher/main.jpeg",
+    "sku": "AM6Dasher",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6Dasher/gallery-1.jpeg",
+    "sku": "AM6Dasher",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2021/11/DASHER_AM-1-scaled.jpeg",
+    "localPath": "images/products/AM6Dasher/gallery-2.jpeg",
+    "sku": "AM6Dasher",
+    "filename": "gallery-2.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/02/Rico-Alpha-25GT-A-9750-scaled-e1708089582151.jpg",
+    "localPath": "images/products/25GT-100/main.jpg",
+    "sku": "25GT-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/25GT-100/gallery-1.jpeg",
+    "sku": "25GT-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2026/03/WEBMAILERSUBJECT_25-GT-scaled.jpeg",
+    "localPath": "images/products/25GT-100/gallery-2.jpeg",
+    "sku": "25GT-100",
+    "filename": "gallery-2.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/06/WOLF-e1654781699953.png",
+    "localPath": "images/products/22GT-Wolf-Sticker/main.png",
+    "sku": "22GT-Wolf-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/11/CREEDMOOR-STICKER_V1.png",
+    "localPath": "images/products/25ApolloCreedmoor/main.png",
+    "sku": "25ApolloCreedmoor",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/06/Rico-Alpha-22-CDMR-SRP-8685-2v2.jpg",
+    "localPath": "images/products/AM25Creed-SRP/main.jpg",
+    "sku": "AM25Creed-SRP",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM25Creed-SRP/gallery-1.jpeg",
+    "sku": "AM25Creed-SRP",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/11/CREEDMOOR-STICKER_V1.png",
+    "localPath": "images/products/AM25Creed-SRP/gallery-2.png",
+    "sku": "AM25Creed-SRP",
+    "filename": "gallery-2.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/05/TOP-GUN-1-e1715611636127.png",
+    "localPath": "images/products/25GTtopguntigersticker/main.png",
+    "sku": "25GTtopguntigersticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/08/Rico-Alpha-25x47-1-e1724358115917.png",
+    "localPath": "images/products/AM2547-100/main.png",
+    "sku": "AM2547-100",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM2547-100/gallery-1.jpeg",
+    "sku": "AM2547-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/01/ALPHA-MUNITIONS-STICKER_SIZE-DOESNT-MATTER_X-COPY.png",
+    "localPath": "images/products/Sizedoesntmatter/main.png",
+    "sku": "Sizedoesntmatter",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/06/ARES-e1719411908716.png",
+    "localPath": "images/products/6ARCaressticker-1/main.png",
+    "sku": "6ARCaressticker-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/03/Rico-Alpha-6-CDMR-LRP-8623.jpg",
+    "localPath": "images/products/AM6-1/main.jpg",
+    "sku": "AM6-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6-1/gallery-1.jpeg",
+    "sku": "AM6-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-6-CDMR-SRP-8660.jpg",
+    "localPath": "images/products/AM6Creed-SRP-1/main.jpg",
+    "sku": "AM6Creed-SRP-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6Creed-SRP-1/gallery-1.jpeg",
+    "sku": "AM6Creed-SRP-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-65-CDMR-LRP-8607.jpg",
+    "localPath": "images/products/AM65CreedLRP-100-1/main.jpg",
+    "sku": "AM65CreedLRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM65CreedLRP-100-1/gallery-1.jpeg",
+    "sku": "AM65CreedLRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/04/Rico-Alpha-65-CDMR-SRP-8643.jpg",
+    "localPath": "images/products/AM65Creed-SRP-1/main.jpg",
+    "sku": "AM65Creed-SRP-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM65Creed-SRP-1/gallery-1.jpeg",
+    "sku": "AM65Creed-SRP-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/06/EAGLE-2-scaled.jpg",
+    "localPath": "images/products/6_5Creedmoor-tacteagle-Sticker-1/main.jpg",
+    "sku": "6_5Creedmoor-tacteagle-Sticker-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2020/01/6.5-Epstein-Didnt-Kill-Himself.jpg",
+    "localPath": "images/products/AM65EDKH100-1/main.jpg",
+    "sku": "AM65EDKH100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2023/12/Screenshot-2023-12-04-at-5.17.27%E2%80%AFPM.png",
+    "localPath": "images/products/AM65EDKH100-1/gallery-1.png",
+    "sku": "AM65EDKH100-1",
+    "filename": "gallery-1.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2023/12/DA4331FC-B5F8-4956-A1AD-C4604A44AD77-scaled.jpg",
+    "localPath": "images/products/AM65EDKH100-1/gallery-2.jpg",
+    "sku": "AM65EDKH100-1",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/03/Rico-Alpha-65-Grendel-9840-VERT-scaled-e1742500032501.jpg",
+    "localPath": "images/products/AM65Grendel-100-1/main.jpg",
+    "sku": "AM65Grendel-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM65Grendel-100-1/gallery-1.jpeg",
+    "sku": "AM65Grendel-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/03/Rico-Alpha-65-Grendel-9840-Horz-scaled.jpg",
+    "localPath": "images/products/AM65Grendel-100-1/gallery-2.jpg",
+    "sku": "AM65Grendel-100-1",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/03/HANSEL-AND-GRENDEL_DIRTY_REDUX_02-e1741822507373.jpg",
+    "localPath": "images/products/AM65Grendel-100-1/gallery-3.jpg",
+    "sku": "AM65Grendel-100-1",
+    "filename": "gallery-3.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/Rico-Alpha-6.5x47-scaled.jpg",
+    "localPath": "images/products/AM65x47-100/main.jpg",
+    "sku": "AM65x47-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM65x47-100/gallery-1.jpeg",
+    "sku": "AM65x47-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/Untitled_Artwork-scaled.jpg",
+    "localPath": "images/products/AM65x47-100/gallery-2.jpg",
+    "sku": "AM65x47-100",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/Rico-Alpha-6x47-1707-WEB2-e1647469417197.jpg",
+    "localPath": "images/products/AM65x47-100/gallery-3.jpg",
+    "sku": "AM65x47-100",
+    "filename": "gallery-3.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/03/Untitled_Artwork-scaled.jpg",
+    "localPath": "images/products/6_5x47-Uncle_Sam-Sticker/main.jpg",
+    "sku": "6_5x47-Uncle_Sam-Sticker",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/06/6MM-GT-SHIRT-TEST-PRINT-01.png",
+    "localPath": "images/products/6mmGT-TigerII-Sticker/main.png",
+    "sku": "6mmGT-TigerII-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/06/ALPHA-WEB-STICKER_6MM-BR_CIRCLE-2.png",
+    "localPath": "images/products/80sBRBeaver-Sticker-1-1/main.png",
+    "sku": "80sBRBeaver-Sticker-1-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/06/Rico-6ARC-Vert-6370-scaled-e1719323726456.jpg",
+    "localPath": "images/products/6mmARC-100/main.jpg",
+    "sku": "6mmARC-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/6mmARC-100/gallery-1.jpeg",
+    "sku": "6mmARC-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/06/Rico-6ARC-Horz-6370-scaled-e1719323758269.jpg",
+    "localPath": "images/products/6mmARC-100/gallery-2.jpg",
+    "sku": "6mmARC-100",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/06/ARES-e1719411908716.png",
+    "localPath": "images/products/6mmARC-100/gallery-3.png",
+    "sku": "6mmARC-100",
+    "filename": "gallery-3.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/06/BR-Beaver-scaled.jpg",
+    "localPath": "images/products/BRBeaver-Sticker-1/main.jpg",
+    "sku": "BRBeaver-Sticker-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/09/Rico-Alpha-6BR-8959-Vert-scaled.jpeg",
+    "localPath": "images/products/AM6BR-1/main.jpeg",
+    "sku": "AM6BR-1",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6BR-1/gallery-1.jpeg",
+    "sku": "AM6BR-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/06/ALPHA-WEB-STICKER_6MM-BR_CIRCLE-2.png",
+    "localPath": "images/products/AM6BR-1/gallery-2.png",
+    "sku": "AM6BR-1",
+    "filename": "gallery-2.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2020/12/Rico-6BRA-0392-Vert-scaled.jpeg",
+    "localPath": "images/products/AM6BRA/main.jpeg",
+    "sku": "AM6BRA",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM6BRA/gallery-1.jpeg",
+    "sku": "AM6BRA",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/12/ALPHA-MUNITION_PRODUCT-IMAGES_ALPHA-SHIRT_ALPHA-GRAYN_V2-e1735679515979.png",
+    "localPath": "images/products/Mshirt-GS1-1/main.png",
+    "sku": "Mshirt-GS1-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2021/05/Rico-6GT-MOD-Alpha-3980-Vert-scaled.jpg",
+    "localPath": "images/products/ModCase/main.jpg",
+    "sku": "ModCase",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/09/COYOTE-e1663593844830.png",
+    "localPath": "images/products/6Creedmoor-Sticker-1/main.png",
+    "sku": "6Creedmoor-Sticker-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/01/GT-Tiger-Sticker-2024-e1706034436367.jpg",
+    "localPath": "images/products/6mmGT-RT-Sticker-2/main.jpg",
+    "sku": "6mmGT-RT-Sticker-2",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2023/04/APACHE-scaled.jpg",
+    "localPath": "images/products/7SAWApache-Sticker/main.jpg",
+    "sku": "7SAWApache-Sticker",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2021/09/Rico-Alpha-7mmx08-9142-scaled.jpg",
+    "localPath": "images/products/AM7mm08LRP-100-1/main.jpg",
+    "sku": "AM7mm08LRP-100-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM7mm08LRP-100-1/gallery-1.jpeg",
+    "sku": "AM7mm08LRP-100-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/7mm-08-SRP-scaled-e1725406037514.jpg",
+    "localPath": "images/products/AM7mm08LRP-100-1-1/main.jpg",
+    "sku": "AM7mm08LRP-100-1-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM7mm08LRP-100-1-1/gallery-1.jpeg",
+    "sku": "AM7mm08LRP-100-1-1",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/01/Rico-8_6-BLK-Vert_0404-e1708089741351.jpg",
+    "localPath": "images/products/AM86BLK-100/main.jpg",
+    "sku": "AM86BLK-100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2019/09/Case-Head-Tech-logo-FINAL-GOLD-large-white-background-.jpeg",
+    "localPath": "images/products/AM86BLK-100/gallery-1.jpeg",
+    "sku": "AM86BLK-100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/01/MANDRILL-1-e1706660508738.png",
+    "localPath": "images/products/AM86BLK-100/gallery-2.png",
+    "sku": "AM86BLK-100",
+    "filename": "gallery-2.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/09/Rico-Case-Lube-0921-scaled-e1725406239606.jpg",
+    "localPath": "images/products/Alpha-Case-lube/main.jpg",
+    "sku": "Alpha-Case-lube",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/09/Eagle_Land_STICKER.png",
+    "localPath": "images/products/Alpha-Eagle-Sticker/main.png",
+    "sku": "Alpha-Eagle-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/10/ALPHA-HUNTER_MOUNTAIN-LION_STICKER-01.png",
+    "localPath": "images/products/AHLion/main.png",
+    "sku": "AHLion",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/10/ALPHA-HUNTER_RAM.png",
+    "localPath": "images/products/AHSheep-1/main.png",
+    "sku": "AHSheep-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/10/CaseGauge_CM002.jpg",
+    "localPath": "images/products/N_A/main.jpg",
+    "sku": "N_A",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/10/CaseGauge_CM002.jpg",
+    "localPath": "images/products/N_A/main.jpg",
+    "sku": "N_A",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/Rico-Alpha-Crowning-Tool-scaled.jpg",
+    "localPath": "images/products/N_A/main.jpg",
+    "sku": "N_A",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/Rico-Alpha-Roughing-Drill-FIN_2063-scaled.jpg",
+    "localPath": "images/products/N_A/main.jpg",
+    "sku": "N_A",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/02/Rico-Alpha-Straight-Flute-Reamer-no-XC-scaled-e1740416541978.jpg",
+    "localPath": "images/products/Reamers/main.jpg",
+    "sku": "Reamers",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/09/RougherWebImage.jpg",
+    "localPath": "images/products/N_A/main.jpg",
+    "sku": "N_A",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-12.jpg",
+    "localPath": "images/products/AlphaHat-112-L_B/main.jpg",
+    "sku": "AlphaHat-112-L_B",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-11.jpg",
+    "localPath": "images/products/AlphaHat-112-L_B/gallery-1.jpg",
+    "sku": "AlphaHat-112-L_B",
+    "filename": "gallery-1.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-03.jpg",
+    "localPath": "images/products/AlphaHat-112-L_B/gallery-2.jpg",
+    "sku": "AlphaHat-112-L_B",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-18.jpg",
+    "localPath": "images/products/AlphaHat-111-D_K/main.jpg",
+    "sku": "AlphaHat-111-D_K",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-17.jpg",
+    "localPath": "images/products/AlphaHat-111-D_K/gallery-1.jpg",
+    "sku": "AlphaHat-111-D_K",
+    "filename": "gallery-1.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-01.jpg",
+    "localPath": "images/products/AlphaHat-111-D_K/gallery-2.jpg",
+    "sku": "AlphaHat-111-D_K",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-16.jpg",
+    "localPath": "images/products/AlphaHat-111-N_W/main.jpg",
+    "sku": "AlphaHat-111-N_W",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-15.jpg",
+    "localPath": "images/products/AlphaHat-111-N_W/gallery-1.jpg",
+    "sku": "AlphaHat-111-N_W",
+    "filename": "gallery-1.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-02.jpg",
+    "localPath": "images/products/AlphaHat-111-N_W/gallery-2.jpg",
+    "sku": "AlphaHat-111-N_W",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-14.jpg",
+    "localPath": "images/products/AlphaHat-112-OB_N/main.jpg",
+    "sku": "AlphaHat-112-OB_N",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-13.jpg",
+    "localPath": "images/products/AlphaHat-112-OB_N/gallery-1.jpg",
+    "sku": "AlphaHat-112-OB_N",
+    "filename": "gallery-1.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/05/AlphaHatsHiRes-04.jpg",
+    "localPath": "images/products/AlphaHat-112-OB_N/gallery-2.jpg",
+    "sku": "AlphaHat-112-OB_N",
+    "filename": "gallery-2.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/10/AlphaShirt01.png",
+    "localPath": "images/products/Mshirt-GS1-1-1/main.png",
+    "sku": "Mshirt-GS1-1-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/09/ALPHA-MUNITIONS-MIAMI-HEAT-PRINT.png",
+    "localPath": "images/products/Miami_Moose/main.png",
+    "sku": "Miami_Moose",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/05/Rico-Alpha-Spray-Lube-A-5695-FIN2-scaled-e1715966723102.jpg",
+    "localPath": "images/products/Alpha-Case-lube-Spray/main.jpg",
+    "sku": "Alpha-Case-lube-Spray",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/01/ALPHA-SHOOTS-ALPHA-STICKER_UPDATED.png",
+    "localPath": "images/products/Alphasshootalpha/main.png",
+    "sku": "Alphasshootalpha",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/06/BEAVER-e1654781738486.png",
+    "localPath": "images/products/6BRA-Sticker-1/main.png",
+    "sku": "6BRA-Sticker-1",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2021/11/DASHER_AM-1-scaled.jpeg",
+    "localPath": "images/products/Dasher-Beaver-Sticker/main.jpeg",
+    "sku": "Dasher-Beaver-Sticker",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/07/Alpha-Munitions-6mm-Dasher-Clean-No-Border.png",
+    "localPath": "images/products/Dasher-Tacti-Beaver-Sticker/main.png",
+    "sku": "Dasher-Tacti-Beaver-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/11/WASHINGTON-STICKER_V1.png",
+    "localPath": "images/products/FreedomRequiresPrecision/main.png",
+    "sku": "FreedomRequiresPrecision",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2025/03/HANSEL-AND-GRENDEL_DIRTY_REDUX_02-e1741822507373.jpg",
+    "localPath": "images/products/Hansel65Grendel/main.jpg",
+    "sku": "Hansel65Grendel",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/01/MANDRILL-1-e1706660508738.png",
+    "localPath": "images/products/MandrillPI-Sticker/main.png",
+    "sku": "MandrillPI-Sticker",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/06/Rico-Alpha-Reamer-0041-MAIN.jpeg",
+    "localPath": "images/products/N_A/main.jpeg",
+    "sku": "N_A",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2024/10/SUCCESS-STICKER-VERSION-02.png",
+    "localPath": "images/products/Basetotip/main.png",
+    "sku": "Basetotip",
+    "filename": "main.png"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2023/03/THOR-copy-scaled.jpg",
+    "localPath": "images/products/ThorsHammer-Sticker-1/main.jpg",
+    "sku": "ThorsHammer-Sticker-1",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2026/03/hf_20260203_011435_0802c7ec-5a9a-4870-bd2e-7a4303d3ca6e-scaled.jpg",
+    "localPath": "images/products/AmmoBox100/main.jpg",
+    "sku": "AmmoBox100",
+    "filename": "main.jpg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2026/03/EG0A7808-scaled.jpeg",
+    "localPath": "images/products/AmmoBox100/gallery-1.jpeg",
+    "sku": "AmmoBox100",
+    "filename": "gallery-1.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/10/micron_bushing-1-e1666037285437.jpeg",
+    "localPath": "images/products/Micron-Bushings/main.jpeg",
+    "sku": "Micron-Bushings",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/10/micron_3-e1666035177126.jpeg",
+    "localPath": "images/products/Micron-Sizer-Die/main.jpeg",
+    "sku": "Micron-Sizer-Die",
+    "filename": "main.jpeg"
+  },
+  {
+    "remoteUrl": "https://alphamunitions.com/wp-content/uploads/2022/10/micron_2-e1666035196448.jpeg",
+    "localPath": "images/products/Micron-Sizer-Die/gallery-1.jpeg",
+    "sku": "Micron-Sizer-Die",
+    "filename": "gallery-1.jpeg"
+  }
+]
