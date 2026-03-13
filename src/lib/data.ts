@@ -67,6 +67,39 @@ export async function coalesceRequest<T>(cacheKey: string, fn: () => Promise<T>)
   return promise;
 }
 
+// ============================================
+// FALLBACK CATEGORIES: Keyword-based category assignment
+// Used when store_product_categories has no rows for this store.
+// Negative IDs distinguish fallback categories from real DB categories.
+// ============================================
+const FALLBACK_CATEGORIES: Array<{
+  id: number;
+  categoryName: string;
+  keywords: RegExp;
+}> = [
+  { id: -1, categoryName: 'Brass', keywords: /SRP|LRP|primer|grendel|dasher|creedmoor|^6mm|^6\.5|^7mm|^\.2[26]|^\.30[08]|^8\.6|^25|brass|cartridge/i },
+  { id: -2, categoryName: 'Reamers/Gunsmithing', keywords: /reamer|die|sizer|mandrel|gunsmith/i },
+  { id: -3, categoryName: 'Loading Bench', keywords: /bench|press|tool|gauge|comp|micron|powder|scale|funnel/i },
+  { id: -4, categoryName: 'Apparel', keywords: /shirt|hat|hoodie|beanie|cap|tee|polo|jacket|vest/i },
+  { id: -5, categoryName: 'Stickers', keywords: /sticker|decal|patch/i },
+  { id: -6, categoryName: 'Modified Cases', keywords: /modified case/i },
+];
+
+/**
+ * Get the regex pattern for a set of fallback category IDs.
+ * Returns a combined pattern string for use in SQL ~* operator.
+ */
+function getFallbackCategoryPattern(categoryIds: number[]): string | null {
+  const patterns: string[] = [];
+  for (const id of categoryIds) {
+    const cat = FALLBACK_CATEGORIES.find(c => c.id === id);
+    if (cat) {
+      patterns.push(cat.keywords.source);
+    }
+  }
+  return patterns.length > 0 ? patterns.join('|') : null;
+}
+
 /**
  * Get the set of product IDs in the catalogue feed.
  * Cached for 5 minutes since the feed rarely changes.
@@ -481,9 +514,10 @@ export async function getCategoryTreeForStorefront(): Promise<CategoryWithChildr
 async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
   const cacheKey = 'categoryTree';
 
-  // Get all categories first to build lookup
+  // Get all categories first to build lookup (filtered by company to exclude unrelated categories)
   const allCategories = await knex(tableNames.channelCategories)
     .select('*')
+    .where('companyId', STOREFRONT_COMPANY_ID)
     .orderBy('categoryName', 'asc');
 
   // Find ALL root category IDs (deduplicate by name, prefer lowest ID — the original with products)
@@ -694,9 +728,78 @@ async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
   // Note: Product counts are already calculated as DISTINCT products per category tree
   // (including all descendants) in the countMap above, so no aggregation needed here
 
+  // FALLBACK: If all product counts are 0 (store_product_categories empty),
+  // use keyword-based categories derived from product names in the catalogue feed.
+  const totalProducts = rootCategories.reduce((sum, cat) => sum + (cat.productCount || 0), 0);
+  if (totalProducts === 0) {
+    const fallbackTree = await _buildFallbackCategoryTree();
+    if (fallbackTree.length > 0) {
+      setCache(cacheKey, fallbackTree);
+      return fallbackTree;
+    }
+  }
+
   // Cache the result
   setCache(cacheKey, rootCategories);
   return rootCategories;
+}
+
+/**
+ * Build a fallback category tree using keyword matching on product names.
+ * Used when store_product_categories has no rows for this store.
+ */
+async function _buildFallbackCategoryTree(): Promise<CategoryWithChildren[]> {
+  // Fetch all product names from the catalogue feed
+  let query = knex(tableNames.storeProducts)
+    .select(`${tableNames.storeProducts}.id`, `${tableNames.storeProducts}.name`)
+    .join(`${tableNames.catalogueFeed} as cf`, 'cf.productId', `${tableNames.storeProducts}.id`)
+    .whereNull(`${tableNames.storeProducts}.deactivatedAt`);
+
+  if (STOREFRONT_STORE_ID) {
+    query = query.where(`${tableNames.storeProducts}.storeId`, STOREFRONT_STORE_ID);
+  }
+
+  const products = await query;
+
+  // Match each product to fallback categories
+  const categoryCounts = new Map<number, number>();
+  for (const cat of FALLBACK_CATEGORIES) {
+    categoryCounts.set(cat.id, 0);
+  }
+
+  for (const product of products) {
+    const name = product.name || '';
+    for (const cat of FALLBACK_CATEGORIES) {
+      if (cat.keywords.test(name)) {
+        categoryCounts.set(cat.id, (categoryCounts.get(cat.id) || 0) + 1);
+      }
+    }
+  }
+
+  // Build CategoryWithChildren objects for categories that have products
+  const result: CategoryWithChildren[] = [];
+  for (const cat of FALLBACK_CATEGORIES) {
+    const count = categoryCounts.get(cat.id) || 0;
+    if (count === 0) continue;
+
+    result.push({
+      id: cat.id,
+      categoryName: cat.categoryName,
+      parentCategoryId: null,
+      amazonCategoryId: null,
+      walmartCategoryId: null,
+      wooCommerceCategoryId: null,
+      ebayCategoryId: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      children: [],
+      productCount: count,
+      mergedCategoryIds: [cat.id],
+    });
+  }
+
+  result.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
+  return result;
 }
 
 
@@ -704,9 +807,10 @@ async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
  * Get nested category tree for mega menu navigation
  */
 export async function getNestedCategoryTree(): Promise<CategoryWithChildren[]> {
-  // Get all categories
+  // Get all categories (filtered by company)
   const allCategories = await knex(tableNames.channelCategories)
     .select('*')
+    .where('companyId', STOREFRONT_COMPANY_ID)
     .orderBy('categoryName', 'asc');
 
   // Get product counts per category
@@ -856,13 +960,24 @@ export async function getPriceRange(
       }
 
       if (allCategoryIds && allCategoryIds.length > 0) {
-        idsQuery = idsQuery.whereExists(function () {
-          this.select(knex.raw('1'))
-            .from(`${tableNames.storeProductCategories} as spc`)
-            .whereRaw('"spc"."storeProductId" = sp.id')
-            .whereIn('spc.channelCategoryId', allCategoryIds)
-            .whereNull('spc.deletedAt');
-        });
+        const fallbackIds = allCategoryIds.filter(id => id < 0);
+        const realIds = allCategoryIds.filter(id => id > 0);
+
+        if (fallbackIds.length > 0) {
+          // Fallback categories: match product names with keyword regex
+          const pattern = getFallbackCategoryPattern(fallbackIds);
+          if (pattern) {
+            idsQuery = idsQuery.whereRaw('sp.name ~* ?', [pattern]);
+          }
+        } else if (realIds.length > 0) {
+          idsQuery = idsQuery.whereExists(function () {
+            this.select(knex.raw('1'))
+              .from(`${tableNames.storeProductCategories} as spc`)
+              .whereRaw('"spc"."storeProductId" = sp.id')
+              .whereIn('spc.channelCategoryId', realIds)
+              .whereNull('spc.deletedAt');
+          });
+        }
       }
 
       if (allBrandIds && allBrandIds.length > 0) {
@@ -1044,8 +1159,12 @@ async function getProductsUncached(
   // Brand filtering uses EXISTS subqueries (not LEFT JOIN) to avoid row multiplication
   // LEFT JOIN causes N rows per product (1 per variation), making DISTINCT + ORDER BY + LIMIT slow
 
+  // Check if using fallback categories (negative IDs = keyword-based matching)
+  const isFallbackCategory = categoryIds?.some(id => id < 0) || (categoryId != null && categoryId < 0);
+
   // Join categories if we need to filter by them OR if we're searching (to search category names)
-  const needsCategoryJoin = !sanitizedSearch && ((categoryIds && categoryIds.length > 0) || !!categoryId);
+  // Skip category join for fallback categories — they use product name regex instead
+  const needsCategoryJoin = !isFallbackCategory && !sanitizedSearch && ((categoryIds && categoryIds.length > 0) || !!categoryId);
   if (needsCategoryJoin) {
     idsQuery = idsQuery
       .leftJoin(
@@ -1065,11 +1184,21 @@ async function getProductsUncached(
     }
   }
 
+  // Fallback category filtering: match product names with keyword regex
+  if (isFallbackCategory) {
+    const fallbackIds = categoryIds?.filter(id => id < 0) ?? (categoryId != null && categoryId < 0 ? [categoryId] : []);
+    const pattern = getFallbackCategoryPattern(fallbackIds);
+    if (pattern) {
+      idsQuery = idsQuery.whereRaw(`${tableNames.storeProducts}.name ~* ?`, [pattern]);
+    }
+  }
+
   // Apply filters to the IDs query
   // When search is active, LEFT JOINs are skipped — use EXISTS subqueries instead
   if (sanitizedSearch) {
     // Category filter via EXISTS (no LEFT JOIN available during search)
-    if (categoryIds && categoryIds.length > 0) {
+    // Skip for fallback categories (already handled above)
+    if (!isFallbackCategory && categoryIds && categoryIds.length > 0) {
       idsQuery = idsQuery.whereExists(function () {
         this.select(knex.raw('1'))
           .from(`${tableNames.storeProductCategories} as spc_f`)
@@ -1077,7 +1206,7 @@ async function getProductsUncached(
           .whereNull('spc_f.deletedAt')
           .whereIn('spc_f.channelCategoryId', categoryIds);
       });
-    } else if (categoryId) {
+    } else if (!isFallbackCategory && categoryId) {
       idsQuery = idsQuery.whereExists(function () {
         this.select(knex.raw('1'))
           .from(`${tableNames.storeProductCategories} as spc_f`)
@@ -1143,9 +1272,10 @@ async function getProductsUncached(
     });
   } else {
     // Non-search path: use direct column references from LEFT JOINs
-    if (categoryIds && categoryIds.length > 0) {
+    // Skip for fallback categories (already handled above via regex)
+    if (!isFallbackCategory && categoryIds && categoryIds.length > 0) {
       idsQuery = idsQuery.whereIn(`${tableNames.storeProductCategories}.channelCategoryId`, categoryIds);
-    } else if (categoryId) {
+    } else if (!isFallbackCategory && categoryId) {
       idsQuery = idsQuery.where(`${tableNames.storeProductCategories}.channelCategoryId`, categoryId);
     }
 
