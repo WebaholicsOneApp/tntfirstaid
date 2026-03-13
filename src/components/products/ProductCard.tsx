@@ -37,7 +37,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       )}
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-t-lg bg-secondary-50">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-t-lg bg-secondary-50">
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -84,6 +84,13 @@ export default function ProductCard({ product, className }: ProductCardProps) {
         <div className="mt-2">
           <StockBadge inStock={product.inStock} />
         </div>
+
+        {/* Select options link */}
+        {product.variationCount > 1 && (
+          <p className="mt-1.5 text-xs text-primary-600 font-medium uppercase tracking-wider">
+            Select options
+          </p>
+        )}
       </div>
     </Link>
   );
