@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { pgKnex as knex, STOREFRONT_CHANNEL_ID, tableNames } from '~/lib/db';
+import { getApiClient } from '~/lib/api-client';
 import { sendOrderNotification } from '~/lib/notifications';
 import type { FulfillmentPayload, FulfillmentResponse, OrderWithCustomerInfo } from '~/types/fulfillment';
 
@@ -31,70 +31,57 @@ function getImageDomainScore(url: string): number {
 }
 
 async function getProductImage(productId: number, variationId: number | null): Promise<string | null> {
-  // 1. Try the specific variation image
-  if (variationId) {
-    const varImage = await knex(tableNames.variationImages)
-      .select('imageUrl')
-      .where('variationId', variationId)
-      .whereNull('deletedAt')
-      .first();
-    if (varImage?.imageUrl) {
-      const url = Array.isArray(varImage.imageUrl) ? varImage.imageUrl[0] : varImage.imageUrl;
-      if (url && isValidProductImage(url)) return url;
-    }
-  }
+  try {
+    const api = getApiClient();
+    const response = await api.getProductBySlug<any>(`__id_${productId}`).catch(async () => {
+      // Fall back to products endpoint with productId filter
+      return api.get<any>('/products', { productIds: String(productId), limit: 1 });
+    });
 
-  // 2. Fall back to product-level images (sorted by domain reliability)
-  if (productId) {
-    const prodImages = await knex(tableNames.productImages)
-      .select('imageUrl')
-      .where('productId', productId)
-      .whereNull('deletedAt')
-      .orderBy('sortOrder', 'asc');
+    // Try to extract image from the API response
+    const product = response?.product ?? response?.data?.[0] ?? response;
+    if (!product) return null;
 
-    const validProdUrls = prodImages
-      .map((img: any) => Array.isArray(img.imageUrl) ? img.imageUrl[0] : img.imageUrl)
-      .filter((url: string) => url && isValidProductImage(url));
-
-    if (validProdUrls.length > 0) {
-      validProdUrls.sort((a: string, b: string) => getImageDomainScore(a) - getImageDomainScore(b));
-      return validProdUrls[0];
-    }
-  }
-
-  // 3. Fall back to ALL variation images for this product (not just the specific variationId)
-  if (productId) {
-    const allVariationIds = await knex(tableNames.variations)
-      .select('id')
-      .where('productId', productId)
-      .whereNull('deletedAt');
-
-    const varIds = allVariationIds.map((v: any) => v.id);
-    if (varIds.length > 0) {
-      const allVarImages = await knex(tableNames.variationImages)
-        .select('imageUrl')
-        .whereIn('variationId', varIds)
-        .whereNull('deletedAt');
-
-      const validVarUrls = allVarImages
-        .map((img: any) => Array.isArray(img.imageUrl) ? img.imageUrl[0] : img.imageUrl)
-        .filter((url: string) => url && isValidProductImage(url));
-
-      if (validVarUrls.length > 0) {
-        validVarUrls.sort((a: string, b: string) => getImageDomainScore(a) - getImageDomainScore(b));
-        return validVarUrls[0];
+    // Try variation-specific image first
+    if (variationId && product.variations) {
+      const variation = product.variations.find((v: any) => v.id === variationId);
+      if (variation?.images?.length) {
+        const validUrls = variation.images.filter(isValidProductImage);
+        if (validUrls.length > 0) {
+          validUrls.sort((a: string, b: string) => getImageDomainScore(a) - getImageDomainScore(b));
+          return validUrls[0];
+        }
       }
     }
-  }
 
-  return null;
+    // Fall back to product-level image
+    if (product.images?.length) {
+      const validUrls = product.images.filter(isValidProductImage);
+      if (validUrls.length > 0) {
+        validUrls.sort((a: string, b: string) => getImageDomainScore(a) - getImageDomainScore(b));
+        return validUrls[0];
+      }
+    }
+
+    // Fall back to primaryImage
+    if (product.primaryImage && isValidProductImage(product.primaryImage)) {
+      return product.primaryImage;
+    }
+    if (product.imageUrl && isValidProductImage(product.imageUrl)) {
+      return product.imageUrl;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /**
  * POST /api/orders/fulfillment
  *
  * Webhook endpoint called by OneApp when order status changes.
- * Updates order status in database and sends email notifications.
+ * Sends email notifications to customers.
  */
 export async function POST(req: Request): Promise<NextResponse<FulfillmentResponse>> {
   console.log('\n========================================');
@@ -148,28 +135,22 @@ export async function POST(req: Request): Promise<NextResponse<FulfillmentRespon
       );
     }
 
-    // 4. Look up order (must be Storefront channel)
-    const order = await knex('orders')
-      .select([
-        'orders.id',
-        'orders.channelId',
-        'orders.orderStatus',
-        'orders.shippingName',
-        'orders.addressLine1',
-        'orders.addressLine2',
-        'orders.city',
-        'orders.state',
-        'orders.zipCode',
-        'orders.country',
-      ])
-      .where('orders.id', payload.orderId)
-      .where('orders.channelId', STOREFRONT_CHANNEL_ID)
-      .first() as OrderWithCustomerInfo | undefined;
+    // 4. Look up order via OneApp API
+    let order: OrderWithCustomerInfo | undefined;
+    try {
+      const api = getApiClient();
+      const orderData = await api.get<any>(`/orders/${payload.orderId}`);
+      if (orderData && orderData.id) {
+        order = orderData as OrderWithCustomerInfo;
+      }
+    } catch {
+      // order not found
+    }
 
     if (!order) {
-      console.error(`[FULFILLMENT] Order ${payload.orderId} not found or not a Storefront order`);
+      console.error(`[FULFILLMENT] Order ${payload.orderId} not found`);
       return NextResponse.json(
-        { success: false, error: 'Order not found or not a Storefront order' },
+        { success: false, error: 'Order not found' },
         { status: 404 }
       );
     }
@@ -177,63 +158,31 @@ export async function POST(req: Request): Promise<NextResponse<FulfillmentRespon
     console.log(`[FULFILLMENT] Order found: ${order.id}`);
     console.log(`[FULFILLMENT] Current status: ${order.orderStatus}`);
 
-    // 5. Get customer email from order_notes.metadata
-    const orderNote = await knex('order_notes')
-      .select('metadata')
-      .where('orderId', payload.orderId)
-      .where('type', 'system')
-      .whereRaw(`metadata->>'customerEmail' IS NOT NULL`)
-      .first();
-
-    const customerEmail = orderNote?.metadata?.customerEmail;
+    // 5. Extract customer email from order data
+    const customerEmail = (order as any).customerEmail ?? (order as any).email;
 
     if (!customerEmail) {
       console.warn(`[FULFILLMENT] No customer email found for order ${payload.orderId}`);
-    } else {
-      console.log(`[FULFILLMENT] Customer email: ${customerEmail}`);
-    }
-
-    // Note: Database updates (order status, tracking info, order notes) are handled by OneApp
-    // This webhook only sends email notifications to customers
-
-    // 6. Send email notification
-    if (!customerEmail) {
-      console.log('[FULFILLMENT] No customer email - skipping notification');
       return NextResponse.json({
         success: true,
         message: `No customer email for order ${payload.orderId} - notification skipped`,
       });
     }
 
-    // Get order items with product name and variation for email
-    const orderItems = await knex('order_items')
-      .select([
-        'order_items.id',
-        'order_items.productId',
-        'order_items.variationId',
-        'order_items.listingSku',
-        'order_items.quantity',
-        'order_items.itemPrice',
-        'order_items.supplierTrackingNo',
-        'order_items.supplierTrackingCarrier',
-        'store_products.name as productName',
-        'variations.variation as variationName',
-      ])
-      .leftJoin('store_products', 'store_products.id', 'order_items.productId')
-      .leftJoin('variations', 'variations.id', 'order_items.variationId')
-      .where('order_items.orderId', payload.orderId);
+    console.log(`[FULFILLMENT] Customer email: ${customerEmail}`);
 
-    // Fetch images for each item
+    // 6. Get order items with images
+    const rawItems: any[] = (order as any).items ?? payload.items ?? [];
     const itemsWithImages = await Promise.all(
-      orderItems.map(async (item) => {
+      rawItems.map(async (item: any) => {
         const imageUrl = await getProductImage(item.productId, item.variationId);
         return {
-          name: item.productName || item.listingSku,
-          variationName: item.variationName || undefined,
-          sku: item.listingSku || undefined,
+          name: item.productName || item.name || item.listingSku,
+          variationName: item.variationName || item.variation || undefined,
+          sku: item.listingSku || item.sku || undefined,
           imageUrl: imageUrl || undefined,
           quantity: item.quantity,
-          price: item.itemPrice,
+          price: item.itemPrice || item.price,
         };
       })
     );

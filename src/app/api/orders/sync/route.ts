@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createOrder, getOrderByStripeSession } from '~/lib/orders';
 import { sendOrderConfirmationEmail } from '~/lib/notifications/email-service';
-import { pgKnex as knex, tableNames } from '~/lib/db';
+import { getApiClient } from '~/lib/api-client';
 
 // Lazy initialize Stripe
 let stripe: Stripe | null = null;
@@ -95,34 +95,29 @@ export async function POST(request: Request) {
       const unitTax = Math.round(totalLineTax / quantity);
 
       const productId = parseInt(metadata.productId || '0', 10);
-
-      // Fetch product image from database (same approach as storefront)
-      let imageUrl = product?.images?.[0] || metadata.imageUrl || null;
       const variationId = parseInt(metadata.variationId || '0', 10);
 
-      if (!imageUrl) {
-        // First try variation image
-        if (variationId) {
-          const varImage = await knex(tableNames.variationImages)
-            .select('imageUrl')
-            .where('variationId', variationId)
-            .whereNull('deletedAt')
-            .first();
-          if (varImage?.imageUrl) {
-            imageUrl = Array.isArray(varImage.imageUrl) ? varImage.imageUrl[0] : varImage.imageUrl;
-          }
-        }
+      // Fetch product image via API (fallback to Stripe-provided image or metadata)
+      let imageUrl = product?.images?.[0] || metadata.imageUrl || null;
 
-        // Fall back to product image
-        if (!imageUrl && productId) {
-          const prodImage = await knex(tableNames.productImages)
-            .select('imageUrl')
-            .where('productId', productId)
-            .whereNull('deletedAt')
-            .first();
-          if (prodImage?.imageUrl) {
-            imageUrl = Array.isArray(prodImage.imageUrl) ? prodImage.imageUrl[0] : prodImage.imageUrl;
+      if (!imageUrl && productId) {
+        try {
+          const api = getApiClient();
+          const resp = await api.get<any>('/products', { productIds: String(productId), limit: 1 });
+          const productData = resp?.data?.[0];
+          if (productData) {
+            // Try variation-specific image first
+            if (variationId && productData.variations) {
+              const variation = productData.variations.find((v: any) => v.id === variationId);
+              if (variation?.images?.[0]) imageUrl = variation.images[0];
+            }
+            // Fall back to product image
+            if (!imageUrl) {
+              imageUrl = productData.primaryImage ?? productData.imageUrl ?? productData.images?.[0] ?? null;
+            }
           }
+        } catch {
+          // Image is non-critical — proceed without it
         }
       }
 

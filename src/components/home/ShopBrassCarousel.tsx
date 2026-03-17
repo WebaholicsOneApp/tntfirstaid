@@ -149,7 +149,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
             <div className="mt-8">
               <Link
                 href="/shop"
-                className="inline-block bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm tracking-[0.15em] uppercase px-10 py-4 transition-colors duration-200"
+                className="inline-block bg-primary-500 hover:bg-primary-600 rounded-md text-white font-semibold text-sm tracking-[0.15em] uppercase px-10 py-4 transition-colors duration-200"
               >
                 SHOP ALL BRASS
               </Link>

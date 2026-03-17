@@ -236,5 +236,5 @@ export interface CategorySuggestion {
 export interface SearchSuggestionsResponse {
   products: ProductSuggestion[];
   categories: CategorySuggestion[];
-  queryType: 'sku' | 'keyword';
+  queryType: 'sku' | 'keyword' | 'ymm';
 }

@@ -41,7 +41,7 @@ export default function HeroSection() {
           {/* Shop button */}
           <Link
             href="/shop"
-            className={`group relative inline-block overflow-hidden border-2 border-primary-500 font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-all duration-700 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            className={`group relative inline-block overflow-hidden border-2 border-primary-500 rounded-md font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-all duration-700 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           >
             {/* Sweep layer */}
             <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />

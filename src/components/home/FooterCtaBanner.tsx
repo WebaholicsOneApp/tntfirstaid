@@ -27,14 +27,14 @@ export default function FooterCtaBanner() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/shop"
-                className="group relative inline-block overflow-hidden border-2 border-primary-500 font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-colors duration-200"
+                className="group relative inline-block overflow-hidden border-2 border-primary-500 rounded-md font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-colors duration-200"
               >
                 <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
                 <span className="relative z-10 text-white transition-colors duration-500 group-hover:text-secondary-900">SHOP</span>
               </Link>
               <Link
                 href="/news"
-                className="group relative inline-block overflow-hidden border-2 border-primary-500 font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-colors duration-200"
+                className="group relative inline-block overflow-hidden border-2 border-primary-500 rounded-md font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-colors duration-200"
               >
                 <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
                 <span className="relative z-10 text-white transition-colors duration-500 group-hover:text-secondary-900">NEWS</span>

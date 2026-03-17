@@ -1,12 +1,9 @@
 /**
  * Order Management
- * Proxies order creation to OneApp (storefront is read-only)
+ * All order operations proxy through the OneApp Storefront API.
+ * No direct database access.
  */
-import { pgKnex as knex, STOREFRONT_COMPANY_ID, STOREFRONT_STORE_ID } from './db';
-
-function getOneAppApiUrl(): string {
-  return process.env.ONEAPP_API_URL || 'http://localhost:3001';
-}
+import { getApiClient } from './api-client';
 
 interface OrderItemInput {
   variationId: number;
@@ -43,6 +40,8 @@ interface CreateOrderInput {
   phoneNumber?: string;
 }
 
+export type { OrderItemInput, ShippingAddress, CreateOrderInput };
+
 /**
  * Create an order by proxying to OneApp API
  */
@@ -53,46 +52,12 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderId: n
   console.log(`[ORDER] Items Count: ${input.items.length}`);
   console.log(`[ORDER] Total: $${(input.total / 100).toFixed(2)}`);
 
-  // Determine store ID (read-only query is fine)
-  let storeId = STOREFRONT_STORE_ID;
-  if (!storeId) {
-    const store = await knex('stores')
-      .where('companyId', STOREFRONT_COMPANY_ID)
-      .first();
-    storeId = store?.id || null;
-  }
-
-  if (!storeId) {
-    console.error('[ORDER] Unable to determine store ID');
-    return null;
-  }
-
-  const oneAppUrl = getOneAppApiUrl();
-  console.log(`[ORDER] Proxying to OneApp: ${oneAppUrl}/api/v1/orders/storefront-create`);
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
-
   try {
-    const response = await fetch(`${oneAppUrl}/api/v1/orders/storefront-create`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        ...input,
-        storeId,
-        companyId: STOREFRONT_COMPANY_ID,
-      }),
-    });
+    const api = getApiClient();
+    const result = await api.post<any>('/orders/storefront-create', input);
 
-    clearTimeout(timeout);
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('[ORDER] OneApp error:', result.error || result);
+    if (!result || !result.orderId) {
+      console.error('[ORDER] OneApp returned invalid result:', result);
       return null;
     }
 
@@ -104,27 +69,19 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderId: n
       orderId: result.orderId,
       orderNumber: result.orderNumber,
     };
-  } catch (fetchError: any) {
-    clearTimeout(timeout);
-    if (fetchError.name === 'AbortError') {
-      console.error('[ORDER] OneApp request timed out');
-    } else {
-      console.error('[ORDER] OneApp fetch error:', fetchError.message);
-    }
+  } catch (error) {
+    console.error('[ORDER] OneApp fetch error:', error instanceof Error ? error.message : error);
     return null;
   }
 }
 
 /**
- * Get order by Stripe payment intent ID (read-only query)
- * OneApp stores the payment intent ID in channelOrderId, not the session ID
+ * Get order by Stripe payment intent ID via OneApp API
  */
 export async function getOrderByPaymentIntent(paymentIntentId: string): Promise<any | null> {
   try {
-    const order = await knex('orders')
-      .where('channelOrderId', paymentIntentId)
-      .first();
-
+    const api = getApiClient();
+    const order = await api.getOrderBySession(paymentIntentId);
     return order || null;
   } catch (error) {
     console.error('Error getting order by payment intent:', error);
@@ -134,15 +91,11 @@ export async function getOrderByPaymentIntent(paymentIntentId: string): Promise<
 
 /**
  * @deprecated Use getOrderByPaymentIntent instead.
- * Legacy function kept for backward compatibility with sync route.
- * Note: channelOrderId stores payment intent IDs (pi_...), not session IDs (cs_...).
  */
 export async function getOrderByStripeSession(sessionId: string): Promise<any | null> {
   try {
-    const order = await knex('orders')
-      .where('channelOrderId', sessionId)
-      .first();
-
+    const api = getApiClient();
+    const order = await api.getOrderBySession(sessionId);
     return order || null;
   } catch (error) {
     console.error('Error getting order by Stripe session:', error);
@@ -151,14 +104,12 @@ export async function getOrderByStripeSession(sessionId: string): Promise<any | 
 }
 
 /**
- * Get order by ID (read-only query)
+ * Get order by ID via OneApp API
  */
 export async function getOrderById(orderId: number): Promise<any | null> {
   try {
-    const order = await knex('orders')
-      .where('id', orderId)
-      .first();
-
+    const api = getApiClient();
+    const order = await api.get<any>(`/orders/${orderId}`);
     return order || null;
   } catch (error) {
     console.error('Error getting order by ID:', error);

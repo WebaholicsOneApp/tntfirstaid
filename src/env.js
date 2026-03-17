@@ -5,26 +5,9 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
 
-    // Database (legacy direct-DB approach — optional when using OneApp API)
-    PG_HOST: z.string().optional(),
-    PG_USER: z.string().optional(),
-    PG_PASS: z.string().optional(),
-    PG_DB: z.string().optional(),
-    PG_PORT: z.string().default("5432"),
-    PG_SSL_REJECT_UNAUTHORIZED: z.string().default("false"),
-
     // Stripe (server-side — optional when OneApp handles payments)
     STRIPE_SECRET_KEY: z.string().optional(),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
-
-    // Storefront IDs (legacy — optional when using OneApp API)
-    STOREFRONT_COMPANY_ID: z.string().optional(),
-    STOREFRONT_CHANNEL_ID: z.string().default("6"),
-    STOREFRONT_STORE_ID: z.string().optional(),
-    STORE_CHANNEL_ID: z.string().optional(),
-
-    // Catalogue Feed
-    CATALOGUE_FEED_TABLE: z.string().optional(),
 
     // OneApp Backend
     ONEAPP_API_URL: z.string().url(),
@@ -61,27 +44,10 @@ export const env = createEnv({
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
 
-    // Database
-    PG_HOST: process.env.PG_HOST,
-    PG_USER: process.env.PG_USER,
-    PG_PASS: process.env.PG_PASS,
-    PG_DB: process.env.PG_DB,
-    PG_PORT: process.env.PG_PORT,
-    PG_SSL_REJECT_UNAUTHORIZED: process.env.PG_SSL_REJECT_UNAUTHORIZED,
-
     // Stripe
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-
-    // Storefront IDs
-    STOREFRONT_COMPANY_ID: process.env.STOREFRONT_COMPANY_ID,
-    STOREFRONT_CHANNEL_ID: process.env.STOREFRONT_CHANNEL_ID,
-    STOREFRONT_STORE_ID: process.env.STOREFRONT_STORE_ID,
-    STORE_CHANNEL_ID: process.env.STORE_CHANNEL_ID,
-
-    // Catalogue Feed
-    CATALOGUE_FEED_TABLE: process.env.CATALOGUE_FEED_TABLE,
 
     // OneApp Backend
     ONEAPP_API_URL: process.env.ONEAPP_API_URL,
