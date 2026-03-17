@@ -24,7 +24,7 @@ export default function MegaMenu({ categories, onClose }: MegaMenuProps) {
   return (
     <div className="absolute left-0 right-0 top-full bg-white shadow-2xl border-t-2 border-primary-500 z-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
           {displayCategories.map((category) => (
             <div key={category.id} className="space-y-2">
               <Link

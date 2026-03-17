@@ -12,7 +12,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden -mt-24">
+    <section className="relative overflow-hidden">
       {/* Background image */}
       <div className="relative h-[60vh] sm:h-[70vh] min-h-[400px] sm:min-h-[500px] max-h-[800px]">
         <Image
@@ -41,9 +41,14 @@ export default function HeroSection() {
           {/* Shop button */}
           <Link
             href="/shop"
-            className={`inline-block border-2 border-white text-white hover:bg-white hover:text-secondary-800 font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-all duration-700 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            className={`group relative inline-block overflow-hidden border-2 border-primary-500 font-semibold text-sm tracking-[0.2em] uppercase px-12 py-4 transition-all duration-700 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           >
-            SHOP
+            {/* Sweep layer */}
+            <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+            {/* Text */}
+            <span className="relative z-10 text-white transition-colors duration-500 group-hover:text-secondary-900">
+              SHOP
+            </span>
           </Link>
         </div>
       </div>

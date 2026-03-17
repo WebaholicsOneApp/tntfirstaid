@@ -107,19 +107,22 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                 return (
                   <div
                     key={link.href}
-                    className="relative flex items-center"
+                    className="group relative flex items-center"
                     onMouseEnter={handleShopEnter}
                     onMouseLeave={handleShopLeave}
                   >
                     <Link
                       href={link.href}
-                      className={`px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
+                      className={`relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
                         megaMenuOpen
                           ? 'text-white'
                           : 'text-primary-400 hover:text-white'
                       }`}
                     >
                       {link.label}
+                      <span className={`absolute bottom-0 left-0 h-[2px] bg-primary-500 transition-[width] duration-300 ${
+                        megaMenuOpen ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`} />
                     </Link>
                   </div>
                 );
@@ -128,7 +131,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                 return (
                   <div
                     key={link.href}
-                    className="relative"
+                    className="group relative"
                     onMouseEnter={() => {
                       if (contactDropdownTimeoutRef.current) clearTimeout(contactDropdownTimeoutRef.current);
                       setContactDropdownOpen(true);
@@ -139,11 +142,14 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                   >
                     <Link
                       href={link.href}
-                      className={`px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
+                      className={`relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
                         contactDropdownOpen ? 'text-white' : 'text-primary-400 hover:text-white'
                       }`}
                     >
                       {link.label}
+                      <span className={`absolute bottom-0 left-0 h-[2px] bg-primary-500 transition-[width] duration-300 ${
+                        contactDropdownOpen ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`} />
                     </Link>
                     {contactDropdownOpen && (
                       <div className="absolute top-full right-0 mt-1 min-w-[160px] bg-secondary-800 border border-secondary-700 rounded-md shadow-xl py-1 z-50">
@@ -163,13 +169,15 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                 );
               }
               return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] text-primary-400 hover:text-white transition-colors whitespace-nowrap"
-                >
-                  {link.label}
-                </Link>
+                <div key={link.href} className="group relative">
+                  <Link
+                    href={link.href}
+                    className="relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] text-primary-400 hover:text-white transition-colors whitespace-nowrap"
+                  >
+                    {link.label}
+                    <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary-500 transition-[width] duration-300 group-hover:w-full" />
+                  </Link>
+                </div>
               );
             })}
           </nav>
@@ -226,6 +234,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
         <div
           onMouseEnter={handleShopEnter}
           onMouseLeave={handleShopLeave}
+          className="animate-slide-up"
         >
           <MegaMenu categories={categories} onClose={closeMegaMenu} />
         </div>

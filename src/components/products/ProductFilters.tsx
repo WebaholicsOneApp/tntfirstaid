@@ -74,7 +74,7 @@ function CategoryItem({
           )}
         >
           {category.categoryName}
-          {category.productCount != null && category.productCount > 0 && (
+          {category.productCount != null && (
             <span className="ml-1 text-xs text-secondary-300">
               ({category.productCount})
             </span>

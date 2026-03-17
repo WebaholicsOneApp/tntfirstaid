@@ -5,7 +5,12 @@
 import { pgKnex as knex, tableNames, STOREFRONT_COMPANY_ID, STOREFRONT_STORE_ID } from './db';
 
 function normalizeCategoryName(name: string): string {
-  return name.toLowerCase().replace(/\s*&\s*/g, ' and ').trim().replace(/\s+/g, ' ');
+  return name.toLowerCase()
+    .replace(/\s*&\s*/g, ' and ')
+    .replace(/\/.*$/, '')    // strip "/SubCategory" suffix → "Reamers/Gunsmithing" → "reamers"
+    .replace(/s$/, '')       // strip trailing 's' → "reamers" → "reamer"
+    .trim()
+    .replace(/\s+/g, ' ');
 }
 
 /** Sanitize brand names — return null for placeholder values imported as-is */
@@ -90,7 +95,6 @@ const FALLBACK_CATEGORIES: Array<{
   { id: -3, categoryName: 'Loading Bench', keywords: /bench|press|tool|gauge|comp|micron|powder|scale|funnel/i },
   { id: -4, categoryName: 'Apparel', keywords: /shirt|hat|hoodie|beanie|cap|tee|polo|jacket|vest/i },
   { id: -5, categoryName: 'Stickers', keywords: /sticker|decal|patch/i },
-  { id: -6, categoryName: 'Modified Cases', keywords: /modified case/i },
 ];
 
 /**
@@ -530,19 +534,24 @@ async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
     .where('companyId', STOREFRONT_COMPANY_ID)
     .orderBy('categoryName', 'asc');
 
-  // Find ALL root category IDs (deduplicate by name, prefer lowest ID — the original with products)
-  const rootIds = new Set<number>();
-  const rootCandidates = new Map<string, number>(); // name -> lowest ID
+  // Find ALL root category IDs (deduplicate by normalized name, prefer longest name then lowest ID)
+  // Excluded categories are dropped entirely from the display.
+  const EXCLUDED_ROOT_NAMES = new Set(['modified case', 'reloading component']); // normalized names to exclude
+  const rootCandidates = new Map<string, { id: number; categoryName: string }>(); // normalizedName -> winner
 
   for (const cat of allCategories) {
-    if (cat.parentCategoryId === null) {
-      const existing = rootCandidates.get(cat.categoryName);
-      if (existing === undefined || cat.id < existing) {
-        rootCandidates.set(cat.categoryName, cat.id);
-      }
+    if (cat.parentCategoryId !== null) continue;
+    const key = normalizeCategoryName(cat.categoryName);
+    if (EXCLUDED_ROOT_NAMES.has(key)) continue;
+    const existing = rootCandidates.get(key);
+    if (!existing || cat.categoryName.length > existing.categoryName.length ||
+        (cat.categoryName.length === existing.categoryName.length && cat.id < existing.id)) {
+      rootCandidates.set(key, { id: cat.id, categoryName: cat.categoryName });
     }
   }
-  for (const id of rootCandidates.values()) {
+
+  const rootIds = new Set<number>();
+  for (const { id } of rootCandidates.values()) {
     rootIds.add(id);
   }
 
@@ -580,13 +589,26 @@ async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
 
   for (const group of siblingGroups.values()) {
     if (group.length < 2) continue;
-    const sorted = [...group].sort((a, b) => a.id - b.id);
+    const sorted = [...group].sort((a, b) => b.categoryName.length - a.categoryName.length || a.id - b.id);
     const primary = sorted[0]!;
     const allMergedIds = sorted.map(c => c.id);
     mergedIdsMap.set(primary.id, allMergedIds);
     for (const secondary of sorted.slice(1)) {
       mergedIntoMap.set(secondary.id, primary.id);
     }
+  }
+
+  // Merge secondary root categories (same normalized name, not in rootIds) so their
+  // products get counted under the winning root.
+  for (const cat of allCategories) {
+    if (cat.parentCategoryId !== null) continue;
+    const key = normalizeCategoryName(cat.categoryName);
+    const winner = rootCandidates.get(key);
+    if (!winner || cat.id === winner.id) continue;
+    mergedIntoMap.set(cat.id, winner.id);
+    const existing = mergedIdsMap.get(winner.id) ?? [winner.id];
+    if (!existing.includes(cat.id)) existing.push(cat.id);
+    mergedIdsMap.set(winner.id, existing);
   }
 
   // Get all (productId, categoryId) pairs for products with valid pricing
@@ -797,7 +819,6 @@ async function _buildFallbackCategoryTree(): Promise<CategoryWithChildren[]> {
   const result: CategoryWithChildren[] = [];
   for (const cat of FALLBACK_CATEGORIES) {
     const count = categoryCounts.get(cat.id) || 0;
-    if (count === 0) continue;
 
     result.push({
       id: cat.id,
