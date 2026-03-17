@@ -27,12 +27,27 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
     );
   }, [product.variations]);
 
-  const [selectedVariation, setSelectedVariation] = useState(defaultVariation);
+  // Multi-variation products start with no selection so the price range is shown
+  const [selectedVariation, setSelectedVariation] = useState(
+    product.variations.length > 1 ? null : defaultVariation
+  );
+
+  // Compute price range across all variations
+  const priceRange = useMemo(() => {
+    const prices = product.variations
+      .map((v) => v.price)
+      .filter((p): p is number => p != null && p > 0);
+    if (prices.length === 0) return null;
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    return min !== max ? { min, max } : null;
+  }, [product.variations]);
 
   // Get current price to display
   const displayPrice = selectedVariation?.price ?? product.price;
   const displayMsrp = selectedVariation?.msrp ?? product.msrp;
   const isOnSale = displayMsrp != null && displayPrice != null && displayMsrp > displayPrice;
+  const showRange = !selectedVariation && priceRange != null;
 
   // Get images — prefer selected variation images, fall back to product images
   const images = useMemo(() => {
@@ -90,9 +105,11 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
         {/* Price */}
         <div className="flex items-baseline gap-3">
           <span className="text-2xl font-bold text-secondary-900">
-            {formatCentsToDollars(displayPrice)}
+            {showRange
+              ? `${formatCentsToDollars(priceRange.min)} – ${formatCentsToDollars(priceRange.max)}`
+              : formatCentsToDollars(displayPrice)}
           </span>
-          {isOnSale && (
+          {!showRange && isOnSale && (
             <span className="text-lg text-secondary-400 line-through">
               {formatCentsToDollars(displayMsrp)}
             </span>

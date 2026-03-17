@@ -24,7 +24,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     product.maxPrice > product.price;
 
   const priceDisplay = hasRange
-    ? `${formatCentsToDollars(product.price)} - ${formatCentsToDollars(product.maxPrice)}`
+    ? `${formatCentsToDollars(product.price)} – ${formatCentsToDollars(product.maxPrice)}`
     : formatCentsToDollars(product.price);
 
   return (

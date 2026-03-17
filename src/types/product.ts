@@ -219,6 +219,7 @@ export interface ProductSuggestion {
   brandName: string | null;
   primaryImage: string | null;
   price: number | null; // in cents
+  maxPrice: number | null; // in cents
   inStock: boolean;
 }
 

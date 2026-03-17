@@ -89,6 +89,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       <ShopPageClient
         products={products}
         totalCount={totalCount}
+        page={page}
+        pageSize={pageSize}
         categories={categoryTree}
       />
 

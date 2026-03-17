@@ -122,6 +122,8 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
       <ShopPageClient
         products={products}
         totalCount={totalCount}
+        page={page}
+        pageSize={pageSize}
         categories={categoryTree}
         currentCategorySlug={categorySlug}
       />

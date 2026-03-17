@@ -79,7 +79,9 @@ function InlineSuggestions({
                 <p className="text-sm text-secondary-800 font-medium truncate">{product.name}</p>
                 {product.price != null && (
                   <p className="text-xs font-semibold text-secondary-900">
-                    {formatCentsToDollars(product.price)}
+                    {product.maxPrice != null
+                      ? `${formatCentsToDollars(product.price)} – ${formatCentsToDollars(product.maxPrice)}`
+                      : formatCentsToDollars(product.price)}
                   </p>
                 )}
               </div>

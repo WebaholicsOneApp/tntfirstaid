@@ -2246,12 +2246,10 @@ export async function getProductDetailBySlug(slug: string): Promise<ProductDetai
             'variationId',
             'manufacturerNo',
             'brandId',
-            // Only count quantity from suppliers with valid pricing data (cost > 0, shipping exists)
-            // This ensures stock status matches whether a price can be calculated
+            // Count all real inventory regardless of pricing data
+            // Stock status should reflect actual quantity, not whether cost/shipping exists
             knex.raw(`SUM(CASE
-              WHEN cost > 0
-                AND quantity > 0
-                AND COALESCE("estimatedShipping", "shippingCost") IS NOT NULL
+              WHEN quantity > 0
               THEN quantity
               ELSE 0
             END) as "totalQuantity"`),
@@ -2771,7 +2769,6 @@ export async function enrichProductList(products: Array<{
         END) as "minPrice"`),
         knex.raw(`MAX(CASE
           WHEN "${tableNames.variations}"."itemPrice" > 0
-            AND "manufacturer_suppliers".quantity > 0
           THEN "${tableNames.variations}"."itemPrice"
           ELSE NULL
         END) as "maxPrice"`),
@@ -3180,7 +3177,16 @@ async function getProductSuggestions(escapedQuery: string, rawQuery: string, isS
         THEN "${tableNames.variations}"."itemPrice"
         ELSE NULL
       END) as "price"`),
-      knex.raw('SUM(COALESCE("manufacturer_suppliers".quantity, 0)) as "totalQuantity"')
+      knex.raw(`MAX(CASE
+        WHEN "${tableNames.variations}"."itemPrice" > 0
+        THEN "${tableNames.variations}"."itemPrice"
+        ELSE NULL
+      END) as "maxPrice"`),
+      knex.raw(`SUM(CASE
+        WHEN "manufacturer_suppliers".quantity > 0
+        THEN "manufacturer_suppliers".quantity
+        ELSE 0
+      END) as "totalQuantity"`)
     )
     .leftJoin(
       tableNames.manufacturerSuppliers,
@@ -3223,16 +3229,19 @@ async function getProductSuggestions(escapedQuery: string, rawQuery: string, isS
     }
   }
 
-  const pricingMap = new Map<number, { price: number | null; inStock: boolean }>();
+  const pricingMap = new Map<number, { price: number | null; maxPrice: number | null; inStock: boolean }>();
   for (const p of pricing) {
+    const min = p.price ? Math.round(Number(p.price)) : null;
+    const max = p.maxPrice ? Math.round(Number(p.maxPrice)) : null;
     pricingMap.set(Number(p.productId), {
-      price: p.price ? Math.round(Number(p.price)) : null,
+      price: min,
+      maxPrice: max != null && min != null && max > min ? max : null,
       inStock: Number(p.totalQuantity) > 0,
     });
   }
 
   return products.map(p => {
-    const priceInfo = pricingMap.get(p.id) || { price: null, inStock: false };
+    const priceInfo = pricingMap.get(p.id) || { price: null, maxPrice: null, inStock: false };
     return {
       id: p.id,
       slug: slugify(p.name),
@@ -3240,6 +3249,7 @@ async function getProductSuggestions(escapedQuery: string, rawQuery: string, isS
       brandName: sanitizeBrandName(p.brandName),
       primaryImage: imageMap.get(p.id) || null,
       price: priceInfo.price,
+      maxPrice: priceInfo.maxPrice,
       inStock: priceInfo.inStock,
     };
   });

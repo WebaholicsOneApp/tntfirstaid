@@ -10,6 +10,8 @@ import MobileFilterDrawer from './MobileFilterDrawer';
 interface ShopPageClientProps {
   products: ProductListItem[];
   totalCount: number;
+  page: number;
+  pageSize: number;
   categories: CategoryWithChildren[];
   currentCategorySlug?: string;
 }
@@ -37,6 +39,8 @@ function FiltersWrapper({ categories, currentCategorySlug, priceRange }: { categ
 export default function ShopPageClient({
   products,
   totalCount,
+  page,
+  pageSize,
   categories,
   currentCategorySlug,
 }: ShopPageClientProps) {
@@ -78,10 +82,6 @@ export default function ShopPageClient({
             {filterIcon}
             {filtersVisible ? 'Hide Filters' : 'Show Filters'}
           </button>
-
-          <p className="text-sm text-secondary-500">
-            {totalCount} product{totalCount !== 1 ? 's' : ''}
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -95,8 +95,6 @@ export default function ShopPageClient({
             </svg>
             Filters
           </button>
-
-          <SortSelectWrapper />
         </div>
       </div>
 
@@ -120,6 +118,14 @@ export default function ShopPageClient({
 
         {/* Product grid — expands to fill when sidebar collapses */}
         <div className="flex-1 min-w-0">
+          {/* Count + sort — aligned with grid */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-secondary-500">
+              Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalCount)} of {totalCount} results
+            </p>
+            <SortSelectWrapper />
+          </div>
+
           <ProductGrid products={products} />
         </div>
       </div>
