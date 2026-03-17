@@ -1,6 +1,8 @@
 'use client';
 
+import { useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useNavigationLoading } from '~/lib/navigation-loading-context';
 
 const SORT_OPTIONS = [
   { value: 'best_sellers', label: 'Best Sellers' },
@@ -16,12 +18,20 @@ export default function SortSelect() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get('sort') ?? 'best_sellers';
+  const [isPending, startTransition] = useTransition();
+  const { setIsNavigating } = useNavigationLoading();
+
+  useEffect(() => {
+    setIsNavigating(isPending);
+  }, [isPending, setIsNavigating]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', e.target.value);
     params.delete('page'); // Reset to page 1 on sort change
-    router.push(`${pathname}?${params.toString()}`);
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
   };
 
   return (

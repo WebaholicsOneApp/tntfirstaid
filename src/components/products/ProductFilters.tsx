@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useNavigationLoading } from '~/lib/navigation-loading-context';
 import type { CategoryWithChildren } from '~/types';
 import { cn } from '~/lib/utils';
 
@@ -25,10 +26,12 @@ function CategoryItem({
   category,
   currentCategorySlug,
   depth,
+  onNavigate,
 }: {
   category: CategoryWithChildren;
   currentCategorySlug?: string;
   depth: number;
+  onNavigate: (href: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const hasChildren = category.children.length > 0;
@@ -58,6 +61,10 @@ function CategoryItem({
         )}
         <a
           href={`/shop/${slug}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate(`/shop/${slug}`);
+          }}
           className={cn(
             'flex-1 text-sm py-1 transition-colors',
             isActive
@@ -82,6 +89,7 @@ function CategoryItem({
               category={child}
               currentCategorySlug={currentCategorySlug}
               depth={depth + 1}
+              onNavigate={onNavigate}
             />
           ))}
         </ul>
@@ -99,6 +107,12 @@ export default function ProductFilters({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+  const { setIsNavigating } = useNavigationLoading();
+
+  useEffect(() => {
+    setIsNavigating(isPending);
+  }, [isPending, setIsNavigating]);
 
   const [minPrice, setMinPrice] = useState(
     searchParams.get('minPrice') ?? (priceRange && priceRange.min > 0 ? String(priceRange.min) : '')
@@ -124,8 +138,10 @@ export default function ProductFilters({
     }
 
     params.delete('page'); // Reset to page 1
-    router.push(`${pathname}?${params.toString()}`);
-  }, [minPrice, maxPrice, searchParams, pathname, router]);
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
+  }, [minPrice, maxPrice, searchParams, pathname, router, startTransition]);
 
   const handleInStockToggle = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -135,8 +151,10 @@ export default function ProductFilters({
       params.set('inStock', 'true');
     }
     params.delete('page');
-    router.push(`${pathname}?${params.toString()}`);
-  }, [inStock, searchParams, pathname, router]);
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
+  }, [inStock, searchParams, pathname, router, startTransition]);
 
   const resetFilters = useCallback(() => {
     setMinPrice('');
@@ -147,8 +165,16 @@ export default function ProductFilters({
     if (sort) params.set('sort', sort);
 
     // If we're on a category page, stay there; otherwise go to /shop
-    router.push(`${pathname}?${params.toString()}`);
-  }, [searchParams, pathname, router]);
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
+  }, [searchParams, pathname, router, startTransition]);
+
+  const handleCategoryNavigate = useCallback((href: string) => {
+    startTransition(() => {
+      router.push(href);
+    });
+  }, [router, startTransition]);
 
   const hasActiveFilters =
     searchParams.has('minPrice') ||
@@ -169,6 +195,7 @@ export default function ProductFilters({
               category={category}
               currentCategorySlug={currentCategorySlug}
               depth={0}
+              onNavigate={handleCategoryNavigate}
             />
           ))}
         </ul>

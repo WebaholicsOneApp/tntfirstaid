@@ -3,6 +3,7 @@
 import { useState, useMemo, Suspense } from 'react';
 import type { ProductListItem, CategoryWithChildren } from '~/types';
 import ProductGrid from './ProductGrid';
+import ProductGridLoadingWrapper from './ProductGridLoadingWrapper';
 import SortSelect from './SortSelect';
 import ProductFilters from './ProductFilters';
 import MobileFilterDrawer from './MobileFilterDrawer';
@@ -126,7 +127,9 @@ export default function ShopPageClient({
             <SortSelectWrapper />
           </div>
 
-          <ProductGrid products={products} />
+          <ProductGridLoadingWrapper>
+            <ProductGrid products={products} />
+          </ProductGridLoadingWrapper>
         </div>
       </div>
 
