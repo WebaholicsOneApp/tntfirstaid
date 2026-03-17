@@ -220,56 +220,69 @@ export function SearchOverlay({ isOpen, onClose, onNavigate }: SearchOverlayProp
       {/* Floating panel */}
       <div className="relative bg-white rounded-b-2xl shadow-[0_8px_40px_rgba(0,0,0,0.22)]">
         <div className="container mx-auto px-4 pb-6">
-          {/* Header row */}
-          <div className="flex items-center gap-4 py-4">
-            <Link href="/" onClick={handleClose} className="flex items-center flex-shrink-0">
-              <span className="text-xl font-display font-bold text-primary-500 tracking-wider uppercase">
-                Alpha Munitions
-              </span>
-            </Link>
+          {/* Header — stacked on mobile, inline on desktop */}
+          <div className="py-4">
+            {/* Row 1: Logo (centered on mobile, inline on desktop) */}
+            <div className="flex items-center justify-center sm:hidden mb-3">
+              <Link href="/" onClick={handleClose} className="flex items-center">
+                <span className="text-xl font-display font-bold text-primary-500 tracking-wider uppercase">
+                  Alpha Munitions
+                </span>
+              </Link>
+            </div>
 
-            {/* Search input */}
-            <form onSubmit={handleSubmit} role="search" className="flex-1 min-w-0 max-w-xl mx-auto">
-              <div className="relative flex items-center rounded-full border border-secondary-300 bg-secondary-50 px-4 py-2 sm:px-5 sm:py-3 focus-within:border-primary-500 focus-within:bg-white transition-colors">
-                <svg className="w-5 h-5 text-secondary-400 flex-shrink-0 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            {/* Row 2 (mobile) / Single row (desktop): Search + Close */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Logo — desktop only */}
+              <Link href="/" onClick={handleClose} className="hidden sm:flex items-center flex-shrink-0">
+                <span className="text-xl font-display font-bold text-primary-500 tracking-wider uppercase">
+                  Alpha Munitions
+                </span>
+              </Link>
+
+              {/* Search input */}
+              <form onSubmit={handleSubmit} role="search" className="flex-1 min-w-0 sm:max-w-xl sm:mx-auto">
+                <div className="relative flex items-center rounded-full border border-secondary-300 bg-secondary-50 px-4 py-2.5 sm:px-5 sm:py-3 focus-within:border-primary-500 focus-within:bg-white transition-colors">
+                  <svg className="w-5 h-5 text-secondary-400 flex-shrink-0 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    ref={inputRef}
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    className="flex-1 bg-transparent text-base sm:text-lg text-secondary-900 placeholder-secondary-400 outline-none focus:outline-none border-0 appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden min-w-0"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => { setQuery(''); reset(); inputRef.current?.focus(); }}
+                      className="p-1.5 text-secondary-400 hover:text-secondary-600 transition-colors flex-shrink-0"
+                      aria-label="Clear search"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </form>
+
+              <button
+                onClick={handleClose}
+                className="p-2 text-secondary-500 hover:text-primary-600 transition-colors rounded-full hover:bg-secondary-100 flex-shrink-0"
+                aria-label="Close search"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                <input
-                  ref={inputRef}
-                  type="search"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search ammunition, reloading supplies..."
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  className="flex-1 bg-transparent text-base sm:text-lg text-secondary-900 placeholder-secondary-400 outline-none focus:outline-none border-0 appearance-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden min-w-0"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => { setQuery(''); reset(); inputRef.current?.focus(); }}
-                    className="p-1.5 text-secondary-400 hover:text-secondary-600 transition-colors flex-shrink-0"
-                    aria-label="Clear search"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </form>
-
-            <button
-              onClick={handleClose}
-              className="p-2 text-secondary-500 hover:text-primary-600 transition-colors rounded-full hover:bg-secondary-100 flex-shrink-0"
-              aria-label="Close search"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              </button>
+            </div>
           </div>
 
           {/* Body */}

@@ -3,6 +3,34 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getStoreConfig } from '~/lib/store-config.server';
 import ContactForm from './ContactForm';
+import FaqAccordion from '../faq/FaqAccordion';
+
+const contactFaqs = [
+  {
+    q: 'What Brass Preparation do you recommend for your Brass?',
+    a: 'We recommend full-length sizing, trimming to length, and deburring/chamfering before loading. Our OCD Technology brass is already weight-sorted and dimensionally inspected, so minimal additional prep is needed compared to standard brass.',
+  },
+  {
+    q: 'What is the weight variation of your brass?',
+    a: 'Our brass is individually weight-sorted to extremely tight tolerances as part of our OCD Technology process. Weight variation is typically held to less than 0.5 grains, which is far tighter than industry standard.',
+  },
+  {
+    q: 'Do you manufacture all products in-house?',
+    a: 'Yes, all Alpha Munitions products are manufactured in our facility in American Fork, Utah. We control every step of the process to ensure the highest quality standards.',
+  },
+  {
+    q: 'How do I get notified of new products?',
+    a: 'Sign up for our newsletter to receive notifications about new product launches, restocks, and exclusive offers. You can also follow us on social media for the latest updates.',
+  },
+  {
+    q: 'Do you have any international distributors?',
+    a: 'We are currently focused on domestic distribution within the United States. For international inquiries, please contact us directly and we will do our best to assist you.',
+  },
+  {
+    q: "I'm interested in becoming a distributor",
+    a: 'We welcome inquiries from qualified retailers and distributors. Please visit our Distributors page or contact us directly with your business information, and our team will review your application.',
+  },
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
@@ -200,6 +228,16 @@ export default async function ContactPage() {
               </div>
             </div>
           </div>
+
+          {/* Inline FAQ */}
+          <section className="mt-16 pt-16 border-t border-secondary-100">
+            <h2 className="text-2xl font-display font-bold text-secondary-800 mb-8 text-center">
+              Frequently Asked Questions
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <FaqAccordion questions={contactFaqs} />
+            </div>
+          </section>
         </div>
       </main>
     </div>

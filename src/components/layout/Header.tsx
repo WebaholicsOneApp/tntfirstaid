@@ -7,6 +7,7 @@ import { useCart } from '~/lib/cart';
 import type { CategoryWithChildren } from '~/types';
 import MobileMenu from './MobileMenu';
 import MegaMenu from '~/components/navigation/MegaMenu';
+import { SearchOverlay } from '~/components/search/SearchOverlay';
 
 interface HeaderProps {
   siteName?: string;
@@ -189,6 +190,12 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
         onClose={() => setMobileMenuOpen(false)}
         siteName={siteName}
         categories={categories}
+      />
+
+      {/* Search Overlay */}
+      <SearchOverlay
+        isOpen={searchOverlayOpen}
+        onClose={() => setSearchOverlayOpen(false)}
       />
     </header>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getProducts, getCategoryTreeForStorefront, getCategoryBySlug, getAllRelatedCategoryIds } from '~/lib/data';
 import { convertDollarsToCents, getPaginationRange } from '~/lib/utils';
 import ShopPageClient from '~/components/products/ShopPageClient';
+import Breadcrumbs from '~/components/common/Breadcrumbs';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -75,6 +76,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-800">
           Shop
         </h1>
+        <Breadcrumbs
+          items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
+          className="mt-2"
+        />
         <p className="mt-2 text-secondary-500">
           Browse our selection of premium ammunition and reloading supplies.
         </p>

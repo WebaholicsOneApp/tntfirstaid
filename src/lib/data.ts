@@ -301,6 +301,7 @@ import type {
   CategorySuggestion,
   SearchSuggestionsResponse
 } from '~/types';
+import type { ReviewAggregate, ReviewsResponse, ReviewSortOption } from '~/types/review';
 import { parseSearchQuery } from './search-utils';
 
 /**
@@ -2967,10 +2968,28 @@ export async function enrichProductList(products: Array<{
     });
   }
 
+  // Fetch review aggregates for all products in one query
+  const reviewAggregates = await knex(tableNames.reviewAggregates)
+    .select('productId', 'averageRating', 'totalReviews')
+    .whereIn('productId', productIds)
+    .where('companyId', STOREFRONT_COMPANY_ID);
+
+  const reviewMap = new Map<number, { averageRating: number; totalReviews: number }>();
+  for (const ra of reviewAggregates) {
+    const total = Number(ra.totalReviews) || 0;
+    if (total > 0) {
+      reviewMap.set(Number(ra.productId), {
+        averageRating: Number(ra.averageRating) || 0,
+        totalReviews: total,
+      });
+    }
+  }
+
   const enrichedResult = products
     .map(p => {
       const numId = Number(p.id);
       const priceInfo = pricingMap.get(numId) || { price: null, maxPrice: null, msrp: null, maxMsrp: null, map: null, maxMap: null, inStock: false };
+      const reviewInfo = reviewMap.get(numId);
       return {
         id: p.id,
         slug: slugify(p.name),
@@ -2990,6 +3009,7 @@ export async function enrichProductList(products: Array<{
         maxMap: priceInfo.maxMap,
         inStock: priceInfo.inStock,
         variationCount: variationMap.get(numId) || 1,
+        ...(reviewInfo && { averageRating: reviewInfo.averageRating, totalReviews: reviewInfo.totalReviews }),
       };
     }); // Products are pre-filtered in query to ensure valid pricing
 
@@ -3259,5 +3279,136 @@ async function getCategorySuggestions(escapedQuery: string): Promise<CategorySug
     productCount: countMap.get(c.id) || 0,
     parentName: c.parentName || null,
   }));
+}
+
+// ============================================
+// Reviews
+// ============================================
+
+/**
+ * Get review aggregate (average rating, counts) for a product.
+ * Cached for 5 minutes since aggregates change infrequently.
+ */
+export async function getReviewAggregate(productId: number): Promise<ReviewAggregate | null> {
+  const cacheKey = `reviewAggregate:${productId}`;
+  const cached = getCachedLong<ReviewAggregate | null>(cacheKey);
+  if (cached !== null) return cached;
+
+  const row = await knex(tableNames.reviewAggregates)
+    .where({ productId, companyId: STOREFRONT_COMPANY_ID })
+    .first();
+
+  if (!row) {
+    setCache(cacheKey, null);
+    return null;
+  }
+
+  const aggregate: ReviewAggregate = {
+    totalReviews: Number(row.totalReviews) || 0,
+    averageRating: Number(row.averageRating) || 0,
+    rating1Count: Number(row.rating1Count) || 0,
+    rating2Count: Number(row.rating2Count) || 0,
+    rating3Count: Number(row.rating3Count) || 0,
+    rating4Count: Number(row.rating4Count) || 0,
+    rating5Count: Number(row.rating5Count) || 0,
+  };
+
+  setCache(cacheKey, aggregate);
+  return aggregate;
+}
+
+/**
+ * Get paginated reviews for a product with images.
+ */
+export async function getProductReviews(
+  productId: number,
+  options: { page?: number; limit?: number; sort?: ReviewSortOption } = {}
+): Promise<ReviewsResponse> {
+  const page = options.page ?? 1;
+  const limit = Math.min(options.limit ?? 10, 50);
+  const sort = options.sort ?? 'newest';
+  const offset = (page - 1) * limit;
+
+  const cacheKey = `productReviews:${productId}:${page}:${limit}:${sort}`;
+  const cached = getCached<ReviewsResponse>(cacheKey);
+  if (cached) return cached;
+
+  // Get aggregate in parallel with reviews
+  const [aggregate, countResult, reviews] = await Promise.all([
+    getReviewAggregate(productId),
+    knex(tableNames.reviews)
+      .where({ productId, companyId: STOREFRONT_COMPANY_ID })
+      .whereNull('deletedAt')
+      .count('* as total')
+      .first(),
+    knex(tableNames.reviews)
+      .where({ productId, companyId: STOREFRONT_COMPANY_ID })
+      .whereNull('deletedAt')
+      .select('id', 'customerName', 'rating', 'title', 'content', 'verifiedPurchase', 'helpfulCount', 'createdAt')
+      .modify((qb) => {
+        switch (sort) {
+          case 'oldest': qb.orderBy('createdAt', 'asc'); break;
+          case 'highest': qb.orderBy('rating', 'desc').orderBy('createdAt', 'desc'); break;
+          case 'lowest': qb.orderBy('rating', 'asc').orderBy('createdAt', 'desc'); break;
+          case 'helpful': qb.orderBy('helpfulCount', 'desc').orderBy('createdAt', 'desc'); break;
+          default: qb.orderBy('createdAt', 'desc'); break;
+        }
+      })
+      .limit(limit)
+      .offset(offset),
+  ]);
+
+  const total = Number(countResult?.total) || 0;
+
+  // Fetch images for all reviews in one query
+  const reviewIds = reviews.map((r: { id: number }) => r.id);
+  const images = reviewIds.length > 0
+    ? await knex(tableNames.reviewImages)
+        .whereIn('reviewId', reviewIds)
+        .select('id', 'reviewId', 'imageUrl', 'thumbnailUrl')
+    : [];
+
+  const imagesByReview = new Map<number, typeof images>();
+  for (const img of images) {
+    const existing = imagesByReview.get(img.reviewId) || [];
+    existing.push(img);
+    imagesByReview.set(img.reviewId, existing);
+  }
+
+  const result: ReviewsResponse = {
+    reviews: reviews.map((r: any) => ({
+      id: r.id,
+      customerName: r.customerName || 'Anonymous',
+      rating: Number(r.rating),
+      title: r.title || null,
+      content: r.content || '',
+      verifiedPurchase: Boolean(r.verifiedPurchase),
+      helpfulCount: Number(r.helpfulCount) || 0,
+      createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+      images: (imagesByReview.get(r.id) || []).map((img: any) => ({
+        id: img.id,
+        imageUrl: img.imageUrl,
+        thumbnailUrl: img.thumbnailUrl || null,
+      })),
+    })),
+    aggregate: aggregate || {
+      totalReviews: 0,
+      averageRating: 0,
+      rating1Count: 0,
+      rating2Count: 0,
+      rating3Count: 0,
+      rating4Count: 0,
+      rating5Count: 0,
+    },
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+
+  setCache(cacheKey, result);
+  return result;
 }
 

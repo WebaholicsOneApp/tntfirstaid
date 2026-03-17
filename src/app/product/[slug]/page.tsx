@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProductDetailBySlug } from '~/lib/data';
+import { getProductDetailBySlug, getReviewAggregate } from '~/lib/data';
 import { stripHtml } from '~/lib/sanitize';
 import Breadcrumbs from '~/components/common/Breadcrumbs';
 import JsonLd from '~/components/common/JsonLd';
 import ProductDetailClient from '~/components/products/ProductDetailClient';
 import ProductGrid from '~/components/products/ProductGrid';
 import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
+import type { ReviewAggregate } from '~/types/review';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -51,6 +52,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+
+  // Fetch review aggregate in parallel — non-blocking if table is empty
+  const reviewAggregate = await getReviewAggregate(product.id).catch(() => null);
 
   // Build breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
@@ -104,7 +108,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <Breadcrumbs items={breadcrumbs} className="mb-6" />
 
       {/* Product detail */}
-      <ProductDetailClient product={product} />
+      <ProductDetailClient product={product} reviewAggregate={reviewAggregate} />
 
       {/* Related products */}
       {product.relatedProducts.length > 0 && (

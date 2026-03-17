@@ -2,19 +2,22 @@
 
 import { useState, useMemo } from 'react';
 import type { ProductDetail } from '~/types';
+import type { ReviewAggregate } from '~/types/review';
 import { formatCentsToDollars, cn } from '~/lib/utils';
 import { sanitizeProductDescription } from '~/lib/sanitize';
 import ProductGallery from './ProductGallery';
 import VariantSelector from './VariantSelector';
 import AddToCartButton from './AddToCartButton';
 import StockBadge from './StockBadge';
+import ReviewsSection, { StarRating } from './ReviewsSection';
 
 interface ProductDetailClientProps {
   product: ProductDetail;
+  reviewAggregate?: ReviewAggregate | null;
 }
 
-export default function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
+export default function ProductDetailClient({ product, reviewAggregate }: ProductDetailClientProps) {
+  const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>('description');
 
   // Find the default variation — first in-stock variation, or just the first
   const defaultVariation = useMemo(() => {
@@ -64,6 +67,19 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {product.name}
         </h1>
 
+        {/* Star rating summary */}
+        {reviewAggregate && reviewAggregate.totalReviews > 0 && (
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <StarRating rating={reviewAggregate.averageRating} />
+            <span className="text-sm text-secondary-500">
+              {reviewAggregate.averageRating.toFixed(1)} ({reviewAggregate.totalReviews} review{reviewAggregate.totalReviews !== 1 ? 's' : ''})
+            </span>
+          </button>
+        )}
+
         {/* Brand */}
         {product.brandName && (
           <p className="text-sm text-secondary-500">
@@ -107,6 +123,32 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           productImage={product.primaryImage}
         />
 
+        {/* SKU / Category / Tags */}
+        <div className="text-sm text-secondary-500 space-y-1">
+          {selectedVariation?.manufacturerNo && (
+            <p>
+              <span className="font-medium text-secondary-700">SKU:</span>{' '}
+              {selectedVariation.manufacturerNo}
+            </p>
+          )}
+          {product.categoryName && (
+            <p>
+              <span className="font-medium text-secondary-700">Category:</span>{' '}
+              {product.categoryName}
+            </p>
+          )}
+          {product.keywords && (
+            <p>
+              <span className="font-medium text-secondary-700">Tags:</span>{' '}
+              {product.keywords
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+                .join(', ')}
+            </p>
+          )}
+        </div>
+
         {/* Bullet points */}
         {product.bulletPoints.length > 0 && (
           <ul className="space-y-2">
@@ -146,10 +188,21 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             >
               Specifications
             </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={cn(
+                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px',
+                activeTab === 'reviews'
+                  ? 'border-primary-500 text-primary-700'
+                  : 'border-transparent text-secondary-500 hover:text-secondary-700'
+              )}
+            >
+              Reviews{reviewAggregate && reviewAggregate.totalReviews > 0 ? ` (${reviewAggregate.totalReviews})` : ''}
+            </button>
           </div>
 
           <div className="pt-4">
-            {activeTab === 'description' ? (
+            {activeTab === 'description' && (
               sanitizedDescription ? (
                 <div
                   className="product-description prose prose-sm max-w-none"
@@ -160,7 +213,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   No description available.
                 </p>
               )
-            ) : (
+            )}
+            {activeTab === 'specifications' && (
               <div className="space-y-3">
                 {selectedVariation?.manufacturerNo && (
                   <SpecRow label="Manufacturer #" value={selectedVariation.manufacturerNo} />
@@ -186,6 +240,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </p>
                 )}
               </div>
+            )}
+            {activeTab === 'reviews' && (
+              <ReviewsSection productId={product.id} aggregate={reviewAggregate ?? null} />
             )}
           </div>
         </div>
