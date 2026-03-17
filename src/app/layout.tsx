@@ -41,7 +41,11 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${storeConfig.siteName}`,
     },
     description: `${storeConfig.siteName} - Premium ammunition and reloading supplies`,
-    icons: [{ rel: 'icon', url: '/favicon.ico' }],
+    icons: [
+      { rel: 'icon', url: '/favicon.ico', sizes: 'any' },
+      { rel: 'icon', url: '/favicon.png', type: 'image/png' },
+      { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
+    ],
     metadataBase: new URL(storeConfig.siteUrl),
   };
 }
