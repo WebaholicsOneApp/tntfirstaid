@@ -5,23 +5,23 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
 
-    // Database
-    PG_HOST: z.string().min(1),
-    PG_USER: z.string().min(1),
-    PG_PASS: z.string().min(1),
-    PG_DB: z.string().min(1),
+    // Database (legacy direct-DB approach — optional when using OneApp API)
+    PG_HOST: z.string().optional(),
+    PG_USER: z.string().optional(),
+    PG_PASS: z.string().optional(),
+    PG_DB: z.string().optional(),
     PG_PORT: z.string().default("5432"),
     PG_SSL_REJECT_UNAUTHORIZED: z.string().default("false"),
 
-    // Stripe
-    STRIPE_SECRET_KEY: z.string().min(1),
-    STRIPE_WEBHOOK_SECRET: z.string().min(1),
+    // Stripe (server-side — optional when OneApp handles payments)
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
-    // Storefront IDs
-    STOREFRONT_COMPANY_ID: z.string().min(1),
+    // Storefront IDs (legacy — optional when using OneApp API)
+    STOREFRONT_COMPANY_ID: z.string().optional(),
     STOREFRONT_CHANNEL_ID: z.string().default("6"),
     STOREFRONT_STORE_ID: z.string().optional(),
-    STORE_CHANNEL_ID: z.string().min(1),
+    STORE_CHANNEL_ID: z.string().optional(),
 
     // Catalogue Feed
     CATALOGUE_FEED_TABLE: z.string().optional(),
@@ -35,8 +35,8 @@ export const env = createEnv({
     ID_OBFUSCATION_SECRET: z.string().min(1),
 
     // Email
-    RESEND_API_KEY: z.string().min(1),
-    FROM_EMAIL: z.string().email(),
+    RESEND_API_KEY: z.string().optional(),
+    FROM_EMAIL: z.string().email().optional(),
     STORE_NAME: z.string().default("Alpha Munitions"),
 
     // CORS
