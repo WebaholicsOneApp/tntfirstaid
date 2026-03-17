@@ -21,16 +21,24 @@ const navLinks = [
   { href: '/distributors', label: 'Distributors' },
   { href: '/news', label: 'News and Data' },
   { href: '/calculator', label: "Kauber's Wind Constant Calculator" },
-  { href: '/dealer-sign-up', label: 'Dealer Sign Up' },
-  { href: '/contact', label: 'Contact' },
+  {
+    href: '/contact',
+    label: 'Contact',
+    children: [
+      { href: '/contact', label: 'Contact Us' },
+      { href: '/dealer-sign-up', label: 'Dealer Sign Up' },
+    ],
+  },
 ];
 
 export default function Header({ siteName = 'Alpha Munitions', categories }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+  const [contactDropdownOpen, setContactDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const megaMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const contactDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { cart, openCart } = useCart();
 
   useEffect(() => {
@@ -99,6 +107,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                 return (
                   <div
                     key={link.href}
+                    className="relative flex items-center"
                     onMouseEnter={handleShopEnter}
                     onMouseLeave={handleShopLeave}
                   >
@@ -112,6 +121,44 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                     >
                       {link.label}
                     </Link>
+                  </div>
+                );
+              }
+              if (link.children) {
+                return (
+                  <div
+                    key={link.href}
+                    className="relative"
+                    onMouseEnter={() => {
+                      if (contactDropdownTimeoutRef.current) clearTimeout(contactDropdownTimeoutRef.current);
+                      setContactDropdownOpen(true);
+                    }}
+                    onMouseLeave={() => {
+                      contactDropdownTimeoutRef.current = setTimeout(() => setContactDropdownOpen(false), 150);
+                    }}
+                  >
+                    <Link
+                      href={link.href}
+                      className={`px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
+                        contactDropdownOpen ? 'text-white' : 'text-primary-400 hover:text-white'
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                    {contactDropdownOpen && (
+                      <div className="absolute top-full right-0 mt-1 min-w-[160px] bg-secondary-800 border border-secondary-700 rounded-md shadow-xl py-1 z-50">
+                        {link.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className="block px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary-400 hover:text-white hover:bg-secondary-700 transition-colors whitespace-nowrap"
+                            onClick={() => setContactDropdownOpen(false)}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               }

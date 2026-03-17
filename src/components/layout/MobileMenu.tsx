@@ -85,6 +85,13 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/dealer-sign-up"
+            onClick={onClose}
+            className="block py-2.5 px-8 text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
+          >
+            Dealer Sign Up
+          </Link>
 
           {/* Category links */}
           {categories && categories.length > 0 && (
@@ -96,7 +103,7 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
                 <div key={cat.id}>
                   <div className="flex items-center">
                     <Link
-                      href={`/categories/${slugify(cat.categoryName)}?categoryId=${cat.id}`}
+                      href={`/shop?category=${slugify(cat.categoryName)}`}
                       onClick={onClose}
                       className="flex-1 py-2.5 px-5 text-secondary-200 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
                     >
@@ -125,7 +132,7 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
                       {cat.children.map(subcat => (
                         <Link
                           key={subcat.id}
-                          href={`/categories/${slugify(subcat.categoryName)}?categoryId=${subcat.id}`}
+                          href={`/shop?category=${slugify(subcat.categoryName)}`}
                           onClick={onClose}
                           className="block py-2 px-8 text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
                         >

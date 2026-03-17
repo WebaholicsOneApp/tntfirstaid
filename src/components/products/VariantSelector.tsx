@@ -29,7 +29,7 @@ export default function VariantSelector({
         {variations.map((variation) => {
           const isSelected = variation.id === selectedVariationId;
           const displayName =
-            variation.variation ?? `Pack of ${variation.id}`;
+            variation.variation || variation.manufacturerNo || `Option ${variation.id}`;
 
           return (
             <button

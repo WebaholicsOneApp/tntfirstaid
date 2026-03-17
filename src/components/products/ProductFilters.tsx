@@ -9,6 +9,7 @@ interface ProductFiltersProps {
   categories: CategoryWithChildren[];
   currentCategorySlug?: string;
   className?: string;
+  priceRange?: { min: number; max: number };
 }
 
 function slugify(text: string): string {
@@ -93,13 +94,18 @@ export default function ProductFilters({
   categories,
   currentCategorySlug,
   className,
+  priceRange,
 }: ProductFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') ?? '');
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? '');
+  const [minPrice, setMinPrice] = useState(
+    searchParams.get('minPrice') ?? (priceRange && priceRange.min > 0 ? String(priceRange.min) : '')
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    searchParams.get('maxPrice') ?? (priceRange && priceRange.max > 0 ? String(priceRange.max) : '')
+  );
   const inStock = searchParams.get('inStock') === 'true';
 
   const applyFilters = useCallback(() => {

@@ -10,6 +10,7 @@ interface MobileFilterDrawerProps {
   categories: CategoryWithChildren[];
   currentCategorySlug?: string;
   resultCount?: number;
+  priceRange?: { min: number; max: number };
 }
 
 export default function MobileFilterDrawer({
@@ -18,6 +19,7 @@ export default function MobileFilterDrawer({
   categories,
   currentCategorySlug,
   resultCount,
+  priceRange,
 }: MobileFilterDrawerProps) {
   // Lock body scroll when open
   useEffect(() => {
@@ -73,6 +75,7 @@ export default function MobileFilterDrawer({
           <ProductFilters
             categories={categories}
             currentCategorySlug={currentCategorySlug}
+            priceRange={priceRange}
           />
         </div>
 

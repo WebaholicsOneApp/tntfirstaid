@@ -158,7 +158,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
         </div>
 
         {/* Right: Smoking brass image — 50% width, always full height */}
-        <div className="hidden lg:block relative bg-black shadow-xl">
+        <AnimateIn animation="slide-right-far" duration={1000} className="hidden lg:block relative bg-black shadow-xl overflow-hidden h-full">
           <Image
             src={`${WP_UPLOADS}2023/02/image001.jpg`}
             alt="Alpha Munitions brass casing with smoke"
@@ -166,7 +166,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
             className="object-cover"
             sizes="50vw"
           />
-        </div>
+        </AnimateIn>
       </div>
     </section>
   );

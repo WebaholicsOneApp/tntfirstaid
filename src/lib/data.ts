@@ -8,6 +8,14 @@ function normalizeCategoryName(name: string): string {
   return name.toLowerCase().replace(/\s*&\s*/g, ' and ').trim().replace(/\s+/g, ' ');
 }
 
+/** Sanitize brand names — return null for placeholder values imported as-is */
+function sanitizeBrandName(name: string | null | undefined): string | null {
+  if (!name) return null;
+  const trimmed = name.trim();
+  if (!trimmed || trimmed === '#N/A' || trimmed === 'N/A' || trimmed === '#REF!' || trimmed === '#VALUE!') return null;
+  return trimmed;
+}
+
 // ============================================
 // PERFORMANCE: Simple in-memory cache for expensive operations
 // Different TTLs for different data volatility levels
@@ -155,11 +163,12 @@ async function _computeProductPriceData(): Promise<{
         knex.raw(`MIN(v."itemPrice") as "minPrice"`),
         knex.raw(`(array_agg(v.msrp ORDER BY v."itemPrice" ASC))[1] > MIN(v."itemPrice") as "onSale"`)
       )
-      .join(`${tableNames.manufacturerSuppliers} as ms`, 'v.id', 'ms.variationId')
+      .leftJoin(`${tableNames.manufacturerSuppliers} as ms`, 'v.id', 'ms.variationId')
       .whereNull('v.deletedAt')
-      .whereNull('ms.deletedAt')
+      .where(function () {
+        this.whereNull('ms.deletedAt').orWhereNull('ms.id');
+      })
       .where('v.itemPrice', '>', 0)
-      .where('ms.quantity', '>', 0)
       .whereExists(existsSubquery)
       .groupBy('v.productId');
 
@@ -601,19 +610,26 @@ async function _buildCategoryTree(): Promise<CategoryWithChildren[]> {
     .whereExists(function () {
       this.select(knex.raw('1'))
         .from(`${tableNames.variations} as price_var`)
-        .join(
-          tableNames.manufacturerSuppliers,
+        .leftJoin(
+          `${tableNames.manufacturerSuppliers} as ms_price`,
           'price_var.id',
-          `${tableNames.manufacturerSuppliers}.variationId`
+          'ms_price.variationId'
         )
         .whereRaw(`price_var."productId" = ${tableNames.storeProducts}.id`)
-        .whereNull(`${tableNames.manufacturerSuppliers}.deletedAt`)
         .whereNull('price_var.deletedAt')
-        .where(`${tableNames.manufacturerSuppliers}.cost`, '>', 0)
-        .where(`${tableNames.manufacturerSuppliers}.quantity`, '>', 0)
         .where(function () {
-          this.whereNotNull(`${tableNames.manufacturerSuppliers}.estimatedShipping`)
-            .orWhereNotNull(`${tableNames.manufacturerSuppliers}.shippingCost`);
+          // Path A: Cost-based pricing with valid supplier data
+          this.where(function () {
+            this.whereNull('ms_price.deletedAt')
+              .where('ms_price.cost', '>', 0)
+              .where('ms_price.quantity', '>', 0)
+              .where(function () {
+                this.whereNotNull('ms_price.estimatedShipping')
+                  .orWhereNotNull('ms_price.shippingCost');
+              });
+          })
+          // Path B: Direct item pricing on variation
+          .orWhere('price_var.itemPrice', '>', 0);
         });
     });
 
@@ -1130,25 +1146,31 @@ async function getProductsUncached(
     // Exclude deactivated products (must match getCategoryTreeForStorefront filter)
     .whereNull(`${tableNames.storeProducts}.deactivatedAt`);
 
-  // Pricing check: correlated EXISTS subquery (same as midnightauto pattern).
-  // PostgreSQL short-circuits on first matching supplier row per product — much faster
-  // than a derived table JOIN that must materialise ALL priced product IDs upfront.
+  // Pricing check: correlated EXISTS subquery.
+  // Accepts either cost-based pricing (via manufacturer_suppliers) or direct item pricing.
   idsQuery = idsQuery.whereExists(function () {
     this.select(knex.raw('1'))
       .from(tableNames.variations + ' as price_var')
-      .join(
-        tableNames.manufacturerSuppliers,
+      .leftJoin(
+        `${tableNames.manufacturerSuppliers} as ms_price`,
         'price_var.id',
-        `${tableNames.manufacturerSuppliers}.variationId`
+        'ms_price.variationId'
       )
       .whereRaw(`price_var."productId" = ${tableNames.storeProducts}.id`)
-      .whereNull(`${tableNames.manufacturerSuppliers}.deletedAt`)
       .whereNull('price_var.deletedAt')
-      .where(`${tableNames.manufacturerSuppliers}.cost`, '>', 0)
-      .where(`${tableNames.manufacturerSuppliers}.quantity`, '>', 0)
       .where(function () {
-        this.whereNotNull(`${tableNames.manufacturerSuppliers}.estimatedShipping`)
-          .orWhereNotNull(`${tableNames.manufacturerSuppliers}.shippingCost`);
+        // Path A: Cost-based pricing with valid supplier data
+        this.where(function () {
+          this.whereNull('ms_price.deletedAt')
+            .where('ms_price.cost', '>', 0)
+            .where('ms_price.quantity', '>', 0)
+            .where(function () {
+              this.whereNotNull('ms_price.estimatedShipping')
+                .orWhereNotNull('ms_price.shippingCost');
+            });
+        })
+        // Path B: Direct item pricing on variation
+        .orWhere('price_var.itemPrice', '>', 0);
       });
   });
 
@@ -1522,19 +1544,24 @@ async function getProductsUncached(
           searchCountQuery = searchCountQuery.whereExists(function () {
             this.select(knex.raw('1'))
               .from(tableNames.variations + ' as price_var')
-              .join(
-                tableNames.manufacturerSuppliers,
+              .leftJoin(
+                `${tableNames.manufacturerSuppliers} as ms_price`,
                 'price_var.id',
-                `${tableNames.manufacturerSuppliers}.variationId`
+                'ms_price.variationId'
               )
               .whereRaw(`price_var."productId" = ${tableNames.storeProducts}.id`)
-              .whereNull(`${tableNames.manufacturerSuppliers}.deletedAt`)
               .whereNull('price_var.deletedAt')
-              .where(`${tableNames.manufacturerSuppliers}.cost`, '>', 0)
-              .where(`${tableNames.manufacturerSuppliers}.quantity`, '>', 0)
               .where(function () {
-                this.whereNotNull(`${tableNames.manufacturerSuppliers}.estimatedShipping`)
-                  .orWhereNotNull(`${tableNames.manufacturerSuppliers}.shippingCost`);
+                this.where(function () {
+                  this.whereNull('ms_price.deletedAt')
+                    .where('ms_price.cost', '>', 0)
+                    .where('ms_price.quantity', '>', 0)
+                    .where(function () {
+                      this.whereNotNull('ms_price.estimatedShipping')
+                        .orWhereNotNull('ms_price.shippingCost');
+                    });
+                })
+                .orWhere('price_var.itemPrice', '>', 0);
               });
           });
 
@@ -2995,7 +3022,7 @@ export async function enrichProductList(products: Array<{
         slug: slugify(p.name),
         name: p.name,
         description: p.description,
-        brandName: p.brandName,
+        brandName: sanitizeBrandName(p.brandName),
         brandId: p.brandId,
         categoryName: p.categoryName ?? null,
         categoryId: p.categoryId ?? null,
@@ -3150,7 +3177,6 @@ async function getProductSuggestions(escapedQuery: string, rawQuery: string, isS
       `${tableNames.variations}.productId`,
       knex.raw(`MIN(CASE
         WHEN "${tableNames.variations}"."itemPrice" > 0
-          AND "manufacturer_suppliers".quantity > 0
         THEN "${tableNames.variations}"."itemPrice"
         ELSE NULL
       END) as "price"`),
@@ -3211,7 +3237,7 @@ async function getProductSuggestions(escapedQuery: string, rawQuery: string, isS
       id: p.id,
       slug: slugify(p.name),
       name: p.name,
-      brandName: p.brandName || null,
+      brandName: sanitizeBrandName(p.brandName),
       primaryImage: imageMap.get(p.id) || null,
       price: priceInfo.price,
       inStock: priceInfo.inStock,

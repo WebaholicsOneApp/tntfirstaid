@@ -28,7 +28,7 @@ export default function MegaMenu({ categories, onClose }: MegaMenuProps) {
           {displayCategories.map((category) => (
             <div key={category.id} className="space-y-2">
               <Link
-                href={`/categories/${slugify(category.categoryName)}?categoryId=${category.id}`}
+                href={`/shop?category=${slugify(category.categoryName)}`}
                 onClick={onClose}
                 className="group block"
               >
@@ -48,7 +48,7 @@ export default function MegaMenu({ categories, onClose }: MegaMenuProps) {
                   {category.children.slice(0, 5).map((subcat) => (
                     <Link
                       key={subcat.id}
-                      href={`/categories/${slugify(subcat.categoryName)}?categoryId=${subcat.id}`}
+                      href={`/shop?category=${slugify(subcat.categoryName)}`}
                       onClick={onClose}
                       className="block py-0.5 text-sm text-secondary-500 hover:text-primary-600 transition-colors"
                     >
@@ -57,7 +57,7 @@ export default function MegaMenu({ categories, onClose }: MegaMenuProps) {
                   ))}
                   {category.children.length > 5 && (
                     <Link
-                      href={`/categories/${slugify(category.categoryName)}?categoryId=${category.id}`}
+                      href={`/shop?category=${slugify(category.categoryName)}`}
                       onClick={onClose}
                       className="block py-0.5 text-xs text-primary-600 hover:text-primary-700 font-medium"
                     >
@@ -73,7 +73,7 @@ export default function MegaMenu({ categories, onClose }: MegaMenuProps) {
         {/* View All link */}
         <div className="mt-6 pt-4 border-t border-secondary-100 text-center">
           <Link
-            href="/products"
+            href="/shop"
             onClick={onClose}
             className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors"
           >

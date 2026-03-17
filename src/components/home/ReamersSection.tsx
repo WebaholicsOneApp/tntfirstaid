@@ -75,7 +75,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
     <section className="bg-gray-50">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:min-h-screen">
         {/* Left: Large reamer image — 50% width, full height */}
-        <div className="hidden lg:block relative bg-white shadow-xl">
+        <AnimateIn animation="slide-left-far" duration={1000} className="hidden lg:block relative bg-white shadow-xl overflow-hidden h-full">
           <Image
             src="/images/reamer-hero.jpg"
             alt="Alpha Munitions Reamer Tool"
@@ -83,7 +83,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
             className="object-contain p-12"
             sizes="50vw"
           />
-        </div>
+        </AnimateIn>
 
         {/* Right: Heading + carousel */}
         <div className="w-full px-6 lg:pl-12 lg:pr-8 overflow-hidden py-14 sm:py-20 flex flex-col justify-center bg-white">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import type { ProductListItem, CategoryWithChildren } from '~/types';
 import ProductGrid from './ProductGrid';
 import SortSelect from './SortSelect';
@@ -22,12 +22,13 @@ function SortSelectWrapper() {
   );
 }
 
-function FiltersWrapper({ categories, currentCategorySlug }: { categories: CategoryWithChildren[]; currentCategorySlug?: string }) {
+function FiltersWrapper({ categories, currentCategorySlug, priceRange }: { categories: CategoryWithChildren[]; currentCategorySlug?: string; priceRange: { min: number; max: number } }) {
   return (
     <Suspense fallback={<div className="space-y-6"><div className="h-40 bg-secondary-50 rounded animate-pulse" /></div>}>
       <ProductFilters
         categories={categories}
         currentCategorySlug={currentCategorySlug}
+        priceRange={priceRange}
       />
     </Suspense>
   );
@@ -41,6 +42,17 @@ export default function ShopPageClient({
 }: ShopPageClientProps) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(true);
+
+  const priceRange = useMemo(() => {
+    const prices = products
+      .map(p => p.price)
+      .filter((p): p is number => p != null && p > 0);
+    if (prices.length === 0) return { min: 0, max: 0 };
+    return {
+      min: Math.round(Math.min(...prices) / 100),
+      max: Math.round(Math.max(...prices) / 100),
+    };
+  }, [products]);
 
   const filterIcon = (
     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -102,7 +114,7 @@ export default function ShopPageClient({
             className="w-64 transition-opacity duration-300"
             style={{ opacity: filtersVisible ? 1 : 0 }}
           >
-            <FiltersWrapper categories={categories} currentCategorySlug={currentCategorySlug} />
+            <FiltersWrapper categories={categories} currentCategorySlug={currentCategorySlug} priceRange={priceRange} />
           </div>
         </div>
 
@@ -119,6 +131,7 @@ export default function ShopPageClient({
         categories={categories}
         currentCategorySlug={currentCategorySlug}
         resultCount={totalCount}
+        priceRange={priceRange}
       />
     </div>
   );
