@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import type { ProductListItem, CategoryWithChildren } from '~/types';
 import ProductGrid from './ProductGrid';
 import ProductGridLoadingWrapper from './ProductGridLoadingWrapper';
@@ -15,6 +15,7 @@ interface ShopPageClientProps {
   pageSize: number;
   categories: CategoryWithChildren[];
   currentCategorySlug?: string;
+  priceRange: { min: number; max: number };
 }
 
 function SortSelectWrapper() {
@@ -44,20 +45,10 @@ export default function ShopPageClient({
   pageSize,
   categories,
   currentCategorySlug,
+  priceRange,
 }: ShopPageClientProps) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(true);
-
-  const priceRange = useMemo(() => {
-    const prices = products
-      .map(p => p.price)
-      .filter((p): p is number => p != null && p > 0);
-    if (prices.length === 0) return { min: 0, max: 0 };
-    return {
-      min: Math.round(Math.min(...prices) / 100),
-      max: Math.round(Math.max(...prices) / 100),
-    };
-  }, [products]);
 
   const filterIcon = (
     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

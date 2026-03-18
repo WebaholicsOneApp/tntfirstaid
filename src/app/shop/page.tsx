@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getProducts, getCategoryTreeForStorefront, getCategoryBySlug, getAllRelatedCategoryIds } from '~/lib/data';
+import { getProducts, getCategoryTreeForStorefront, getCategoryBySlug, getAllRelatedCategoryIds, getPriceRange } from '~/lib/data';
 import { convertDollarsToCents, getPaginationRange } from '~/lib/utils';
 import ShopPageClient from '~/components/products/ShopPageClient';
 import Breadcrumbs from '~/components/common/Breadcrumbs';
@@ -60,10 +60,16 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
   const pageSize = 24;
 
-  // Fetch products and category tree in parallel
-  const [result, categoryTree] = await Promise.all([
+  // Build price range filters (exclude price filters to get full range)
+  const priceRangeFilters: { categoryIds?: number[]; inStock?: boolean } = {};
+  if (filters.categoryIds) priceRangeFilters.categoryIds = filters.categoryIds;
+  if (filters.inStock) priceRangeFilters.inStock = true;
+
+  // Fetch products, category tree, and price range in parallel
+  const [result, categoryTree, priceRange] = await Promise.all([
     getProducts(filters, sortBy, { page, pageSize }),
     getCategoryTreeForStorefront(),
+    getPriceRange(priceRangeFilters),
   ]);
 
   const { products, totalCount, totalPages } = result;
@@ -92,6 +98,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         page={page}
         pageSize={pageSize}
         categories={categoryTree}
+        priceRange={{ min: Math.round(priceRange.min / 100), max: Math.round(priceRange.max / 100) }}
       />
 
       {/* Pagination */}

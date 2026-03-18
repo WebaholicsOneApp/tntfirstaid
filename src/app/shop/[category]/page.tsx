@@ -7,6 +7,7 @@ import {
   getCategoryBySlug,
   getCategoryWithHierarchy,
   getAllRelatedCategoryIds,
+  getPriceRange,
 } from '~/lib/data';
 import { convertDollarsToCents, getPaginationRange } from '~/lib/utils';
 import ShopPageClient from '~/components/products/ShopPageClient';
@@ -82,11 +83,16 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
   const page = Math.max(1, parseInt(queryParams.page ?? '1', 10) || 1);
   const pageSize = 24;
 
-  // Fetch products, category tree, and hierarchy in parallel
-  const [result, categoryTree, hierarchy] = await Promise.all([
+  // Build price range filters (exclude price filters to get full range)
+  const priceRangeFilters: { categoryIds: number[]; inStock?: boolean } = { categoryIds };
+  if (filters.inStock) priceRangeFilters.inStock = true;
+
+  // Fetch products, category tree, hierarchy, and price range in parallel
+  const [result, categoryTree, hierarchy, priceRange] = await Promise.all([
     getProducts(filters, sortBy, { page, pageSize }),
     getCategoryTreeForStorefront(),
     getCategoryWithHierarchy(category.id),
+    getPriceRange(priceRangeFilters),
   ]);
 
   const { products, totalCount, totalPages } = result;
@@ -126,6 +132,7 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
         pageSize={pageSize}
         categories={categoryTree}
         currentCategorySlug={categorySlug}
+        priceRange={{ min: Math.round(priceRange.min / 100), max: Math.round(priceRange.max / 100) }}
       />
 
       {/* Pagination */}
