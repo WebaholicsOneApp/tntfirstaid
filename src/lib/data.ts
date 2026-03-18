@@ -177,6 +177,7 @@ function toVariationDetail(v: any): VariationDetail {
     images: v.images ?? [],
     inStock: v.inStock ?? false,
     quantity: v.quantity ?? 0,
+    packCount: v.packCount ?? null,
   };
 }
 

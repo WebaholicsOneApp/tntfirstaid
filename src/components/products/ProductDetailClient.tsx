@@ -128,6 +128,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             variations={product.variations}
             selectedVariationId={selectedVariation?.id ?? null}
             onSelect={setSelectedVariation}
+            onClear={() => setSelectedVariation(null)}
           />
         )}
 

@@ -1,60 +1,162 @@
 'use client';
 
+import { useState, useMemo, useCallback } from 'react';
 import type { VariationDetail } from '~/types';
-import { formatCentsToDollars, cn } from '~/lib/utils';
 
 interface VariantSelectorProps {
   variations: VariationDetail[];
   selectedVariationId: number | null;
   onSelect: (variation: VariationDetail) => void;
+  onClear: () => void;
 }
 
 export default function VariantSelector({
   variations,
   selectedVariationId,
   onSelect,
+  onClear,
 }: VariantSelectorProps) {
+  const hasSecondDimension = variations.some((v) => v.variationTwo != null && v.variationTwo !== '');
+
+  // Derive selected values from the currently selected variation
+  const selectedVariation = variations.find((v) => v.id === selectedVariationId) ?? null;
+  const [sel1, setSel1] = useState<string>(selectedVariation?.variation ?? '');
+  const [sel2, setSel2] = useState<string>(selectedVariation?.variationTwo ?? '');
+
+  // Get unique in-stock values for each dimension
+  const options1 = useMemo(() => {
+    const seen = new Set<string>();
+    return variations
+      .filter((v) => v.inStock)
+      .map((v) => v.variation)
+      .filter((val): val is string => {
+        if (val == null || val === '' || seen.has(val)) return false;
+        seen.add(val);
+        return true;
+      });
+  }, [variations]);
+
+  const options2 = useMemo(() => {
+    if (!hasSecondDimension) return [];
+    const seen = new Set<string>();
+    return variations
+      .filter((v) => {
+        if (!v.inStock) return false;
+        if (sel1) return v.variation === sel1;
+        return true;
+      })
+      .map((v) => v.variationTwo)
+      .filter((val): val is string => {
+        if (val == null || val === '' || seen.has(val)) return false;
+        seen.add(val);
+        return true;
+      });
+  }, [variations, hasSecondDimension, sel1]);
+
+  // Find matching variation for current selections
+  const findMatch = useCallback(
+    (v1: string, v2: string) => {
+      return variations.find((v) => {
+        const match1 = v.variation === v1;
+        if (!hasSecondDimension) return match1;
+        return match1 && v.variationTwo === v2;
+      });
+    },
+    [variations, hasSecondDimension]
+  );
+
   if (variations.length <= 1) return null;
 
-  // Determine the label for the variant group
-  const variantLabel =
-    variations[0]?.variantType ?? 'Option';
+  const label1 = variations[0]?.variantType ?? 'Option';
+  const label2 = hasSecondDimension ? (variations[0]?.variantTypeTwo ?? 'Option 2') : null;
+
+  const handleSelect1 = (value: string) => {
+    setSel1(value);
+    // Auto-clear sel2 if it's no longer valid for the new dim1 selection
+    if (hasSecondDimension && sel2) {
+      const stillValid = variations.some(
+        (v) => v.inStock && v.variation === value && v.variationTwo === sel2
+      );
+      if (!stillValid) {
+        setSel2('');
+        onClear();
+        return;
+      }
+    }
+    if (!hasSecondDimension || sel2) {
+      const match = findMatch(value, sel2);
+      if (match) onSelect(match);
+    }
+  };
+
+  const handleSelect2 = (value: string) => {
+    setSel2(value);
+    if (sel1) {
+      const match = findMatch(sel1, value);
+      if (match) onSelect(match);
+    }
+  };
+
+  const handleClear = () => {
+    setSel1('');
+    setSel2('');
+    onClear();
+  };
+
+  const hasSelection = sel1 !== '' || sel2 !== '';
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-secondary-700 mb-2">
-        {variantLabel}
-      </label>
-      <div className="flex flex-wrap gap-2">
-        {variations.map((variation) => {
-          const isSelected = variation.id === selectedVariationId;
-          const displayName =
-            variation.variation || variation.manufacturerNo || `Option ${variation.id}`;
-
-          return (
-            <button
-              key={variation.id}
-              onClick={() => onSelect(variation)}
-              disabled={!variation.inStock}
-              className={cn(
-                'px-4 py-2 rounded-md border text-sm font-medium transition-all active:scale-95 duration-75',
-                isSelected
-                  ? 'border-primary-500 bg-primary-50 text-primary-800 ring-1 ring-primary-300'
-                  : variation.inStock
-                    ? 'border-secondary-200 bg-white text-secondary-700 hover:border-primary-300'
-                    : 'border-secondary-100 bg-secondary-50 text-secondary-300 cursor-not-allowed line-through'
-              )}
-            >
-              <span>{displayName}</span>
-              {variation.price != null && (
-                <span className="ml-2 text-xs text-secondary-500">
-                  {formatCentsToDollars(variation.price)}
-                </span>
-              )}
-            </button>
-          );
-        })}
+    <div className="space-y-4">
+      {/* First dimension */}
+      <div>
+        <label className="block text-sm font-medium text-secondary-700 mb-1.5">
+          {label1}
+        </label>
+        {options1.length === 0 ? (
+          <p className="text-sm text-secondary-500 italic">Currently unavailable</p>
+        ) : (
+          <select
+            value={sel1}
+            onChange={(e) => handleSelect1(e.target.value)}
+            className="w-full max-w-xs rounded-md border border-secondary-300 bg-white px-3 py-2.5 text-sm text-secondary-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          >
+            <option value="">Choose an option</option>
+            {options1.map((opt) => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+        )}
       </div>
+
+      {/* Second dimension */}
+      {hasSecondDimension && label2 && (
+        <div>
+          <label className="block text-sm font-medium text-secondary-700 mb-1.5">
+            {label2}
+          </label>
+          <select
+            value={sel2}
+            onChange={(e) => handleSelect2(e.target.value)}
+            className="w-full max-w-xs rounded-md border border-secondary-300 bg-white px-3 py-2.5 text-sm text-secondary-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          >
+            <option value="">Choose an option</option>
+            {options2.map((opt) => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Clear link */}
+      {hasSelection && (
+        <button
+          type="button"
+          onClick={handleClear}
+          className="text-sm text-primary-600 hover:text-primary-800 underline"
+        >
+          Clear
+        </button>
+      )}
     </div>
   );
 }

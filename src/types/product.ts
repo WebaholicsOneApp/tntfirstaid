@@ -150,6 +150,7 @@ export interface VariationDetail {
   images: string[];
   inStock: boolean;
   quantity: number;
+  packCount: number | null;
 }
 
 // Category with hierarchy
