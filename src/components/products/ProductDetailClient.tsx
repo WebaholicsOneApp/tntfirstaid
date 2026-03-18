@@ -186,7 +186,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             <button
               onClick={() => setActiveTab('description')}
               className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px',
+                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
                 activeTab === 'description'
                   ? 'border-primary-500 text-primary-700'
                   : 'border-transparent text-secondary-500 hover:text-secondary-700'
@@ -197,7 +197,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             <button
               onClick={() => setActiveTab('specifications')}
               className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px',
+                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
                 activeTab === 'specifications'
                   ? 'border-primary-500 text-primary-700'
                   : 'border-transparent text-secondary-500 hover:text-secondary-700'
@@ -208,7 +208,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             <button
               onClick={() => setActiveTab('reviews')}
               className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px',
+                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
                 activeTab === 'reviews'
                   ? 'border-primary-500 text-primary-700'
                   : 'border-transparent text-secondary-500 hover:text-secondary-700'

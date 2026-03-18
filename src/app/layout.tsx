@@ -2,6 +2,7 @@ import '~/app/globals.css';
 
 import { type Metadata } from 'next';
 import { Playfair_Display, Inter, Cardo } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 import { getNonce } from '~/lib/get-nonce';
 import { NonceProvider } from '~/lib/nonce-context';
 import { CartProvider } from '~/lib/cart';
@@ -73,6 +74,7 @@ export default async function RootLayout({
         className="font-sans antialiased bg-white text-secondary-800 min-h-screen flex flex-col"
         style={paletteStyle as React.CSSProperties}
       >
+        <NextTopLoader color={storeConfig.primaryColor} showSpinner={false} />
         <NonceProvider nonce={nonce}>
           <CartProvider>
             <NavigationLoadingProvider>

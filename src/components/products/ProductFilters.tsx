@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useNavigationLoading } from '~/lib/navigation-loading-context';
 import type { CategoryWithChildren } from '~/types';
 import { cn } from '~/lib/utils';
+import { Spinner } from '~/components/ui/Spinner';
 
 interface ProductFiltersProps {
   categories: CategoryWithChildren[];
@@ -233,9 +234,11 @@ export default function ProductFilters({
         </div>
         <button
           onClick={applyFilters}
-          className="mt-2 w-full text-sm py-1.5 bg-primary-500 text-secondary-900 rounded-md hover:bg-primary-400 transition-colors font-medium"
+          disabled={isPending}
+          className="mt-2 w-full text-sm py-1.5 bg-primary-500 text-secondary-900 rounded-md hover:bg-primary-400 transition-colors font-medium disabled:opacity-70 flex items-center justify-center gap-2"
         >
-          Apply Price
+          {isPending && <Spinner />}
+          {isPending ? 'Applying…' : 'Apply Price'}
         </button>
       </div>
 
@@ -244,11 +247,12 @@ export default function ProductFilters({
         <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
           Availability
         </h3>
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className={cn('flex items-center gap-2 cursor-pointer', isPending && 'opacity-50 cursor-not-allowed')}>
           <input
             type="checkbox"
             checked={inStock}
             onChange={handleInStockToggle}
+            disabled={isPending}
             className="w-4 h-4 rounded border-secondary-300 text-primary-500 focus:ring-primary-300"
           />
           <span className="text-sm text-secondary-600">In Stock Only</span>
@@ -259,8 +263,10 @@ export default function ProductFilters({
       {hasActiveFilters && (
         <button
           onClick={resetFilters}
-          className="w-full text-sm py-2 border border-secondary-200 text-secondary-600 rounded-md hover:bg-secondary-50 transition-colors"
+          disabled={isPending}
+          className="w-full text-sm py-2 border border-secondary-200 text-secondary-600 rounded-md hover:bg-secondary-50 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
         >
+          {isPending && <Spinner />}
           Reset Filters
         </button>
       )}

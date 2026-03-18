@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { VariationDetail } from '~/types';
 import { useCart } from '~/lib/cart';
 import { cn } from '~/lib/utils';
+import { Spinner } from '~/components/ui/Spinner';
 
 interface AddToCartButtonProps {
   productId: number;
@@ -24,15 +25,16 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [isAdding, setIsAdding] = useState(false);
+  const [addPhase, setAddPhase] = useState<'idle' | 'adding' | 'added'>('idle');
 
   const isOutOfStock = !variation?.inStock;
   const isDisabled = disabled || isOutOfStock || !variation;
   const maxQty = variation?.quantity ?? 99;
+  const isAdding = addPhase !== 'idle';
 
   const handleAdd = () => {
-    if (!variation || isDisabled) return;
-    setIsAdding(true);
+    if (!variation || isDisabled || isAdding) return;
+    setAddPhase('adding');
 
     addItem(
       {
@@ -49,8 +51,9 @@ export default function AddToCartButton({
       quantity
     );
 
-    // Brief visual feedback
-    setTimeout(() => setIsAdding(false), 600);
+    // Phase 1: spinner "Adding…" for 300ms, then phase 2: green "Added!" for 400ms
+    setTimeout(() => setAddPhase('added'), 300);
+    setTimeout(() => setAddPhase('idle'), 700);
   };
 
   const handleDecrement = () => {
@@ -107,19 +110,22 @@ export default function AddToCartButton({
         onClick={handleAdd}
         disabled={isDisabled}
         className={cn(
-          'flex-1 px-6 py-3 rounded-md text-sm font-semibold uppercase tracking-wider transition-all',
+          'flex-1 px-6 py-3 rounded-md text-sm font-semibold uppercase tracking-wider transition-all flex items-center justify-center gap-2',
           isOutOfStock
             ? 'bg-secondary-100 text-secondary-400 cursor-not-allowed'
-            : isAdding
+            : addPhase === 'added'
               ? 'bg-green-600 text-white'
               : 'bg-primary-500 text-secondary-900 hover:bg-primary-400 active:bg-primary-600'
         )}
       >
+        {!isOutOfStock && addPhase === 'adding' && <Spinner />}
         {isOutOfStock
           ? 'Out of Stock'
-          : isAdding
-            ? 'Added!'
-            : 'Add to Cart'}
+          : addPhase === 'adding'
+            ? 'Adding…'
+            : addPhase === 'added'
+              ? 'Added!'
+              : 'Add to Cart'}
       </button>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useNavigationLoading } from '~/lib/navigation-loading-context';
+import { Spinner } from '~/components/ui/Spinner';
 
 const SORT_OPTIONS = [
   { value: 'best_sellers', label: 'Best Sellers' },
@@ -39,18 +40,26 @@ export default function SortSelect() {
       <label htmlFor="sort-select" className="text-sm text-secondary-500 whitespace-nowrap">
         Sort by:
       </label>
-      <select
-        id="sort-select"
-        value={currentSort}
-        onChange={handleChange}
-        className="text-sm border border-secondary-200 rounded-md px-3 py-2 bg-white text-secondary-700 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300"
-      >
-        {SORT_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative flex items-center">
+        <select
+          id="sort-select"
+          value={currentSort}
+          onChange={handleChange}
+          disabled={isPending}
+          className="text-sm border border-secondary-200 rounded-md px-3 py-2 bg-white text-secondary-700 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 disabled:opacity-70"
+        >
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {isPending && (
+          <span className="absolute right-8 pointer-events-none">
+            <Spinner className="w-3.5 h-3.5 text-secondary-400" />
+          </span>
+        )}
+      </div>
     </div>
   );
 }

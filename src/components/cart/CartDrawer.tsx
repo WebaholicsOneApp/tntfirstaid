@@ -147,7 +147,7 @@ export default function CartDrawer() {
                         <div className="flex items-center border border-secondary-200 rounded-lg">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-l-lg"
+                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-l-lg active:scale-95 transition-transform duration-75"
                             aria-label="Decrease quantity"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function CartDrawer() {
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-r-lg"
+                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-r-lg active:scale-95 transition-transform duration-75"
                             aria-label="Increase quantity"
                             disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
                           >
@@ -170,7 +170,7 @@ export default function CartDrawer() {
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-secondary-400 hover:text-red-500 transition-colors p-1"
+                          className="text-secondary-400 hover:text-red-500 transition-colors p-1 active:scale-95 transition-transform duration-75"
                           aria-label={`Remove ${item.name} from cart`}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -37,7 +37,7 @@ export default function VariantSelector({
               onClick={() => onSelect(variation)}
               disabled={!variation.inStock}
               className={cn(
-                'px-4 py-2 rounded-md border text-sm font-medium transition-all',
+                'px-4 py-2 rounded-md border text-sm font-medium transition-all active:scale-95 duration-75',
                 isSelected
                   ? 'border-primary-500 bg-primary-50 text-primary-800 ring-1 ring-primary-300'
                   : variation.inStock
