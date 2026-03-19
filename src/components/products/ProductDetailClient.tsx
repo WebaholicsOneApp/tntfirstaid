@@ -63,6 +63,21 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
     [product.description]
   );
 
+  // Split bulletPoints: items with "Label: value" pattern → specs, rest → features
+  const { specs, features } = useMemo(() => {
+    const specs: { label: string; value: string }[] = [];
+    const features: string[] = [];
+    for (const point of product.bulletPoints) {
+      const colonIdx = point.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 30) {
+        specs.push({ label: point.slice(0, colonIdx).trim(), value: point.slice(colonIdx + 1).trim() });
+      } else {
+        features.push(point);
+      }
+    }
+    return { specs, features };
+  }, [product.bulletPoints]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
       {/* Left: Image Gallery */}
@@ -77,10 +92,19 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
           </p>
         )}
 
-        {/* Product name */}
-        <h1 className="text-2xl sm:text-3xl font-display font-bold text-secondary-800 leading-tight">
-          {product.name}
-        </h1>
+        {/* Product name + SKU */}
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-secondary-800 leading-tight">
+            {product.name}
+          </h1>
+          {selectedVariation?.manufacturerNo && (
+            <p className="inline-flex items-center gap-1.5 text-xs">
+              <span className="text-secondary-400 uppercase tracking-wider">SKU</span>
+              <span className="text-secondary-300">|</span>
+              <span className="font-mono text-secondary-500">{selectedVariation.manufacturerNo}</span>
+            </p>
+          )}
+        </div>
 
         {/* Star rating summary */}
         {reviewAggregate && reviewAggregate.totalReviews > 0 && (
@@ -93,13 +117,6 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
               {reviewAggregate.averageRating.toFixed(1)} ({reviewAggregate.totalReviews} review{reviewAggregate.totalReviews !== 1 ? 's' : ''})
             </span>
           </button>
-        )}
-
-        {/* Brand */}
-        {product.brandName && (
-          <p className="text-sm text-secondary-500">
-            by <span className="font-medium text-secondary-700">{product.brandName}</span>
-          </p>
         )}
 
         {/* Price */}
@@ -141,36 +158,24 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
           productImage={product.primaryImage}
         />
 
-        {/* SKU / Category / Tags */}
-        <div className="text-sm text-secondary-500 space-y-1">
-          {selectedVariation?.manufacturerNo && (
-            <p>
-              <span className="font-medium text-secondary-700">SKU:</span>{' '}
-              {selectedVariation.manufacturerNo}
-            </p>
-          )}
-          {product.categoryName && (
-            <p>
-              <span className="font-medium text-secondary-700">Category:</span>{' '}
-              {product.categoryName}
-            </p>
-          )}
-          {product.keywords && (
+        {/* Tags */}
+        {product.keywords && (
+          <div className="text-sm text-secondary-500">
             <p>
               <span className="font-medium text-secondary-700">Tags:</span>{' '}
               {product.keywords
-                .split(',')
+                .split(/[|,]/)
                 .map((tag) => tag.trim())
                 .filter(Boolean)
                 .join(', ')}
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Bullet points */}
-        {product.bulletPoints.length > 0 && (
+        {/* Feature bullet points (non-spec items only — specs go in Specifications tab) */}
+        {features.length > 0 && (
           <ul className="space-y-2">
-            {product.bulletPoints.map((point, i) => (
+            {features.map((point, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-secondary-600">
                 <svg className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -234,12 +239,18 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             )}
             {activeTab === 'specifications' && (
               <div className="space-y-3">
+                {product.categoryName && (
+                  <SpecRow label="Category" value={product.categoryName} />
+                )}
                 {selectedVariation?.manufacturerNo && (
                   <SpecRow label="Manufacturer #" value={selectedVariation.manufacturerNo} />
                 )}
                 {selectedVariation?.weight != null && selectedVariation.weight > 0 && (
                   <SpecRow label="Weight" value={`${selectedVariation.weight} lbs`} />
                 )}
+                {specs.map((spec) => (
+                  <SpecRow key={spec.label} label={spec.label} value={spec.value} />
+                ))}
                 {selectedVariation?.variation && (
                   <SpecRow label={selectedVariation.variantType ?? 'Variant'} value={selectedVariation.variation} />
                 )}
@@ -249,10 +260,10 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
                     value={selectedVariation.variationTwo}
                   />
                 )}
-                {product.brandName && (
+                {product.brandName && product.brandName !== '#N/A' && (
                   <SpecRow label="Brand" value={product.brandName} />
                 )}
-                {!selectedVariation?.manufacturerNo && !selectedVariation?.weight && !product.brandName && (
+                {specs.length === 0 && !product.categoryName && !selectedVariation && (
                   <p className="text-sm text-secondary-400 italic">
                     No specifications available.
                   </p>
