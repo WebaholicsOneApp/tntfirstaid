@@ -53,39 +53,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Feature blocks below hero */}
-      <div className="bg-secondary-800">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-secondary-700">
-          {[
-            {
-              title: 'Neck Tension',
-              description:
-                'Consistent neck tension is the foundation of precision ammunition. Alpha brass is manufactured to exacting tolerances, ensuring uniform neck wall thickness and concentricity for every case.',
-            },
-            {
-              title: 'Internal Volumes',
-              description:
-                'Case-to-case consistency in internal volume is what separates premium brass from the rest. Our proprietary manufacturing process delivers industry-leading uniformity in H2O capacity.',
-            },
-            {
-              title: 'Flash Holes',
-              description:
-                'Every Alpha case features precision-drilled flash holes that are centered and deburred. This attention to detail ensures consistent ignition and contributes to the extreme accuracy our brass is known for.',
-            },
-          ].map((item, i) => (
-            <div
-              key={item.title}
-              className={`px-8 py-8 text-center transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-              style={{ transitionDelay: `${600 + i * 100}ms` }}
-            >
-              <h3 className="text-primary-500 text-sm font-bold tracking-[0.2em] uppercase mb-3">
-                {item.title}
-              </h3>
-              <p className="text-secondary-300 text-sm leading-relaxed">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
