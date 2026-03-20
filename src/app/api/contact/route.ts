@@ -10,12 +10,8 @@ import { type NextRequest, NextResponse } from 'next/server';
  */
 
 // OneApp customer-forms endpoint
-const ONEAPP_API_URL = process.env.ONEAPP_API_URL || 'http://localhost:3001';
-const CUSTOMER_FORM_KEY = process.env.CUSTOMER_FORM_KEY || '';
-const STORE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Alpha Munitions';
-const STOREFRONT_STORE_ID = process.env.STOREFRONT_STORE_ID
-  ? Number(process.env.STOREFRONT_STORE_ID)
-  : null;
+const ONEAPP_API_URL = process.env.ONEAPP_API_URL!;
+const CUSTOMER_FORM_KEY = process.env.CUSTOMER_FORM_KEY!;
 
 function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,7 +21,7 @@ function validateEmail(email: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, subject, message } = body;
+    const { name, email, subject, message } = body;
 
     // Validate required fields
     if (!name?.trim()) {
@@ -41,11 +37,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    // Parse first/last name
-    const nameParts = name.trim().split(/\s+/);
-    const firstName = nameParts[0];
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
-
     // Forward to OneApp customer-forms endpoint
     const oneappUrl = `${ONEAPP_API_URL}/api/v1/customer-forms/${CUSTOMER_FORM_KEY}/submit`;
 
@@ -53,14 +44,10 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: firstName,
-        last_name: lastName,
+        full_name: name.trim(),
         email_address: email.trim().toLowerCase(),
-        phone_number: phone?.trim() || undefined,
         subject: subject.trim(),
         message: message.trim(),
-        storeId: STOREFRONT_STORE_ID,
-        storeName: STORE_NAME,
       }),
     });
 
