@@ -3,19 +3,24 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import AnimateIn from '~/components/ui/AnimateIn';
+import { useParallax } from '~/hooks/useParallax';
 
 export default function FooterCtaBanner() {
+  const { ref: parallaxRef, style: parallaxStyle } = useParallax(0.1);
+
   return (
     <section className="relative overflow-hidden">
-      {/* Background image of brass casings */}
+      {/* Background image of brass casings with parallax */}
       <div className="relative py-24 sm:py-32">
-        <Image
-          src="/images/cta-brass-casings.jpg"
-          alt="Brass casings close-up"
-          fill
-          className="object-cover"
-          sizes="100vw"
-        />
+        <div ref={parallaxRef} className="absolute inset-[-10%]" style={parallaxStyle}>
+          <Image
+            src="/images/cta-brass-casings.jpg"
+            alt="Brass casings close-up"
+            fill
+            className="object-cover"
+            sizes="100vw"
+          />
+        </div>
         <div className="absolute inset-0 bg-black/60" />
 
         <div className="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import type { CategoryWithChildren } from '~/types';
 
@@ -22,6 +23,9 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isOpen, onClose, siteName, categories }: MobileMenuProps) {
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   // Reset expanded category when menu closes
   useEffect(() => {
@@ -34,18 +38,20 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
     setExpandedCategory(prev => prev === categoryId ? null : categoryId);
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/50 z-[60]"
           onClick={onClose}
         />
       )}
 
       {/* Slide-out menu */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-secondary-800 shadow-2xl flex flex-col transform transition-transform duration-300 ${
+      <div className={`fixed inset-y-0 left-0 z-[70] w-72 bg-secondary-800 shadow-2xl flex flex-col transform transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Menu header */}
@@ -158,6 +164,7 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
           </div>
         </nav>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

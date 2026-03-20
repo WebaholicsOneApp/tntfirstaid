@@ -3,9 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useParallax } from '~/hooks/useParallax';
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
+  const { ref: parallaxRef, style: parallaxStyle } = useParallax(0.1);
 
   useEffect(() => {
     setLoaded(true);
@@ -13,16 +15,18 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Background image */}
+      {/* Background image with parallax */}
       <div className="relative h-[60vh] sm:h-[70vh] min-h-[400px] sm:min-h-[500px] max-h-[800px]">
-        <Image
-          src="/images/hero-homepage.jpg"
-          alt="Alpha Munitions - American Made Alpha Grade"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
+        <div ref={parallaxRef} className="absolute inset-[-10%]" style={parallaxStyle}>
+          <Image
+            src="/images/hero-homepage.jpg"
+            alt="Alpha Munitions - American Made Alpha Grade"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        </div>
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40" />
 

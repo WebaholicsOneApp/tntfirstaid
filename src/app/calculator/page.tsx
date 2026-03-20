@@ -32,7 +32,7 @@ export default function CalculatorPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-start">
             {/* Left column — Instructions */}
-            <div>
+            <div className="lg:sticky lg:top-8">
               <h2 className="text-xl font-display font-bold text-secondary-800 mb-4">
                 Wind Constant Calculator Instruction
               </h2>

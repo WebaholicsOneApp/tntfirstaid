@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import AnimateIn from '~/components/ui/AnimateIn';
+import { useInView } from '~/hooks/useInView';
 
 export default function SignaturesSection() {
+  const { ref: imgRef, isInView } = useInView({ threshold: 0.3 });
+
   return (
     <section className="bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
@@ -21,18 +24,20 @@ export default function SignaturesSection() {
           </p>
         </AnimateIn>
 
-        {/* Signatures image */}
-        <AnimateIn animation="fade-in" delay={200}>
-          <div className="relative w-full max-w-md mx-auto">
-            <Image
-              src="https://alphamunitions.com/wp-content/uploads/2025/01/alpha-signatures-1.jpg"
-              alt="Alpha Munitions team signatures"
-              width={500}
-              height={300}
-              className="w-full h-auto"
-            />
-          </div>
-        </AnimateIn>
+        {/* Signatures image — ink-draw reveal */}
+        <div ref={imgRef} className="relative w-full max-w-md mx-auto">
+          <Image
+            src="https://alphamunitions.com/wp-content/uploads/2025/01/alpha-signatures-1.jpg"
+            alt="Alpha Munitions team signatures"
+            width={500}
+            height={300}
+            className="w-full h-auto transition-[filter,opacity] duration-1200 ease-out"
+            style={{
+              filter: isInView ? 'grayscale(0)' : 'grayscale(1)',
+              opacity: isInView ? 1 : 0.6,
+            }}
+          />
+        </div>
       </div>
     </section>
   );

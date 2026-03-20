@@ -50,11 +50,11 @@ function InputField({ name, value, onChange, placeholder }: {
 }) {
   return (
     <input
-      type="number"
+      type="text"
+      inputMode="decimal"
       name={name}
       value={value}
       onChange={onChange}
-      step="any"
       placeholder={placeholder}
       className="w-full px-4 py-2.5 bg-white border border-primary-300 rounded-lg text-sm text-center focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20"
     />
@@ -67,6 +67,14 @@ function OutputField({ value }: { value: string | number }) {
       {value}
     </div>
   );
+}
+
+interface Row {
+  label: string;
+  hint: string;
+  required: boolean;
+  isInput: boolean;
+  content: React.ReactNode;
 }
 
 export default function CalculatorClient() {
@@ -84,16 +92,36 @@ export default function CalculatorClient() {
     setInputs((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const rows: { label: string; hint: string; content: React.ReactNode }[] = [
-    { label: 'Distance (Yards)', hint: 'Enter yards in 100 yard increments', content: <InputField name="distance" value={inputs.distance} onChange={handleChange} placeholder="200" /> },
-    { label: 'Wind Velocity (MPH)', hint: 'Enter wind velocity', content: <InputField name="windVelocity" value={inputs.windVelocity} onChange={handleChange} placeholder="10" /> },
-    { label: 'Software Produced MOA Correction', hint: 'Ballistic app MOA correction for above wind', content: <InputField name="softwareMoa" value={inputs.softwareMoa} onChange={handleChange} placeholder="1.1" /> },
-    { label: 'True Constant', hint: 'Will auto-populate', content: <OutputField value={results?.trueConstant ?? ''} /> },
-    { label: 'True Wind Drift (Inches)', hint: 'Will auto-populate', content: <OutputField value={results?.trueWindDrift ?? ''} /> },
-    { label: 'Field Constant', hint: 'Adjust to meet your wind drift deviation limit', content: <InputField name="fieldConstant" value={inputs.fieldConstant} onChange={handleChange} placeholder={results ? String(Math.round(results.trueConstant)) : '18'} /> },
-    { label: 'Field Constant Produced Wind Drift (Inches)', hint: 'Will auto-populate', content: <OutputField value={results?.fieldConstantDrift ?? ''} /> },
-    { label: 'Deviation From True Wind Drift', hint: 'Will auto-populate', content: <OutputField value={results?.deviation ?? ''} /> },
+  const handleReset = useCallback(() => {
+    setInputs({ distance: '', windVelocity: '', softwareMoa: '', fieldConstant: '' });
+  }, []);
+
+  const inputRows: Row[] = [
+    { label: 'Distance (Yards)', hint: 'Enter yards in 100 yard increments', required: true, isInput: true, content: <InputField name="distance" value={inputs.distance} onChange={handleChange} placeholder="ex: 600" /> },
+    { label: 'Wind Velocity (MPH)', hint: 'Enter wind velocity', required: true, isInput: true, content: <InputField name="windVelocity" value={inputs.windVelocity} onChange={handleChange} placeholder="ex: 9" /> },
+    { label: 'Software Produced MOA Correction', hint: 'Ballistic app MOA correction for above wind', required: true, isInput: true, content: <InputField name="softwareMoa" value={inputs.softwareMoa} onChange={handleChange} placeholder="ex: 3.0" /> },
   ];
+
+  const resultRows: Row[] = [
+    { label: 'True Constant', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.trueConstant ?? ''} /> },
+    { label: 'True Wind Drift (Inches)', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.trueWindDrift ?? ''} /> },
+    { label: 'Field Constant', hint: 'Adjust to meet your wind drift deviation limit', required: false, isInput: true, content: <InputField name="fieldConstant" value={inputs.fieldConstant} onChange={handleChange} placeholder={results ? `ex: ${Math.round(results.trueConstant)}` : 'ex: 18'} /> },
+    { label: 'Field Constant Produced Wind Drift (Inches)', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.fieldConstantDrift ?? ''} /> },
+    { label: 'Deviation From True Wind Drift', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.deviation ?? ''} /> },
+  ];
+
+  function renderRow(row: Row) {
+    return (
+      <div key={row.label} className={row.isInput ? 'border-l-2 border-l-primary-500 pl-3' : ''}>
+        <label className="block text-[10px] font-bold text-secondary-600 uppercase tracking-[0.12em] text-center mb-1.5">
+          {row.label}
+          {row.required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+        <div>{row.content}</div>
+        <p className="text-[10px] text-gray-400 mt-1 text-center">{row.hint}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -103,20 +131,35 @@ export default function CalculatorClient() {
         </h2>
       </div>
 
-      <div className="bg-primary-500/20 px-5 py-4 space-y-4">
-        {rows.map((row) => (
-          <div key={row.label}>
-            <label className="block text-[10px] font-bold text-secondary-600 uppercase tracking-[0.12em] text-center mb-1.5">
-              {row.label}
-            </label>
-            <div className="flex items-start gap-3">
-              <div className="flex-1">{row.content}</div>
-              <span className="text-[10px] text-gray-400 leading-tight w-32 pt-2.5 hidden xl:block">
-                {row.hint}
-              </span>
-            </div>
-          </div>
-        ))}
+      <div className="bg-primary-500/20 px-5 py-4 space-y-3">
+        {/* YOUR INPUTS section */}
+        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary-500 text-center">
+          Your Inputs
+        </div>
+
+        {inputRows.map(renderRow)}
+
+        {/* RESULTS section */}
+        <div className="border-t border-primary-300 pt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary-500 text-center">
+          Results
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {resultRows.slice(0, 4).map(renderRow)}
+        </div>
+        {/* Deviation — full width */}
+        {resultRows[4] && renderRow(resultRows[4])}
+
+        {/* Reset button */}
+        <div className="pt-2 text-center">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="px-6 py-2 text-xs font-semibold uppercase tracking-wider border border-secondary-400 text-secondary-600 rounded-lg hover:bg-secondary-100 transition-colors"
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       <div className="bg-primary-500 rounded-b-xl px-5 py-2.5" />

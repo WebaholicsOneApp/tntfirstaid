@@ -7,6 +7,7 @@ import ShopBrassCarousel from '~/components/home/ShopBrassCarousel';
 import ReamersSection from '~/components/home/ReamersSection';
 import SignaturesSection from '~/components/home/SignaturesSection';
 import FooterCtaBanner from '~/components/home/FooterCtaBanner';
+import AnimatedDivider from '~/components/ui/AnimatedDivider';
 
 export default async function HomePage() {
   // Fetch brass products and reamer/tool products in parallel
@@ -21,11 +22,11 @@ export default async function HomePage() {
       <OcdTechnologySection />
       <FeatureIconsSection />
       <DataDrivenSection />
-      <div className="mx-auto max-w-7xl px-6 lg:px-8"><hr className="border-secondary-200" /></div>
+      <AnimatedDivider />
       <ShopBrassCarousel products={brassProducts} />
-      <div className="mx-auto max-w-7xl px-6 lg:px-8"><hr className="border-secondary-200" /></div>
+      <AnimatedDivider />
       <ReamersSection products={reamerProducts} />
-      <div className="mx-auto max-w-7xl px-6 lg:px-8"><hr className="border-secondary-200" /></div>
+      <AnimatedDivider />
       <SignaturesSection />
       <FooterCtaBanner />
     </>

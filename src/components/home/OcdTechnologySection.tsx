@@ -20,7 +20,7 @@ const hotspots: HotspotData[] = [
     id: 'flash-holes',
     title: 'Flash Holes',
     description:
-      'Every Alpha case features precision-drilled flash holes that are centered and deburred. This attention to detail ensures consistent ignition and contributes to the extreme accuracy our brass is known for.',
+      'Our flash holes will always be precisely centered and free of burrs. Flash holes free of burrs have shown lower ES/SD\'s in testing. Extensive testing was also conducted on flash hole size. We consistently saw better performance from the .08" flash holes vs the .062". The .08" flash hole was used to break 8 International Benchrest Shooters (IBS) world records in 2021.',
     left: '9.3%',
     top: '48%',
     direction: 'right',
@@ -29,7 +29,7 @@ const hotspots: HotspotData[] = [
     id: 'internal-volumes',
     title: 'Internal Volumes',
     description:
-      'Case-to-case consistency in internal volume is what separates premium brass from the rest. Our proprietary manufacturing process delivers industry-leading uniformity in H2O capacity.',
+      'Our production line and tooling are designed to produce extremely consistent internal volumes. Consistent internal volumes results in extremely consistent velocities.',
     left: '52.5%',
     top: '46%',
     direction: 'above',
@@ -38,7 +38,7 @@ const hotspots: HotspotData[] = [
     id: 'neck-tension',
     title: 'Neck Tension',
     description:
-      'Consistent neck tension is the foundation of precision ammunition. Alpha brass is manufactured to exacting tolerances, ensuring uniform neck wall thickness and concentricity for every case.',
+      'Proper neck tension is key to ensure consistent release of the bullet from the case. Varying neck tension will produce inconsistent bullet velocities which greatly affects a bullets trajectory. We developed proprietary tooling to ensure extremely consistent neck tension.',
     left: '89%',
     top: '46%',
     direction: 'left',
