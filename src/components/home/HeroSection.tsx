@@ -29,14 +29,14 @@ export default function HeroSection() {
         {/* Content overlay */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <h1
-            className={`text-primary-500 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.3em] uppercase transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-[0.3em] uppercase transition-[opacity,transform] duration-700 ${loaded ? 'opacity-100 translate-y-0 hero-shimmer' : 'opacity-0 translate-y-4 text-primary-500'}`}
           >
             <span className="block">American Made.</span>
             <span className="block">Alpha Grade.</span>
           </h1>
-          {/* Gold underline */}
+          {/* Gold underline — draws left to right */}
           <div
-            className={`w-20 h-0.5 bg-primary-500 mt-6 mb-8 transition-all duration-700 delay-200 ${loaded ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`}
+            className={`w-20 h-0.5 bg-primary-500 mt-6 mb-8 ${loaded ? 'animate-draw-line' : 'opacity-0'}`}
           />
           {/* Shop button */}
           <Link

@@ -69,7 +69,45 @@
 }
 .animate-hotspot-pop-in { animation: hotspot-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
+/* Hero gold shimmer — light glints across text like polished brass */
+@keyframes shimmer {
+  from { background-position: 100% center; }
+  to { background-position: 0% center; }
+}
+.hero-shimmer {
+  background: linear-gradient(
+    105deg,
+    #e9c360 0%, #e9c360 35%,
+    #fef9e7 45%, #ffffff 50%, #fef9e7 55%,
+    #e9c360 65%, #e9c360 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 1.5s ease-in-out 0.9s both;
+}
+
+/* Underline draw left-to-right */
+@keyframes draw-line {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+.animate-draw-line {
+  animation: draw-line 800ms ease-out 200ms both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-hotspot-pulse { animation: none; }
   .animate-hotspot-pop-in { animation: none; opacity: 1; }
+  .hero-shimmer {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: var(--color-primary-500);
+  }
+  .animate-draw-line {
+    animation: none;
+    clip-path: none;
+  }
 }
