@@ -79,12 +79,16 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     <div className="container mx-auto px-4 py-8">
       {/* Page heading */}
       <div className="mb-8">
+        <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-3">
+          {'// All Products //'}
+        </p>
         <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-800">
           Shop
         </h1>
+        <div className="mt-3 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
         <Breadcrumbs
           items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
-          className="mt-2"
+          className="mt-3"
         />
         <p className="mt-2 text-secondary-500">
           Browse our selection of premium ammunition and reloading supplies.

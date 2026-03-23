@@ -4,6 +4,7 @@
   --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
   --font-serif: var(--font-cardo), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Courier New", monospace;
   --color-primary-50: var(--primary-50, #fdf8eb);
   --color-primary-100: var(--primary-100, #faefc5);
   --color-primary-200: var(--primary-200, #f5df8f);

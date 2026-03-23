@@ -24,13 +24,18 @@ export default async function NewsPage() {
           priority
         />
         <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
-            Stay Informed
+          <p className="font-mono text-[0.65rem] tracking-[0.3em] text-primary-500/70 uppercase mb-4">
+            {'// Stay Informed //'}
           </p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-2">
             News & Data
           </h1>
+          <div className="mx-auto mt-4 mb-6 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
           <p className="text-secondary-300 text-lg leading-relaxed">
             Technical articles, data-driven insights, and everything happening
             at Alpha Munitions.

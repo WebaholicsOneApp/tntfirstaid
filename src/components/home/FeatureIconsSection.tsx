@@ -7,8 +7,19 @@ export default function FeatureIconsSection() {
   const { ref, isInView } = useInView();
 
   return (
-    <section className="bg-gray-50 py-20 sm:py-28">
-      <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-secondary-50 py-20 sm:py-28">
+      {/* Corner brackets */}
+      <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-secondary-200" />
+      <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-secondary-200" />
+      <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-secondary-200" />
+      <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-secondary-200" />
+
+      <div ref={ref} className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Section eyebrow */}
+        <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase text-center mb-12">
+          {'// WHY ALPHA //'}
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
           {/* Technology — column 0 */}
           <div className="text-center">
@@ -36,7 +47,7 @@ export default function FeatureIconsSection() {
               </svg>
             </div>
             <h3
-              className={`text-sm font-bold text-secondary-800 tracking-[0.15em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              className={`font-mono text-[0.7rem] font-bold text-secondary-800 tracking-[0.2em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
               style={{ transitionDelay: '700ms' }}
             >
               Technology
@@ -76,7 +87,7 @@ export default function FeatureIconsSection() {
               </svg>
             </div>
             <h3
-              className={`text-sm font-bold text-secondary-800 tracking-[0.15em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              className={`font-mono text-[0.7rem] font-bold text-secondary-800 tracking-[0.2em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
               style={{ transitionDelay: '850ms' }}
             >
               Quality
@@ -137,7 +148,7 @@ export default function FeatureIconsSection() {
               </svg>
             </div>
             <h3
-              className={`text-sm font-bold text-secondary-800 tracking-[0.15em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+              className={`font-mono text-[0.7rem] font-bold text-secondary-800 tracking-[0.2em] uppercase mb-4 transition-all duration-200 ease-out ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
               style={{ transitionDelay: '1000ms' }}
             >
               Support

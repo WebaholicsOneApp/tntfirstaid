@@ -152,13 +152,18 @@ export default async function DistributorsPage() {
           priority
         />
         <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
-            Dealer Network
+          <p className="font-mono text-[0.65rem] tracking-[0.3em] text-primary-500/70 uppercase mb-4">
+            {'// Dealer Network //'}
           </p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-2">
             Authorized Distributors
           </h1>
+          <div className="mx-auto mt-4 mb-6 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
           <p className="text-secondary-300 text-lg leading-relaxed">
             {storeConfig.siteName} products are available through our growing
             network of authorized dealers worldwide.
@@ -174,7 +179,7 @@ export default async function DistributorsPage() {
               <h2 className="text-2xl font-display font-bold text-secondary-800 mb-6 flex items-center gap-3">
                 <span className="text-3xl">{group.flag}</span>
                 {group.country}
-                <span className="text-sm font-normal text-gray-400">
+                <span className="text-sm font-normal text-secondary-400">
                   ({group.distributors.length})
                 </span>
               </h2>
@@ -182,7 +187,7 @@ export default async function DistributorsPage() {
                 {group.distributors.map((dist) => (
                   <div
                     key={dist.name}
-                    className="bg-white rounded-xl border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
+                    className="bg-white border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
                   >
                     <h3 className="font-display font-bold text-secondary-800 text-sm">
                       {dist.name}
@@ -233,8 +238,11 @@ export default async function DistributorsPage() {
           ))}
 
           {/* Become a Distributor CTA */}
-          <section className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+          <section className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+            <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+            <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+            <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+            <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
                 Become a Distributor
@@ -247,15 +255,17 @@ export default async function DistributorsPage() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   href="/dealer-sign-up"
-                  className="px-10 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-colors text-sm uppercase tracking-widest"
+                  className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-10 py-4"
                 >
-                  Apply Now
+                  <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Apply Now</span>
                 </Link>
                 <a
                   href={storeConfig.phoneHref}
-                  className="px-10 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-colors text-sm uppercase tracking-widest border border-white/10"
+                  className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-10 py-4"
                 >
-                  Call Us
+                  <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-white">Call Us</span>
                 </a>
               </div>
             </div>

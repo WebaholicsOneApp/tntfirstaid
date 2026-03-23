@@ -37,17 +37,21 @@ export default async function PrivacyPolicyPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <nav className="container mx-auto px-4 py-4 text-sm text-gray-500">
+      <nav className="container mx-auto px-4 py-4 font-mono text-xs tracking-wider text-secondary-400">
         <Link href="/" className="hover:text-primary-600 transition-colors">
           Home
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-secondary-800 font-medium">Privacy Policy</span>
+        <span className="mx-2 text-secondary-300">/</span>
+        <span className="text-secondary-500 font-medium">Privacy Policy</span>
       </nav>
 
       {/* Hero Header */}
       <header className="bg-secondary-900 py-12 md:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/15 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
             Privacy <span className="text-primary-500">Policy</span>
@@ -58,6 +62,7 @@ export default async function PrivacyPolicyPage() {
           <p className="text-secondary-500 text-sm mt-4">
             Last updated: {config.lastUpdatedDate}
           </p>
+          <div className="mx-auto mt-4 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
         </div>
       </header>
 
@@ -67,7 +72,7 @@ export default async function PrivacyPolicyPage() {
           {config.showOverview && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
@@ -76,7 +81,7 @@ export default async function PrivacyPolicyPage() {
                   Overview
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>{overviewText}</p>
                 <p>
                   By using our website, you agree to the collection and use of
@@ -91,7 +96,7 @@ export default async function PrivacyPolicyPage() {
           {config.showInformationWeCollect && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-100 rounded-2xl flex items-center justify-center text-secondary-700 flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-700 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -101,11 +106,11 @@ export default async function PrivacyPolicyPage() {
                 </h2>
               </div>
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl p-8 border border-secondary-100">
+                <div className="bg-white p-8 border border-secondary-100">
                   <h3 className="text-lg font-bold text-secondary-800 mb-4">
                     Personal Information
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4">
+                  <p className="text-secondary-600 leading-relaxed mb-4">
                     When you make a purchase, we may collect the following
                     information:
                   </p>
@@ -123,16 +128,16 @@ export default async function PrivacyPolicyPage() {
                             <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                           </svg>
                         </div>
-                        <span className="text-gray-600 text-sm">{item}</span>
+                        <span className="text-secondary-600 text-sm">{item}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="bg-white rounded-2xl p-8 border border-secondary-100">
+                <div className="bg-white p-8 border border-secondary-100">
                   <h3 className="text-lg font-bold text-secondary-800 mb-4">
                     Automatically Collected Information
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4">
+                  <p className="text-secondary-600 leading-relaxed mb-4">
                     When you browse our website, we automatically collect certain
                     information about your device:
                   </p>
@@ -151,7 +156,7 @@ export default async function PrivacyPolicyPage() {
                             <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                           </svg>
                         </div>
-                        <span className="text-gray-600 text-sm">{item}</span>
+                        <span className="text-secondary-600 text-sm">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -164,7 +169,7 @@ export default async function PrivacyPolicyPage() {
           {config.showHowWeUseInfo && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
@@ -173,7 +178,7 @@ export default async function PrivacyPolicyPage() {
                   How We Use Your Information
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100">
                 <div className="space-y-4">
                   {[
                     { title: 'Process Orders', desc: 'Fulfill and ship your orders, process payments, and send order confirmations and shipping updates.' },
@@ -187,7 +192,7 @@ export default async function PrivacyPolicyPage() {
                       <span className="text-primary-600 font-bold text-lg mt-0.5">{i + 1}</span>
                       <div>
                         <h4 className="font-bold text-secondary-800 text-sm">{item.title}</h4>
-                        <p className="text-gray-600 text-sm mt-1">{item.desc}</p>
+                        <p className="text-secondary-600 text-sm mt-1">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -200,7 +205,7 @@ export default async function PrivacyPolicyPage() {
           {config.showInformationSharing && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -209,7 +214,7 @@ export default async function PrivacyPolicyPage() {
                   Information Sharing
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-6 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 md:p-12 border border-secondary-100 space-y-6 text-secondary-600 leading-relaxed">
                 <p>
                   We do{' '}
                   <span className="font-bold text-secondary-800">not</span>{' '}
@@ -222,7 +227,7 @@ export default async function PrivacyPolicyPage() {
                     <h4 className="font-bold text-secondary-800 text-sm mb-3">
                       Service Providers
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       With trusted third parties who assist in operating our
                       website, processing payments (Stripe), and shipping orders
                       (UPS).
@@ -232,7 +237,7 @@ export default async function PrivacyPolicyPage() {
                     <h4 className="font-bold text-secondary-800 text-sm mb-3">
                       Legal Requirements
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       When required by law, subpoena, or other legal process, or
                       to protect our rights, property, or safety.
                     </p>
@@ -241,7 +246,7 @@ export default async function PrivacyPolicyPage() {
                     <h4 className="font-bold text-secondary-800 text-sm mb-3">
                       Business Transfers
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       In connection with a merger, acquisition, or sale of
                       assets, your information may be transferred as a business
                       asset.
@@ -256,7 +261,7 @@ export default async function PrivacyPolicyPage() {
           {config.showCookiesTracking && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                   </svg>
@@ -265,7 +270,7 @@ export default async function PrivacyPolicyPage() {
                   Cookies & Tracking
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>
                   We use cookies and similar technologies to enhance your
                   browsing experience. Cookies are small data files stored on
@@ -286,7 +291,7 @@ export default async function PrivacyPolicyPage() {
                     <p className="text-sm">Used to deliver relevant advertisements and track campaign effectiveness.</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 pt-2">
+                <p className="text-sm text-secondary-500 pt-2">
                   You can control cookies through your browser settings. Disabling
                   certain cookies may affect website functionality.
                 </p>
@@ -298,7 +303,7 @@ export default async function PrivacyPolicyPage() {
           {config.showDataSecurity && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-800 rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-800 rounded flex items-center justify-center text-white flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
@@ -307,7 +312,7 @@ export default async function PrivacyPolicyPage() {
                   Data Security
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>We implement industry-standard security measures to protect your personal information:</p>
                 <div className="grid md:grid-cols-2 gap-4 pt-2">
                   {[
@@ -319,7 +324,7 @@ export default async function PrivacyPolicyPage() {
                     'Automated threat detection',
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-secondary-100">
-                      <div className="w-5 h-5 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-5 h-5 bg-primary-500/10 text-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                         </svg>
@@ -328,7 +333,7 @@ export default async function PrivacyPolicyPage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-500 pt-2">
+                <p className="text-sm text-secondary-500 pt-2">
                   While we strive to protect your information, no method of
                   transmission over the internet is 100% secure. We cannot
                   guarantee absolute security but are committed to maintaining the
@@ -342,7 +347,7 @@ export default async function PrivacyPolicyPage() {
           {config.showYourRights && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -351,7 +356,7 @@ export default async function PrivacyPolicyPage() {
                   Your Rights
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>You have the right to:</p>
                 <div className="space-y-3">
                   {[
@@ -362,16 +367,16 @@ export default async function PrivacyPolicyPage() {
                     'Request a copy of your data in a portable format',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-5 h-5 bg-primary-500/10 text-primary-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                         </svg>
                       </div>
-                      <span className="text-gray-600">{item}</span>
+                      <span className="text-secondary-600">{item}</span>
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-500 pt-2">
+                <p className="text-sm text-secondary-500 pt-2">
                   To exercise any of these rights, please contact us at{' '}
                   <a href={`mailto:${storeConfig.supportEmail}`} className="text-primary-600 hover:underline font-medium">
                     {storeConfig.supportEmail}
@@ -386,7 +391,7 @@ export default async function PrivacyPolicyPage() {
           {/* Children's Privacy */}
           {config.showChildrensPrivacy && (
             <section>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 text-secondary-600 leading-relaxed">
                 <h3 className="text-lg font-bold text-secondary-800 mb-3">
                   Children&apos;s Privacy
                 </h3>
@@ -405,7 +410,7 @@ export default async function PrivacyPolicyPage() {
           {/* Changes to This Policy */}
           {config.showChangesToPolicy && (
             <section>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 text-secondary-600 leading-relaxed">
                 <h3 className="text-lg font-bold text-secondary-800 mb-3">
                   Changes to This Policy
                 </h3>
@@ -423,8 +428,11 @@ export default async function PrivacyPolicyPage() {
 
           {/* Contact CTA */}
           {config.showContactCta && (
-            <div className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+              <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+              <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+              <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+              <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
               <div className="relative z-10">
                 <h2 className="text-2xl md:text-4xl font-display font-bold text-white mb-6">
                   Have <span className="text-primary-500">Questions?</span>
@@ -435,15 +443,17 @@ export default async function PrivacyPolicyPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     href="/contact"
-                    className="px-8 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-all text-sm uppercase tracking-widest"
+                    className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Contact Us
+                    <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Contact Us</span>
                   </Link>
                   <a
                     href={`mailto:${storeConfig.supportEmail}`}
-                    className="px-8 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-sm uppercase tracking-widest border border-white/10"
+                    className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Email Support
+                    <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-white">Email Support</span>
                   </a>
                 </div>
               </div>

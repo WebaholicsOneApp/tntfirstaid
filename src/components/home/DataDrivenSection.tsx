@@ -20,11 +20,24 @@ export default function DataDrivenSection() {
           </AnimateIn>
 
           {/* Right: Content panel */}
-          <AnimateIn animation="fade-up" delay={150} className="flex items-center bg-gray-50 p-10 lg:p-16">
+          <AnimateIn animation="fade-up" delay={150} className="relative flex items-center bg-secondary-50 p-10 lg:p-16">
+            {/* Subtle corner brackets */}
+            <div className="absolute top-6 right-6 h-6 w-6 border-t border-r border-secondary-200" />
+            <div className="absolute bottom-6 right-6 h-6 w-6 border-b border-r border-secondary-200" />
+
             <div>
+              {/* Eyebrow */}
+              <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-4">
+                {'// PERFORMANCE //'}
+              </p>
+
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 leading-tight">
                 Data Driven Performance
               </h2>
+
+              {/* Gold divider */}
+              <div className="mt-5 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
+
               <div className="mt-6 space-y-4 text-secondary-500 leading-relaxed">
                 <p>
                   At Alpha Munitions, engineering, technology, and innovation are the

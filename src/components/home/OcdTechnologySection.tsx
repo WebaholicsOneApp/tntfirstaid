@@ -55,8 +55,14 @@ export default function OcdTechnologySection() {
   const activeData = hotspots.find((h) => h.id === activeHotspot);
 
   return (
-    <section className="bg-white py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-white py-20 sm:py-28">
+      {/* Corner brackets */}
+      <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-secondary-200" />
+      <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-secondary-200" />
+      <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-secondary-200" />
+      <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-secondary-200" />
+
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left: Bullet image with hotspots */}
           <AnimateIn animation="slide-right">
@@ -87,7 +93,7 @@ export default function OcdTechnologySection() {
             {/* Mobile: active hotspot content below image */}
             <div className="lg:hidden mt-4 min-h-[100px]">
               {activeData ? (
-                <div className="rounded-lg border-t-2 border-primary-500 bg-secondary-50 p-4 animate-slide-up">
+                <div className="border-t-2 border-primary-500 bg-secondary-50 p-4 animate-slide-up">
                   <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-primary-700 mb-2">
                     {activeData.title}
                   </h4>
@@ -106,6 +112,11 @@ export default function OcdTechnologySection() {
           {/* Right: OCD Content */}
           <AnimateIn animation="fade-up" delay={150}>
             <div>
+              {/* Eyebrow */}
+              <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-4">
+                {'// OCD TECHNOLOGY //'}
+              </p>
+
               {/* OCD logo image */}
               <div className="mb-6">
                 <Image
@@ -121,6 +132,9 @@ export default function OcdTechnologySection() {
                 Alpha Munitions Ultra Premium Rifle Brass with OCD (Optimized Case Design)
                 Technology.
               </h2>
+
+              {/* Gold divider */}
+              <div className="mt-6 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
 
               <ul className="mt-6 space-y-4 text-secondary-600 leading-relaxed">
                 <li className="flex gap-3">
@@ -149,22 +163,12 @@ export default function OcdTechnologySection() {
               <div className="mt-8">
                 <Link
                   href="/about"
-                  className="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold text-sm tracking-wider uppercase transition-colors duration-200 group"
+                  className="group relative inline-block overflow-hidden border border-primary-500 rounded font-mono font-semibold text-sm tracking-[0.2em] uppercase px-8 py-3 transition-colors duration-200"
                 >
-                  LEARN MORE
-                  <svg
-                    className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-primary-600 transition-colors duration-500 group-hover:text-secondary-900">
+                    LEARN MORE
+                  </span>
                 </Link>
               </div>
             </div>

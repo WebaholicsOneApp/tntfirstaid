@@ -25,7 +25,7 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
         return (
           <div
             key={index}
-            className={`rounded-2xl border transition-all ${
+            className={`border transition-all ${
               isOpen
                 ? 'border-primary-500/30 bg-primary-500/5 shadow-sm'
                 : 'border-secondary-100 bg-secondary-50 hover:border-secondary-200'
@@ -64,7 +64,7 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
             </button>
             {isOpen && (
               <div className="px-6 pb-6 md:px-8 md:pb-8 pl-14 md:pl-16 animate-fade-in">
-                <p className="text-gray-600 leading-relaxed">{faq.a}</p>
+                <p className="text-secondary-600 leading-relaxed">{faq.a}</p>
               </div>
             )}
           </div>

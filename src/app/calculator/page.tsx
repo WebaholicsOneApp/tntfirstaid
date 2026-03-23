@@ -21,10 +21,18 @@ export default function CalculatorPage() {
           priority
         />
         <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-white">
+          <p className="font-mono text-[0.65rem] tracking-[0.3em] text-primary-500/70 uppercase mb-4">
+            {'// Ballistics Tool //'}
+          </p>
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-2">
             Kauber&apos;s Wind Constant Calculator
           </h1>
+          <div className="mx-auto mt-4 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
         </div>
       </header>
 
@@ -37,7 +45,7 @@ export default function CalculatorPage() {
                 Wind Constant Calculator Instruction
               </h2>
 
-              <div className="space-y-3 text-gray-600 leading-relaxed text-sm">
+              <div className="space-y-3 text-secondary-600 leading-relaxed text-sm">
                 <p>
                   The purpose of the Wind Constant Calculator is to provide a means to
                   obtain wind constants for your specific caliber, projectile and velocity
