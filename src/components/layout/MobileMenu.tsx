@@ -71,7 +71,7 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
         </div>
 
         {/* Scrollable nav links */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-4">
           {/* Main navigation links */}
           {[
             { href: '/shop', label: 'Shop' },
