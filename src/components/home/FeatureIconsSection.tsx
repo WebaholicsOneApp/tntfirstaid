@@ -22,7 +22,7 @@ export default function FeatureIconsSection() {
               Why Alpha
             </span>
           </div>
-          <h2 className="font-display text-6xl md:text-7xl font-bold text-secondary-900 leading-[0.95] tracking-tight">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold text-secondary-900 leading-tight tracking-tight">
             Built to a<br />
             <em className="not-italic text-primary-600">Higher Standard</em>
           </h2>
@@ -128,7 +128,7 @@ export default function FeatureIconsSection() {
               Support
             </p>
             <h3 className="font-display text-3xl font-bold text-secondary-900 leading-tight mb-4">
-              Expert<br />Support
+              Expert Support.<br />Always Here.
             </h3>
             <p className="text-sm text-secondary-400 leading-relaxed mb-8">
               Our team of experienced shooters and reloaders is here to help. Whether
