@@ -1,5 +1,6 @@
 import { getFeaturedProducts, getCategoryIdsByNamePattern, getProducts } from '~/lib/data';
 import HudHeroSection from '~/components/home/HudHeroSection';
+import MarqueeBand from '~/components/home/MarqueeBand';
 import OcdTechnologySection from '~/components/home/OcdTechnologySection';
 import FeatureIconsSection from '~/components/home/FeatureIconsSection';
 import DataDrivenSection from '~/components/home/DataDrivenSection';
@@ -17,6 +18,7 @@ export default async function HomePage() {
   return (
     <>
       <HudHeroSection />
+      <MarqueeBand />
       <OcdTechnologySection />
       <FeatureIconsSection />
       <DataDrivenSection />

@@ -98,6 +98,15 @@
   animation: draw-line 800ms ease-out 200ms both;
 }
 
+/* Marquee band */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-33.333%); }
+}
+.animate-marquee-scroll {
+  animation: marquee-scroll 35s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-hotspot-pulse { animation: none; }
   .animate-hotspot-pop-in { animation: none; opacity: 1; }
@@ -111,6 +120,7 @@
     animation: none;
     clip-path: none;
   }
+  .animate-marquee-scroll { animation-play-state: paused; }
   /* Disable all custom transitions/animations for accessibility */
   *,
   *::before,

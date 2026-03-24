@@ -86,13 +86,13 @@ function SuccessContent() {
         <div className="space-y-4">
           <Link
             href="/shop"
-            className="block w-full py-4 bg-[#C4A035] text-white font-bold rounded-2xl hover:bg-[#B08E2B] transition-all text-sm"
+            className="block w-full py-3 rounded-full bg-primary-500 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase text-center hover:bg-primary-400 active:scale-[0.98] transition-all duration-300"
           >
             Continue Shopping
           </Link>
           <Link
             href="/"
-            className="block w-full py-4 bg-white text-neutral-600 font-bold rounded-2xl border border-neutral-200 hover:bg-neutral-50 transition-all text-sm"
+            className="block w-full py-3 rounded-full border border-primary-500/40 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase text-center hover:border-primary-500 transition-all duration-300"
           >
             Back to Home
           </Link>
@@ -101,7 +101,7 @@ function SuccessContent() {
         <div className="mt-12 pt-8 border-t border-neutral-100">
           <p className="text-xs text-neutral-400 font-bold uppercase tracking-widest mb-4">Need Help?</p>
           <div className="flex justify-center gap-6">
-            <Link href="/contact" className="text-xs font-bold text-[#C4A035] hover:text-[#B08E2B] uppercase tracking-widest">
+            <Link href="/contact" className="font-mono text-[0.7rem] tracking-[0.15em] text-primary-600 hover:text-primary-500 uppercase transition-colors">
               Contact Us
             </Link>
           </div>
@@ -115,7 +115,7 @@ export default function SuccessPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-[#C4A035] border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" />
       </div>
     }>
       <SuccessContent />

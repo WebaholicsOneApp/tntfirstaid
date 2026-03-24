@@ -33,10 +33,10 @@ export default function ProductCard({ product, className, theme = 'light' }: Pro
     <Link
       href={`/product/${product.slug}`}
       className={cn(
-        'group block border transition-all duration-200',
+        'group block border transition-all duration-300 ease-out',
         isDark
-          ? 'bg-secondary-900 border-primary-500/10 hover:border-primary-500/30 hover:shadow-[0_0_20px_rgba(233,195,96,0.08)]'
-          : 'rounded-lg bg-white border-secondary-100 hover:border-primary-300 hover:shadow-md',
+          ? 'bg-secondary-900 border-primary-500/10 hover:border-primary-500/30 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.12)] active:scale-[0.99] active:translate-y-0'
+          : 'rounded-lg bg-white border-secondary-100 hover:border-primary-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:scale-[0.99] active:translate-y-0',
         className
       )}
     >

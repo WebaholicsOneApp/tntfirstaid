@@ -142,32 +142,24 @@ export default async function DistributorsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero */}
-      <header className="relative py-24 md:py-36 overflow-hidden">
+      <header className="relative bg-secondary-900 overflow-hidden min-h-[300px] md:min-h-[400px]">
         <Image
           src="/images/heroes/distributors.jpg"
           alt="Alpha Munitions products"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25 z-10" />
-        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25 z-10" />
-        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25 z-10" />
-        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25 z-10" />
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="font-mono text-[0.65rem] tracking-[0.3em] text-primary-500/70 uppercase mb-4">
-            {'// Dealer Network //'}
-          </p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-2">
-            Authorized Distributors
-          </h1>
-          <div className="mx-auto mt-4 mb-6 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
-          <p className="text-secondary-300 text-lg leading-relaxed">
-            {storeConfig.siteName} products are available through our growing
-            network of authorized dealers worldwide.
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900/85 via-secondary-900/40 to-black/10" />
+        <div className="container mx-auto px-4 py-14 md:py-20 relative z-10">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400 uppercase">Dealer Network</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">Authorized Distributors</h1>
+            <p className="text-white/60 text-sm leading-relaxed max-w-lg">{storeConfig.siteName} products are available through our growing network of authorized dealers worldwide.</p>
+          </div>
         </div>
       </header>
 
@@ -176,7 +168,7 @@ export default async function DistributorsPage() {
           {/* Distributor Groups */}
           {distributorsByCountry.map((group) => (
             <section key={group.country}>
-              <h2 className="text-2xl font-display font-bold text-secondary-800 mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6 flex items-center gap-3">
                 <span className="text-3xl">{group.flag}</span>
                 {group.country}
                 <span className="text-sm font-normal text-secondary-400">
@@ -189,7 +181,7 @@ export default async function DistributorsPage() {
                     key={dist.name}
                     className="bg-white border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
                   >
-                    <h3 className="font-display font-bold text-secondary-800 text-sm">
+                    <h3 className="font-display font-bold text-secondary-900 text-sm">
                       {dist.name}
                     </h3>
 

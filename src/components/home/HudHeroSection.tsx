@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import Link from 'next/link';
 import { gsap, usePrefersReducedMotion } from '~/hooks/useGSAPAnimation';
 
@@ -18,10 +18,25 @@ const READOUT_POSITIONS: Record<string, string> = {
   'bottom-right': 'bottom-14 right-10 text-right',
 };
 
+const READOUT_VISIBILITY: Record<string, string> = {
+  'top-left':    'md:hidden',       // Would overlap text block on desktop
+  'top-right':   'hidden md:block', // Right HUD area only
+  'bottom-left': 'md:hidden',       // Would overlap CTA area on desktop
+  'bottom-right': '',               // Always visible
+};
+
 export default function HudHeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const [videoVisible, setVideoVisible] = useState(false);
+
+  // Delay iframe visibility so YouTube's loading UI is hidden before fade-in
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    const t = setTimeout(() => setVideoVisible(true), 1200);
+    return () => clearTimeout(t);
+  }, [prefersReducedMotion]);
 
   // Mouse parallax on grid overlay (desktop only)
   const handleMouseMove = useCallback(
@@ -77,10 +92,11 @@ export default function HudHeroSection() {
       });
       gsap.set('[data-hud="center-dot"]', { scale: 0, opacity: 0 });
       gsap.set('[data-hud="hero-text"]', {
-        clipPath: 'inset(50% 50% 50% 50%)',
+        clipPath: 'inset(0% 100% 0% 0%)',
         opacity: 0,
       });
       gsap.set('[data-hud="divider"]', { scaleX: 0, opacity: 0 });
+      gsap.set('[data-hud="american-made"]', { opacity: 0, y: 8 });
       gsap.set('[data-hud="tagline"]', { opacity: 0 });
       gsap.set('[data-hud="cta"]', { opacity: 0, y: 10 });
       gsap.set('[data-hud="scroll-cue"]', { opacity: 0 });
@@ -101,6 +117,9 @@ export default function HudHeroSection() {
       // 0.7s — Hero text reveals
       tl.to('[data-hud="hero-text"]', { clipPath: 'inset(0% 0% 0% 0%)', opacity: 1, duration: 0.6, ease: 'power3.out' }, 0.7);
 
+      // 1.15s — American Made
+      tl.to('[data-hud="american-made"]', { opacity: 1, y: 0, duration: 0.4 }, 1.15);
+
       // 1.2s — Divider + tagline
       tl.to('[data-hud="divider"]', { scaleX: 1, opacity: 1, duration: 0.35 }, 1.2);
       tl.to('[data-hud="tagline"]', { opacity: 1, duration: 0.35 }, 1.3);
@@ -118,8 +137,37 @@ export default function HudHeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden bg-secondary-950"
+      className="relative min-h-[100dvh] w-full overflow-hidden bg-secondary-950"
     >
+
+      {/* -- Background video (YouTube, portrait 9:16) -- */}
+      {!prefersReducedMotion && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/QyWs5N81rZY?autoplay=1&mute=1&loop=1&playlist=QyWs5N81rZY&controls=0&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&playsinline=1"
+            allow="autoplay; encrypted-media"
+            title=""
+            aria-hidden="true"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-1000"
+            style={{
+              width: '100%',
+              height: 'max(100%, 177.78vw)',
+              border: 'none',
+              opacity: videoVisible ? 1 : 0,
+            }}
+          />
+        </div>
+      )}
+
+      {/* -- Gradient overlay: dark left (text legibility) → atmospheric right (video visible) -- */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'linear-gradient(to right, rgba(10,10,10,0.97) 0%, rgba(10,10,10,0.88) 35%, rgba(10,10,10,0.60) 60%, rgba(10,10,10,0.45) 100%)',
+        }}
+      />
+
       {/* Scan-line keyframes + reticle rotation + scroll-cue pulse */}
       <style>{`
         @keyframes hud-scanline {
@@ -185,12 +233,7 @@ export default function HudHeroSection() {
       {DATA_READOUTS.map((group, gi) => (
         <div
           key={group.position}
-          className={`pointer-events-none absolute ${READOUT_POSITIONS[group.position]} ${
-            // Hide top-right and bottom-left on mobile
-            (group.position === 'top-right' || group.position === 'bottom-left')
-              ? 'hidden md:block'
-              : ''
-          }`}
+          className={`pointer-events-none absolute ${READOUT_POSITIONS[group.position]} ${READOUT_VISIBILITY[group.position]}`}
         >
           {group.lines.map((line, li) => (
             <p
@@ -205,8 +248,8 @@ export default function HudHeroSection() {
         </div>
       ))}
 
-      {/* -- Targeting reticle (centered) -- */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      {/* -- Targeting reticle (right half on desktop) -- */}
+      <div className="pointer-events-none absolute inset-y-0 inset-x-0 md:left-[44%] flex items-center justify-center">
         {/* Outer ring — 280px, rotating */}
         <div
           data-hud="outer-ring"
@@ -258,26 +301,43 @@ export default function HudHeroSection() {
       </div>
 
       {/* -- Hero text -- */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+      <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center
+                      md:items-start md:text-left md:w-[44%] md:px-16 lg:px-24">
         {/* Eyebrow */}
         <div data-hud="hero-text">
-          <p className="font-mono text-xs uppercase tracking-[0.4em] text-primary-500/70 mb-4 md:mb-6">
-            {'// Alpha Munitions Command //'}
-          </p>
+          <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="h-px w-6 bg-primary-500/60" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+              Alpha Munitions
+            </span>
+          </div>
         </div>
 
         {/* Heading */}
         <div data-hud="hero-text">
           <h1
-            className="font-display text-5xl font-extrabold uppercase tracking-[0.1em] text-primary-500 md:text-7xl lg:text-8xl"
+            className="font-display text-5xl font-extrabold uppercase tracking-[0.06em] leading-[0.88] text-primary-500 md:text-7xl lg:text-8xl xl:text-9xl"
             style={{
               textShadow:
                 '0 0 40px rgba(233,195,96,0.25), 0 0 80px rgba(233,195,96,0.1)',
             }}
           >
-            <span className="block">ALPHA</span>
-            <span className="block">GRADE</span>
+            <span className="block">AMERICAN</span>
+            <span className="block">MADE</span>
           </h1>
+        </div>
+
+        {/* Secondary headline */}
+        <div data-hud="american-made" className="mt-3">
+          <p
+            className="font-display text-2xl font-extrabold uppercase tracking-[0.35em] md:text-3xl lg:text-4xl xl:text-5xl"
+            style={{
+              WebkitTextStroke: '1px rgba(233,195,96,0.45)',
+              color: 'transparent',
+            }}
+          >
+            ALPHA GRADE
+          </p>
         </div>
 
         {/* Divider */}
@@ -298,24 +358,39 @@ export default function HudHeroSection() {
           {'Precision \u00B7 Performance \u00B7 Perfection'}
         </p>
 
-        {/* CTA */}
+        {/* CTA — HUD corner frame button */}
         <Link
           href="/shop"
           data-hud="cta"
-          className="group relative mt-8 inline-block overflow-hidden border border-primary-500 rounded px-10 py-3 font-mono text-sm uppercase tracking-widest text-primary-500 transition-colors duration-300 hover:text-secondary-950"
+          className="group relative inline-flex items-center gap-4 mt-8 px-8 py-3.5 font-mono text-sm uppercase tracking-widest text-primary-500 hover:text-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
         >
-          <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-300 ease-out group-hover:translate-x-0" />
-          <span className="relative">Shop Now</span>
+          {/* Corner brackets */}
+          <span className="absolute top-0 left-0 w-3 h-3 border-t border-l border-primary-500/50 group-hover:border-primary-500 transition-colors duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" />
+          <span className="absolute top-0 right-0 w-3 h-3 border-t border-r border-primary-500/50 group-hover:border-primary-500 transition-colors duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" />
+          <span className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-primary-500/50 group-hover:border-primary-500 transition-colors duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" />
+          <span className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-primary-500/50 group-hover:border-primary-500 transition-colors duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]" />
+          Shop Now
+          <svg
+            className="w-2.5 h-2.5 group-hover:translate-x-0.5 group-hover:-translate-y-px transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+          </svg>
         </Link>
 
         {/* Scroll cue */}
-        <p
+        <div
           data-hud="scroll-cue"
-          className="absolute bottom-10 font-mono text-xs uppercase tracking-[0.2em] text-secondary-400"
+          className="absolute bottom-10 flex flex-col items-center gap-2"
           style={{ animation: 'hud-pulse 2.5s ease-in-out infinite' }}
         >
-          {'\u25BC Scroll to engage \u25BC'}
-        </p>
+          <p className="font-mono text-[0.6rem] uppercase tracking-[0.25em] text-secondary-500">
+            scroll
+          </p>
+          <svg className="w-3 h-3 text-secondary-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
     </section>
   );

@@ -45,6 +45,12 @@ const hotspots: HotspotData[] = [
   },
 ];
 
+const points = [
+  'OCD Technology is the first major advancement in brass manufacturing in decades.',
+  'OCD brass is the strongest most durable rifle brass ever produced giving shooters the widest performance envelope.',
+  'In testing, OCD brass plastically deforms less than competitors at identical loads resulting in better consistency, brass life and performance in all environmental conditions.',
+];
+
 export default function OcdTechnologySection() {
   const [activeHotspot, setActiveHotspot] = useState<string | null>(null);
 
@@ -56,15 +62,10 @@ export default function OcdTechnologySection() {
 
   return (
     <section className="relative overflow-hidden bg-white py-20 sm:py-28">
-      {/* Corner brackets */}
-      <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-secondary-200" />
-      <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-secondary-200" />
-      <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-secondary-200" />
-      <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-secondary-200" />
-
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left: Bullet image with hotspots */}
+
+          {/* ── Left: Bullet image with hotspots ─────────── */}
           <AnimateIn animation="slide-right">
             <div className="relative" style={{ aspectRatio: '1946 / 704' }}>
               <Image
@@ -74,8 +75,6 @@ export default function OcdTechnologySection() {
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-
-              {/* Hotspot markers */}
               {hotspots.map((hotspot, i) => (
                 <BulletHotspot
                   key={hotspot.id}
@@ -90,89 +89,81 @@ export default function OcdTechnologySection() {
               ))}
             </div>
 
-            {/* Mobile: active hotspot content below image */}
+            {/* Mobile: active hotspot content */}
             <div className="lg:hidden mt-4 min-h-[100px]">
               {activeData ? (
-                <div className="border-t-2 border-primary-500 bg-secondary-50 p-4 animate-slide-up">
+                <div className="border-l-[3px] border-primary-500 bg-secondary-50 pl-4 py-3 animate-slide-up">
                   <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-primary-700 mb-2">
                     {activeData.title}
                   </h4>
-                  <p className="text-sm leading-relaxed text-secondary-600">
+                  <p className="text-sm leading-relaxed text-secondary-500">
                     {activeData.description}
                   </p>
                 </div>
               ) : (
-                <p className="text-center text-sm text-secondary-400">
+                <p className="text-center text-sm text-secondary-300 font-mono tracking-[0.1em]">
                   Tap a + marker to learn more
                 </p>
               )}
             </div>
           </AnimateIn>
 
-          {/* Right: OCD Content */}
+          {/* ── Right: OCD Content ────────────────────────── */}
           <AnimateIn animation="fade-up" delay={150}>
-            <div>
-              {/* Eyebrow */}
-              <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-4">
-                {'// OCD TECHNOLOGY //'}
-              </p>
+            {/* Eyebrow */}
+            <div className="flex items-center gap-3 mb-7">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                OCD Technology
+              </span>
+            </div>
 
-              {/* OCD logo image */}
-              <div className="mb-6">
-                <Image
-                  src="/images/ocd-logo.jpg"
-                  alt="OCD - Optimized Case Design"
-                  width={942}
-                  height={300}
-                  className="w-full max-w-[400px]"
-                />
-              </div>
+            {/* OCD logo */}
+            <div className="mb-7">
+              <Image
+                src="/images/ocd-logo.jpg"
+                alt="OCD — Optimized Case Design"
+                width={942}
+                height={300}
+                className="w-full max-w-[360px] opacity-90"
+              />
+            </div>
 
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-secondary-800 leading-tight">
-                Alpha Munitions Ultra Premium Rifle Brass with OCD (Optimized Case Design)
-                Technology.
-              </h2>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-secondary-900 leading-tight">
+              Alpha Munitions Ultra Premium Rifle Brass with OCD (Optimized Case Design) Technology.
+            </h2>
 
-              {/* Gold divider */}
-              <div className="mt-6 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
+            {/* Gold divider */}
+            <div className="mt-6 h-px w-14 bg-gradient-to-r from-primary-500 to-transparent" />
 
-              <ul className="mt-6 space-y-4 text-secondary-600 leading-relaxed">
-                <li className="flex gap-3">
-                  <span className="text-primary-500 mt-1 flex-shrink-0">&#9679;</span>
-                  <span>
-                    OCD Technology is the first major advancement in brass manufacturing in decades.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-primary-500 mt-1 flex-shrink-0">&#9679;</span>
-                  <span>
-                    OCD brass is the strongest most durable rifle brass ever produced giving shooters
-                    the widest performance envelope.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-primary-500 mt-1 flex-shrink-0">&#9679;</span>
-                  <span>
-                    In testing, OCD brass plastically deforms less than competitors at identical
-                    loads resulting in better consistency, brass life and performance in all
-                    environmental conditions.
-                  </span>
-                </li>
-              </ul>
-
-              <div className="mt-8">
-                <Link
-                  href="/about"
-                  className="group relative inline-block overflow-hidden border border-primary-500 rounded font-mono font-semibold text-sm tracking-[0.2em] uppercase px-8 py-3 transition-colors duration-200"
+            {/* Feature points — gold left border treatment */}
+            <ul className="mt-7 space-y-5">
+              {points.map((point, i) => (
+                <li
+                  key={i}
+                  className="pl-4 border-l-[2px] border-primary-500/40 text-secondary-500 text-sm leading-relaxed hover:border-primary-500 transition-colors duration-300"
                 >
-                  <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-                  <span className="relative z-10 text-primary-600 transition-colors duration-500 group-hover:text-secondary-900">
-                    LEARN MORE
-                  </span>
-                </Link>
-              </div>
+                  {point}
+                </li>
+              ))}
+            </ul>
+
+            {/* CTA */}
+            <div className="mt-9">
+              <Link
+                href="/about"
+                className="group inline-flex items-center gap-3 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              >
+                Learn More
+                <span className="w-5 h-5 rounded-full bg-secondary-950/10 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
+                  <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                  </svg>
+                </span>
+              </Link>
             </div>
           </AnimateIn>
+
         </div>
       </div>
     </section>

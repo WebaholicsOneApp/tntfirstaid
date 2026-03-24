@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 type FormState = 'idle' | 'submitting' | 'error';
@@ -85,11 +86,26 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="bg-white rounded-2xl p-8 md:p-10 shadow-xl border border-secondary-100">
-          <h1 className="text-secondary-800 font-semibold text-xl tracking-wide mb-1">
+        <div className="bg-white rounded-2xl p-8 md:p-10 shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-secondary-100">
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <Image
+              src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+              alt="Alpha Munitions"
+              width={300}
+              height={50}
+              className="w-[160px] h-auto"
+            />
+          </div>
+
+          {/* Eyebrow + title */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Account</span>
+          </div>
+          <h1 className="font-display text-2xl font-bold text-secondary-900 mb-6">
             Create Account
           </h1>
-          <p className="text-gray-500 text-sm mb-8">Join Alpha Munitions today</p>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* First + Last Name */}
@@ -97,7 +113,7 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="firstName"
-                  className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1"
+                  className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400 mb-2 block"
                 >
                   First Name
                 </label>
@@ -108,13 +124,13 @@ export default function RegisterPage() {
                   onChange={(e) => setFirstName(e.target.value)}
                   autoComplete="given-name"
                   placeholder="Jane"
-                  className="w-full px-4 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
                 />
               </div>
               <div className="space-y-2">
                 <label
                   htmlFor="lastName"
-                  className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1"
+                  className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400 mb-2 block"
                 >
                   Last Name
                 </label>
@@ -125,7 +141,7 @@ export default function RegisterPage() {
                   onChange={(e) => setLastName(e.target.value)}
                   autoComplete="family-name"
                   placeholder="Doe"
-                  className="w-full px-4 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
                 />
               </div>
             </div>
@@ -134,7 +150,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1"
+                className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400 mb-2 block"
               >
                 Email Address
               </label>
@@ -145,7 +161,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 placeholder="you@example.com"
-                className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+                className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
               />
             </div>
 
@@ -153,7 +169,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1"
+                className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400 mb-2 block"
               >
                 Password
               </label>
@@ -165,7 +181,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="new-password"
                   placeholder="••••••••"
-                  className="w-full px-5 py-4 pr-12 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 pr-12 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -182,7 +198,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1"
+                className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400 mb-2 block"
               >
                 Confirm Password
               </label>
@@ -194,7 +210,7 @@ export default function RegisterPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   autoComplete="new-password"
                   placeholder="••••••••"
-                  className="w-full px-5 py-4 pr-12 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 pr-12 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
                 />
                 <button
                   type="button"
@@ -218,7 +234,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={formState === 'submitting'}
-              className="w-full py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-all text-sm uppercase tracking-widest shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full py-3 rounded-full bg-primary-500 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-300 justify-center flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
               {formState === 'submitting' ? (
                 <span className="flex items-center justify-center gap-2">

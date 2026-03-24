@@ -44,32 +44,24 @@ export default async function ContactPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero */}
-      <header className="relative py-20 md:py-28 overflow-hidden">
+      <header className="relative bg-secondary-900 overflow-hidden min-h-[300px] md:min-h-[400px]">
         <Image
           src="/images/heroes/contact.jpg"
           alt="Precision shooting"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25 z-10" />
-        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25 z-10" />
-        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25 z-10" />
-        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25 z-10" />
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="font-mono text-[0.65rem] tracking-[0.3em] text-primary-500/70 uppercase mb-4">
-            {'// Reach Out //'}
-          </p>
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-2">
-            Contact Us
-          </h1>
-          <div className="mx-auto mt-4 mb-6 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
-          <p className="text-secondary-300 text-lg leading-relaxed">
-            Questions about our products, need order support, or interested in
-            wholesale pricing? We are here to help.
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900/85 via-secondary-900/40 to-black/10" />
+        <div className="container mx-auto px-4 py-14 md:py-20 relative z-10">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400 uppercase">Reach Out</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">Contact Us</h1>
+            <p className="text-white/60 text-sm leading-relaxed max-w-lg">Questions about our products, need order support, or interested in wholesale pricing? We are here to help.</p>
+          </div>
         </div>
       </header>
 
@@ -78,13 +70,13 @@ export default async function ContactPage() {
           {/* Row 1: FAQ (left) + Contact Form (right) */}
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
             <section>
-              <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-3">
-                {'// Frequently Asked //'}
-              </p>
-              <h2 className="text-2xl font-display font-bold text-secondary-800 mb-2">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-6 bg-primary-500" />
+                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Frequently Asked</span>
+              </div>
+              <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6">
                 Frequently Asked Questions
               </h2>
-              <div className="mt-2 mb-6 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
               <FaqAccordion questions={contactFaqs} />
             </section>
 
@@ -93,13 +85,13 @@ export default async function ContactPage() {
 
           {/* Row 2: Get In Touch — Map left, contact info right */}
           <section>
-            <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-3">
-              {'// Get In Touch //'}
-            </p>
-            <h2 className="text-2xl font-display font-bold text-secondary-800 mb-2">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Get In Touch</span>
+            </div>
+            <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6">
               Get In Touch
             </h2>
-            <div className="mt-2 mb-6 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />
 
             <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
               {/* Map */}

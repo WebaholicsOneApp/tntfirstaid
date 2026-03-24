@@ -90,23 +90,14 @@ export default async function FaqPage() {
         <span className="text-secondary-500 font-medium">FAQ & Help</span>
       </nav>
 
-      {/* Hero Header */}
-      <header className="bg-secondary-900 py-12 md:py-16 relative overflow-hidden text-center">
-        <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
-        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/15 z-10" />
-        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/15 z-10" />
-        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
-        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
-            Frequently Asked{' '}
-            <span className="text-primary-500">Questions</span>
-          </h1>
-          <p className="text-secondary-400 max-w-2xl mx-auto text-lg">
-            Find answers to common questions about our products, shipping,
-            returns, and more.
-          </p>
-          <div className="mx-auto mt-4 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
+      <header className="bg-white border-b border-secondary-100">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Help &amp; Support</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-4">Frequently Asked Questions</h1>
+          <p className="text-secondary-400 text-sm leading-relaxed max-w-2xl">Find answers to common questions about our products, shipping, returns, and more.</p>
         </div>
       </header>
 
@@ -115,7 +106,11 @@ export default async function FaqPage() {
           <div className="space-y-16">
             {faqSections.map((section) => (
               <section key={section.id} id={section.id} className="scroll-mt-48">
-                <h2 className="text-xl font-display font-bold text-secondary-800 mb-8 border-l-4 border-primary-500 pl-4 font-mono">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">{section.id}</span>
+                </div>
+                <h2 className="text-xl font-display font-bold text-secondary-900 mb-6">
                   {section.category}
                 </h2>
                 <FaqAccordion questions={section.questions} />

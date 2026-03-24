@@ -77,7 +77,7 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Overview
                 </h2>
               </div>
@@ -101,13 +101,13 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Information We Collect
                 </h2>
               </div>
               <div className="space-y-6">
                 <div className="bg-white p-8 border border-secondary-100">
-                  <h3 className="text-lg font-bold text-secondary-800 mb-4">
+                  <h3 className="text-lg font-bold text-secondary-900 mb-4">
                     Personal Information
                   </h3>
                   <p className="text-secondary-600 leading-relaxed mb-4">
@@ -134,7 +134,7 @@ export default async function PrivacyPolicyPage() {
                   </div>
                 </div>
                 <div className="bg-white p-8 border border-secondary-100">
-                  <h3 className="text-lg font-bold text-secondary-800 mb-4">
+                  <h3 className="text-lg font-bold text-secondary-900 mb-4">
                     Automatically Collected Information
                   </h3>
                   <p className="text-secondary-600 leading-relaxed mb-4">
@@ -174,7 +174,7 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   How We Use Your Information
                 </h2>
               </div>
@@ -191,7 +191,7 @@ export default async function PrivacyPolicyPage() {
                     <div key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-secondary-100">
                       <span className="text-primary-600 font-bold text-lg mt-0.5">{i + 1}</span>
                       <div>
-                        <h4 className="font-bold text-secondary-800 text-sm">{item.title}</h4>
+                        <h4 className="font-bold text-secondary-900 text-sm">{item.title}</h4>
                         <p className="text-secondary-600 text-sm mt-1">{item.desc}</p>
                       </div>
                     </div>
@@ -210,21 +210,21 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Information Sharing
                 </h2>
               </div>
               <div className="bg-white p-8 md:p-12 border border-secondary-100 space-y-6 text-secondary-600 leading-relaxed">
                 <p>
                   We do{' '}
-                  <span className="font-bold text-secondary-800">not</span>{' '}
+                  <span className="font-bold text-secondary-900">not</span>{' '}
                   sell, trade, or rent your personal information to third
                   parties. We may share your information only in the following
                   circumstances:
                 </p>
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="bg-secondary-50 p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-secondary-800 text-sm mb-3">
+                    <h4 className="font-bold text-secondary-900 text-sm mb-3">
                       Service Providers
                     </h4>
                     <p className="text-sm text-secondary-500 leading-relaxed">
@@ -234,7 +234,7 @@ export default async function PrivacyPolicyPage() {
                     </p>
                   </div>
                   <div className="bg-secondary-50 p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-secondary-800 text-sm mb-3">
+                    <h4 className="font-bold text-secondary-900 text-sm mb-3">
                       Legal Requirements
                     </h4>
                     <p className="text-sm text-secondary-500 leading-relaxed">
@@ -243,7 +243,7 @@ export default async function PrivacyPolicyPage() {
                     </p>
                   </div>
                   <div className="bg-secondary-50 p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-secondary-800 text-sm mb-3">
+                    <h4 className="font-bold text-secondary-900 text-sm mb-3">
                       Business Transfers
                     </h4>
                     <p className="text-sm text-secondary-500 leading-relaxed">
@@ -266,7 +266,7 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Cookies & Tracking
                 </h2>
               </div>
@@ -279,15 +279,15 @@ export default async function PrivacyPolicyPage() {
                 </p>
                 <div className="space-y-3 pt-2">
                   <div className="flex items-start gap-3">
-                    <span className="font-bold text-secondary-800 text-sm w-28 flex-shrink-0 mt-0.5">Essential</span>
+                    <span className="font-bold text-secondary-900 text-sm w-28 flex-shrink-0 mt-0.5">Essential</span>
                     <p className="text-sm">Required for the website to function properly (cart, checkout).</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="font-bold text-secondary-800 text-sm w-28 flex-shrink-0 mt-0.5">Analytics</span>
+                    <span className="font-bold text-secondary-900 text-sm w-28 flex-shrink-0 mt-0.5">Analytics</span>
                     <p className="text-sm">Help us understand how visitors interact with our website to improve performance.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="font-bold text-secondary-800 text-sm w-28 flex-shrink-0 mt-0.5">Marketing</span>
+                    <span className="font-bold text-secondary-900 text-sm w-28 flex-shrink-0 mt-0.5">Marketing</span>
                     <p className="text-sm">Used to deliver relevant advertisements and track campaign effectiveness.</p>
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Data Security
                 </h2>
               </div>
@@ -352,7 +352,7 @@ export default async function PrivacyPolicyPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Your Rights
                 </h2>
               </div>
@@ -392,7 +392,7 @@ export default async function PrivacyPolicyPage() {
           {config.showChildrensPrivacy && (
             <section>
               <div className="bg-white p-8 border border-secondary-100 text-secondary-600 leading-relaxed">
-                <h3 className="text-lg font-bold text-secondary-800 mb-3">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
                   Children&apos;s Privacy
                 </h3>
                 <p>
@@ -411,7 +411,7 @@ export default async function PrivacyPolicyPage() {
           {config.showChangesToPolicy && (
             <section>
               <div className="bg-white p-8 border border-secondary-100 text-secondary-600 leading-relaxed">
-                <h3 className="text-lg font-bold text-secondary-800 mb-3">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
                   Changes to This Policy
                 </h3>
                 <p>

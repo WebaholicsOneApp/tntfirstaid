@@ -73,7 +73,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
   };
 
   return (
-    <header className={`transition-all duration-500 ${scrolled ? 'bg-secondary-800/95 backdrop-blur-sm shadow-lg border-b border-primary-500/[0.08]' : 'bg-secondary-800 border-b border-transparent'}`}>
+    <header className={`transition-all duration-500 ${scrolled ? 'bg-secondary-800/95 backdrop-blur-sm shadow-lg border-b border-primary-500/[0.08]' : 'bg-secondary-800 border-b border-secondary-800'}`}>
       <div className="w-full px-4 lg:px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Left: Hamburger (mobile) + Logo */}
