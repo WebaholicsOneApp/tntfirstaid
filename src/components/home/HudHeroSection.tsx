@@ -142,7 +142,7 @@ export default function HudHeroSection() {
 
       {/* -- Background video (YouTube, portrait 9:16) -- */}
       {!prefersReducedMotion && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden bg-black">
           <iframe
             src="https://www.youtube-nocookie.com/embed/QyWs5N81rZY?autoplay=1&mute=1&loop=1&playlist=QyWs5N81rZY&controls=0&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&playsinline=1"
             allow="autoplay; encrypted-media"
@@ -159,12 +159,12 @@ export default function HudHeroSection() {
         </div>
       )}
 
-      {/* -- Mobile overlay: lighter vignette so centered text stays readable without killing the video -- */}
+      {/* -- Mobile overlay: top-heavy gradient masks YouTube chrome while keeping center content visible -- */}
       <div
         className="pointer-events-none absolute inset-0 md:hidden"
         style={{
           background:
-            'radial-gradient(ellipse at center 40%, rgba(10,10,10,0.30) 0%, rgba(10,10,10,0.65) 60%, rgba(10,10,10,0.85) 100%)',
+            'linear-gradient(to bottom, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.75) 30%, rgba(10,10,10,0.55) 50%, rgba(10,10,10,0.70) 75%, rgba(10,10,10,0.88) 100%)',
         }}
       />
 
