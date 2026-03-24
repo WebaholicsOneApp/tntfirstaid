@@ -9,7 +9,7 @@ export default function FeatureIconsSection() {
   const { ref, isInView } = useInView();
 
   return (
-    <section className="relative bg-white py-24 md:py-32 overflow-hidden">
+    <section className="relative bg-white pb-20 sm:pb-28 overflow-hidden">
       <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8">
 
         {/* ── Header ──────────────────────────────────────── */}

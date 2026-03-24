@@ -159,9 +159,18 @@ export default function HudHeroSection() {
         </div>
       )}
 
-      {/* -- Gradient overlay: dark left (text legibility) → atmospheric right (video visible) -- */}
+      {/* -- Mobile overlay: lighter vignette so centered text stays readable without killing the video -- */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 md:hidden"
+        style={{
+          background:
+            'radial-gradient(ellipse at center 40%, rgba(10,10,10,0.30) 0%, rgba(10,10,10,0.65) 60%, rgba(10,10,10,0.85) 100%)',
+        }}
+      />
+
+      {/* -- Desktop overlay: directional left-to-right for split-text layout -- */}
+      <div
+        className="pointer-events-none absolute inset-0 hidden md:block"
         style={{
           background:
             'linear-gradient(to right, rgba(10,10,10,0.97) 0%, rgba(10,10,10,0.88) 35%, rgba(10,10,10,0.60) 60%, rgba(10,10,10,0.45) 100%)',

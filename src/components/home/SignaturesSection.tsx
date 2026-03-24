@@ -8,7 +8,7 @@ export default function SignaturesSection() {
   const { ref: imgRef, isInView } = useInView({ threshold: 0.3 });
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-32">
+    <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
       <div className="relative mx-auto max-w-3xl px-6 lg:px-8 text-center">
         <AnimateIn animation="fade-up">
 
