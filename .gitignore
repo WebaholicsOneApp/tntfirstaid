@@ -44,3 +44,9 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# superpowers
+.superpowers/
+
+# playwright mcp
+.playwright-mcp/

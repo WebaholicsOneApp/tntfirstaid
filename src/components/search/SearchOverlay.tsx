@@ -48,15 +48,16 @@ function InlineSuggestions({
       {/* Product suggestions */}
       {suggestions.products.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider px-2 py-2">
-            Products
-          </p>
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Products</span>
+          </div>
           {suggestions.products.map((product) => (
             <Link
               key={product.id}
               href={`/product/${product.slug}`}
               onClick={onSelect}
-              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-secondary-50 transition-colors"
+              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-primary-50 transition-colors"
             >
               <div className="w-10 h-10 bg-secondary-100 rounded overflow-hidden flex-shrink-0">
                 {product.primaryImage ? (
@@ -76,9 +77,9 @@ function InlineSuggestions({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-secondary-800 font-medium truncate">{product.name}</p>
+                <p className="font-medium text-secondary-900 text-sm truncate">{product.name}</p>
                 {product.price != null && (
-                  <p className="text-xs font-semibold text-secondary-900">
+                  <p className="text-primary-600 font-mono text-sm">
                     {product.maxPrice != null
                       ? `${formatCentsToDollars(product.price)} – ${formatCentsToDollars(product.maxPrice)}`
                       : formatCentsToDollars(product.price)}
@@ -86,7 +87,7 @@ function InlineSuggestions({
                 )}
               </div>
               {!product.inStock && (
-                <span className="text-xs text-red-500 flex-shrink-0">Out of Stock</span>
+                <span className="text-[0.6rem] font-mono tracking-[0.1em] uppercase text-secondary-400 flex-shrink-0">Out of Stock</span>
               )}
             </Link>
           ))}
@@ -96,15 +97,16 @@ function InlineSuggestions({
       {/* Category suggestions */}
       {suggestions.categories.length > 0 && (
         <div className="mt-2">
-          <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider px-2 py-2">
-            Categories
-          </p>
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Categories</span>
+          </div>
           {suggestions.categories.map((category) => (
             <Link
               key={category.id}
               href={`/shop/${category.slug}`}
               onClick={onSelect}
-              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-secondary-50 transition-colors"
+              className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-primary-50 transition-colors"
             >
               <div className="w-8 h-8 bg-primary-50 rounded flex items-center justify-center flex-shrink-0">
                 <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,12 +114,12 @@ function InlineSuggestions({
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-secondary-800 font-medium">{category.name}</p>
+                <p className="font-medium text-secondary-900 text-sm">{category.name}</p>
                 {category.parentName && (
-                  <p className="text-xs text-secondary-400">in {category.parentName}</p>
+                  <p className="text-[0.6rem] font-mono tracking-[0.1em] uppercase text-secondary-400">in {category.parentName}</p>
                 )}
               </div>
-              <span className="text-xs text-secondary-300 flex-shrink-0">
+              <span className="text-[0.6rem] font-mono tracking-[0.1em] uppercase text-secondary-400 flex-shrink-0">
                 {category.productCount} products
               </span>
             </Link>
@@ -227,9 +229,13 @@ export function SearchOverlay({ isOpen, onClose, onNavigate }: SearchOverlayProp
             {/* Row 1: Logo (centered on mobile, inline on desktop) */}
             <div className="flex items-center justify-center sm:hidden mb-3">
               <Link href="/" onClick={handleClose} className="flex items-center">
-                <span className="text-xl font-display font-bold text-primary-500 tracking-wider uppercase">
-                  Alpha Munitions
-                </span>
+                <Image
+                  src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+                  alt="Alpha Munitions"
+                  width={300}
+                  height={50}
+                  className="w-[140px] h-auto"
+                />
               </Link>
             </div>
 
@@ -237,9 +243,13 @@ export function SearchOverlay({ isOpen, onClose, onNavigate }: SearchOverlayProp
             <div className="flex items-center gap-3 sm:gap-4">
               {/* Logo — desktop only */}
               <Link href="/" onClick={handleClose} className="hidden sm:flex items-center flex-shrink-0">
-                <span className="text-xl font-display font-bold text-primary-500 tracking-wider uppercase">
-                  Alpha Munitions
-                </span>
+                <Image
+                  src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+                  alt="Alpha Munitions"
+                  width={300}
+                  height={50}
+                  className="w-[160px] h-auto"
+                />
               </Link>
 
               {/* Search input */}
@@ -302,16 +312,16 @@ export function SearchOverlay({ isOpen, onClose, onNavigate }: SearchOverlayProp
               {/* Recent Searches */}
               {recentSearches.length > 0 && (
                 <section>
-                  <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
-                    Recent Searches
-                  </p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-px w-6 bg-primary-500" />
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recent Searches</span>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {recentSearches.map((term) => (
-                      <span key={term} className="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary-100 hover:bg-secondary-200 rounded-full text-sm text-secondary-700 transition-colors group">
+                      <span key={term} className="inline-flex items-center gap-1 border border-secondary-200 rounded-full px-4 py-1.5 text-[0.7rem] font-mono tracking-[0.1em] text-secondary-600 hover:border-primary-500/60 hover:text-primary-600 transition-all duration-200 group">
                         <Link
                           href={`/search?q=${encodeURIComponent(term)}`}
                           onClick={() => { addSearch(term); handleSelect(); }}
-                          className="hover:text-primary-600 transition-colors"
                         >
                           {term}
                         </Link>
@@ -332,16 +342,17 @@ export function SearchOverlay({ isOpen, onClose, onNavigate }: SearchOverlayProp
 
               {/* Popular Searches */}
               <section>
-                <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
-                  Popular Searches
-                </p>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Popular Searches</span>
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {POPULAR_SEARCHES.map((term) => (
                     <Link
                       key={term}
                       href={`/search?q=${encodeURIComponent(term)}`}
                       onClick={() => { addSearch(term); handleSelect(); }}
-                      className="px-3 py-1.5 bg-secondary-100 hover:bg-primary-50 hover:text-primary-700 rounded-full text-sm text-secondary-700 transition-colors"
+                      className="border border-secondary-200 rounded-full px-4 py-1.5 text-[0.7rem] font-mono tracking-[0.1em] text-secondary-600 hover:border-primary-500/60 hover:text-primary-600 transition-all duration-200"
                     >
                       {term}
                     </Link>

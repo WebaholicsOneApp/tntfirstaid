@@ -64,12 +64,13 @@ export default function CartDrawer() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-secondary-100">
-            <div className="flex items-center gap-2">
-              <svg className="w-6 h-6 text-secondary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <h2 className="text-lg font-semibold text-secondary-800" suppressHydrationWarning>
-                Your Cart ({cart.itemCount})
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="h-px w-6 bg-primary-500" />
+                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Your Cart</span>
+              </div>
+              <h2 className="font-display text-xl font-bold text-secondary-900" suppressHydrationWarning>
+                {cart.itemCount} {cart.itemCount === 1 ? 'Item' : 'Items'}
               </h2>
             </div>
             <button
@@ -86,15 +87,19 @@ export default function CartDrawer() {
           {/* Cart Items */}
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {cart.items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <svg className="w-24 h-24 text-secondary-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex flex-col items-center justify-center h-full text-center px-6">
+                <svg className="w-16 h-16 text-secondary-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <h3 className="text-lg font-medium text-secondary-700 mb-2">Your cart is empty</h3>
-                <p className="text-secondary-400 mb-6">Looks like you haven&apos;t added anything yet.</p>
+                <div className="flex items-center gap-3 mb-2 justify-center">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Empty</span>
+                </div>
+                <h3 className="font-display text-xl font-bold text-secondary-900 mb-2">Your cart is empty</h3>
+                <p className="text-secondary-400 text-sm leading-relaxed mb-6">Looks like you haven&apos;t added anything yet.</p>
                 <button
                   onClick={closeCart}
-                  className="px-6 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
+                  className="rounded-full border border-primary-500/40 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase hover:border-primary-500 transition-all duration-300"
                 >
                   Continue Shopping
                 </button>
@@ -131,35 +136,35 @@ export default function CartDrawer() {
                       <Link
                         href={`/product/${item.productSlug}`}
                         onClick={closeCart}
-                        className="font-medium text-secondary-800 hover:text-primary-600 transition-colors line-clamp-2"
+                        className="font-medium text-secondary-900 text-sm leading-snug hover:text-primary-600 transition-colors line-clamp-2"
                       >
                         {item.name}
                       </Link>
                       {item.variation && (
-                        <p className="text-sm text-secondary-400 mt-0.5">{item.variation}</p>
+                        <p className="font-mono text-[0.6rem] tracking-[0.1em] text-secondary-400 uppercase mt-0.5">{item.variation}</p>
                       )}
-                      <p className="text-primary-600 font-semibold mt-1">
+                      <p className="font-mono text-sm text-secondary-900 font-semibold mt-1">
                         {formatCentsToDollars(item.price)}
                       </p>
 
                       {/* Quantity & Remove */}
                       <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center border border-secondary-200 rounded-lg">
+                        <div className="flex items-center border border-secondary-200 rounded-full overflow-hidden">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-l-lg active:scale-95 transition-transform duration-75"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-secondary-50 active:scale-95 transition-all duration-75 text-secondary-600"
                             aria-label="Decrease quantity"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                             </svg>
                           </button>
-                          <span className="px-3 py-1 text-sm font-medium text-secondary-700 min-w-[40px] text-center">
+                          <span className="w-8 text-center font-mono text-sm text-secondary-900">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-3 py-1 text-secondary-600 hover:bg-secondary-50 transition-colors rounded-r-lg active:scale-95 transition-transform duration-75"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-secondary-50 active:scale-95 transition-all duration-75 text-secondary-600"
                             aria-label="Increase quantity"
                             disabled={item.maxQuantity ? item.quantity >= item.maxQuantity : false}
                           >
@@ -170,7 +175,7 @@ export default function CartDrawer() {
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-secondary-400 hover:text-red-500 transition-colors p-1 active:scale-95 transition-transform duration-75"
+                          className="text-secondary-300 hover:text-red-400 transition-colors duration-200 p-1 active:scale-95"
                           aria-label={`Remove ${item.name} from cart`}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,21 +192,21 @@ export default function CartDrawer() {
 
           {/* Footer */}
           {cart.items.length > 0 && (
-            <div className="border-t border-secondary-200 px-6 py-4 space-y-4 bg-white">
+            <div className="border-t border-secondary-100 px-6 py-5 space-y-4 bg-white">
               {/* Subtotal */}
-              <div className="flex items-center justify-between text-lg">
-                <span className="text-secondary-600">Subtotal</span>
-                <span className="font-bold text-secondary-800">{formatCentsToDollars(cart.subtotal)}</span>
+              <div className="flex items-end justify-between">
+                <div>
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] uppercase text-secondary-400">Subtotal</span>
+                  <p className="text-[0.65rem] text-secondary-400 mt-0.5">Shipping &amp; taxes at checkout</p>
+                </div>
+                <span className="font-display text-2xl font-bold text-secondary-900">{formatCentsToDollars(cart.subtotal)}</span>
               </div>
-              <p className="text-sm text-secondary-400">
-                Shipping and taxes calculated at checkout
-              </p>
 
               {/* Checkout Button */}
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="block w-full py-3 px-6 bg-primary-500 text-white font-semibold rounded-xl text-center hover:bg-primary-600 transition-colors"
+                className="block w-full py-3 px-6 rounded-full bg-primary-500 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase text-center hover:bg-primary-400 active:scale-[0.98] transition-all duration-300"
               >
                 Proceed to Checkout
               </Link>
@@ -209,7 +214,7 @@ export default function CartDrawer() {
               {/* Continue Shopping */}
               <button
                 onClick={closeCart}
-                className="block w-full py-3 px-6 bg-secondary-100 text-secondary-700 font-medium rounded-xl text-center hover:bg-secondary-200 transition-colors"
+                className="block w-full py-3 px-6 rounded-full border border-primary-500/40 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase text-center hover:border-primary-500 transition-all duration-300"
               >
                 Continue Shopping
               </button>

@@ -49,27 +49,24 @@ export default async function AboutPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero with banner background */}
-      <header className="relative py-28 md:py-40 overflow-hidden">
+      <header className="relative bg-secondary-900 overflow-hidden min-h-[300px] md:min-h-[400px]">
         <Image
           src="/images/about/banner.jpg"
           alt="Alpha Munitions facility"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
-            Our Story
-          </p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
-            About {storeConfig.siteName}
-          </h1>
-          <p className="text-secondary-300 text-lg leading-relaxed">
-            A private U.S. company committed to making the best precision rifle
-            brass in the world.
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900/85 via-secondary-900/40 to-black/10" />
+        <div className="container mx-auto px-4 py-14 md:py-20 relative z-10">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400 uppercase">Our Story</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">About {storeConfig.siteName}</h1>
+            <p className="text-white/60 text-sm leading-relaxed max-w-lg">A private U.S. company committed to making the best precision rifle brass in the world.</p>
+          </div>
         </div>
       </header>
 
@@ -79,10 +76,14 @@ export default async function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
               <div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-800 mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Who We Are</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-6">
                   Who We Are
                 </h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
+                <p className="text-secondary-600 leading-relaxed text-lg">
                   Alpha is a private U.S. company committed to making the best
                   precision rifle brass in the world. Our leadership team consists
                   of experienced professionals with backgrounds spanning
@@ -95,7 +96,7 @@ export default async function AboutPage() {
                   community.
                 </p>
               </div>
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
                   src="/images/about/facility-1.jpg"
                   alt="Alpha Munitions team and facility"
@@ -111,7 +112,7 @@ export default async function AboutPage() {
         <section className="py-20 md:py-28 bg-secondary-50">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden md:order-first order-last">
+              <div className="relative aspect-[4/3] overflow-hidden md:order-first order-last">
                 <Image
                   src="/images/about/facility-2.jpg"
                   alt="Alpha Munitions manufacturing facility"
@@ -120,10 +121,14 @@ export default async function AboutPage() {
                 />
               </div>
               <div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-800 mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Our Facility</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-6">
                   Where We Work
                 </h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
+                <p className="text-secondary-600 leading-relaxed text-lg">
                   We manufacture all of our products in a state of the art
                   facility in Salt Lake City, UT. Our machines utilize the most
                   advanced technologies available in both manufacturing and
@@ -143,10 +148,14 @@ export default async function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
               <div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-800 mb-8">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Our Mission</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-6">
                   Why We Do It
                 </h2>
-                <p className="text-gray-600 leading-relaxed text-lg">
+                <p className="text-secondary-600 leading-relaxed text-lg">
                   We started Alpha Munitions to be different than other brass
                   manufacturers. Along with using the most advanced manufacturing
                   technology in the industry, we wanted to improve the customer
@@ -157,7 +166,7 @@ export default async function AboutPage() {
                   to providing the best for the precision shooting community.
                 </p>
               </div>
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
                   src="/images/about/shooting.jpg"
                   alt="Precision shooting with Alpha Munitions"
@@ -198,22 +207,28 @@ export default async function AboutPage() {
         {/* Values */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4 max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-800 mb-10 text-center">
-              What Drives Us
-            </h2>
+            <div className="text-center mb-10">
+              <div className="flex items-center gap-3 mb-3 justify-center">
+                <div className="h-px w-6 bg-primary-500" />
+                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">What Drives Us</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900">
+                Our Values
+              </h2>
+            </div>
             <div className="grid md:grid-cols-3 gap-8">
               {values.map((value) => (
                 <div
                   key={value.title}
-                  className="bg-secondary-50 rounded-2xl p-8 border border-secondary-100 text-center"
+                  className="bg-secondary-50 p-8 border border-secondary-100 text-center"
                 >
-                  <div className="w-16 h-16 bg-primary-500/10 text-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-primary-500/10 text-primary-600 rounded flex items-center justify-center mx-auto mb-6">
                     {value.icon}
                   </div>
                   <h3 className="text-xl font-display font-bold text-secondary-800 mb-3">
                     {value.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                  <p className="text-secondary-600 leading-relaxed text-sm">
                     {value.description}
                   </p>
                 </div>
@@ -225,8 +240,11 @@ export default async function AboutPage() {
         {/* CTA */}
         <section className="pb-20 md:pb-28">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+              <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+              <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+              <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+              <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
                   Ready to Experience the Difference?
@@ -237,9 +255,10 @@ export default async function AboutPage() {
                 </p>
                 <Link
                   href="/shop"
-                  className="inline-block px-10 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-colors text-sm uppercase tracking-widest"
+                  className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-10 py-4"
                 >
-                  Shop Now
+                  <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Shop Now</span>
                 </Link>
               </div>
             </div>

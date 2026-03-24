@@ -1,7 +1,7 @@
 import '~/app/globals.css';
 
 import { type Metadata } from 'next';
-import { Playfair_Display, Inter, Cardo } from 'next/font/google';
+import { Playfair_Display, Inter, Cardo, JetBrains_Mono } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 import { getNonce } from '~/lib/get-nonce';
 import { NonceProvider } from '~/lib/nonce-context';
@@ -31,6 +31,12 @@ const cardo = Cardo({
   weight: ['400', '700'],
   style: ['normal', 'italic'],
   variable: '--font-cardo',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
   display: 'swap',
 });
 
@@ -69,7 +75,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} ${cardo.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable} ${cardo.variable} ${jetbrainsMono.variable}`}>
       <body
         className="font-sans antialiased bg-white text-secondary-800 min-h-screen flex flex-col"
         style={paletteStyle as React.CSSProperties}

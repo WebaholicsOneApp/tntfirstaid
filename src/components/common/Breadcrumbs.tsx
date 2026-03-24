@@ -15,7 +15,7 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Breadcrumb" className={cn('text-sm', className)}>
+    <nav aria-label="Breadcrumb" className={cn('font-mono text-xs tracking-wider', className)}>
       <ol className="flex items-center flex-wrap gap-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
@@ -26,7 +26,7 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 <span className="mx-2 text-secondary-300 select-none">/</span>
               )}
               {isLast || !item.href ? (
-                <span className="text-secondary-500 font-medium">
+                <span className="text-secondary-400 font-medium">
                   {item.label}
                 </span>
               ) : (

@@ -42,7 +42,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
   const { cart, openCart } = useCart();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -73,7 +73,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
   };
 
   return (
-    <header className={`transition-all duration-500 ${scrolled ? 'bg-secondary-800/95 backdrop-blur-sm shadow-lg' : 'bg-secondary-800'}`}>
+    <header className={`transition-all duration-500 ${scrolled ? 'bg-secondary-800/95 backdrop-blur-sm shadow-lg border-b border-primary-500/[0.08]' : 'bg-secondary-800 border-b border-secondary-800'}`}>
       <div className="w-full px-4 lg:px-6 py-5">
         <div className="flex items-center justify-between">
           {/* Left: Hamburger (mobile) + Logo */}
@@ -107,7 +107,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
                 return (
                   <div
                     key={link.href}
-                    className="group relative flex items-center"
+                    className="group relative"
                     onMouseEnter={handleShopEnter}
                     onMouseLeave={handleShopLeave}
                   >

@@ -69,7 +69,7 @@ export default function ShopPageClient({
           {/* Desktop filter toggle — stationary, only text changes */}
           <button
             onClick={() => setFiltersVisible(v => !v)}
-            className="hidden lg:flex items-center gap-3 px-4 py-3 text-sm font-medium bg-secondary-50 rounded-lg text-secondary-600 hover:bg-secondary-100 transition-colors duration-200 cursor-pointer"
+            className="hidden lg:flex items-center gap-3 px-4 py-3 font-mono text-xs tracking-wider uppercase bg-secondary-50 border border-secondary-200 text-secondary-600 hover:bg-secondary-100 transition-colors duration-200 cursor-pointer"
           >
             {filterIcon}
             {filtersVisible ? 'Hide Filters' : 'Show Filters'}

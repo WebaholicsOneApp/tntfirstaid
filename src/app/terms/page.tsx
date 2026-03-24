@@ -38,17 +38,21 @@ export default async function TermsOfServicePage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <nav className="container mx-auto px-4 py-4 text-sm text-gray-500">
+      <nav className="container mx-auto px-4 py-4 font-mono text-xs tracking-wider text-secondary-400">
         <Link href="/" className="hover:text-primary-600 transition-colors">
           Home
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-secondary-800 font-medium">Terms of Service</span>
+        <span className="mx-2 text-secondary-300">/</span>
+        <span className="text-secondary-500 font-medium">Terms of Service</span>
       </nav>
 
       {/* Hero Header */}
       <header className="bg-secondary-900 py-12 md:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/15 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
             Terms of <span className="text-primary-500">Service</span>
@@ -59,6 +63,7 @@ export default async function TermsOfServicePage() {
           <p className="text-secondary-500 text-sm mt-4">
             Last updated: {config.lastUpdatedDate}
           </p>
+          <div className="mx-auto mt-4 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
         </div>
       </header>
 
@@ -68,16 +73,16 @@ export default async function TermsOfServicePage() {
           {config.showAgreementToTerms && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Agreement to Terms
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>{agreementText}</p>
                 <p>
                   We reserve the right to update or modify these terms at any
@@ -93,16 +98,16 @@ export default async function TermsOfServicePage() {
           {config.showUseOfWebsite && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-100 rounded-2xl flex items-center justify-center text-secondary-700 flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-700 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Use of Website
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>You agree to use our website only for lawful purposes. You must not:</p>
                 <div className="space-y-3 pt-2">
                   {[
@@ -114,12 +119,12 @@ export default async function TermsOfServicePage() {
                     'Use the site to engage in any fraudulent activity',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-5 h-5 bg-red-100 text-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-5 h-5 bg-primary-500/10 text-primary-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      <span className="text-gray-600 text-sm">{item}</span>
+                      <span className="text-secondary-600 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -131,21 +136,21 @@ export default async function TermsOfServicePage() {
           {config.showProductsAndOrders && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Products & Orders
                 </h2>
               </div>
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl p-8 border border-secondary-100">
-                  <h3 className="text-lg font-bold text-secondary-800 mb-4">
+                <div className="bg-white p-8 border border-secondary-100">
+                  <h3 className="text-lg font-bold text-secondary-900 mb-4">
                     Product Information
                   </h3>
-                  <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
+                  <div className="space-y-3 text-secondary-600 text-sm leading-relaxed">
                     <p>
                       We strive to provide accurate product descriptions, images,
                       and pricing. However, we do not warrant that product
@@ -159,11 +164,11 @@ export default async function TermsOfServicePage() {
                     </p>
                   </div>
                 </div>
-                <div className="bg-white rounded-2xl p-8 border border-secondary-100">
-                  <h3 className="text-lg font-bold text-secondary-800 mb-4">
+                <div className="bg-white p-8 border border-secondary-100">
+                  <h3 className="text-lg font-bold text-secondary-900 mb-4">
                     Pricing & Payment
                   </h3>
-                  <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
+                  <div className="space-y-3 text-secondary-600 text-sm leading-relaxed">
                     <p>
                       All prices are listed in US Dollars (USD). We reserve the
                       right to change prices at any time without notice. In the
@@ -177,11 +182,11 @@ export default async function TermsOfServicePage() {
                     </p>
                   </div>
                 </div>
-                <div className="bg-white rounded-2xl p-8 border border-secondary-100">
-                  <h3 className="text-lg font-bold text-secondary-800 mb-4">
+                <div className="bg-white p-8 border border-secondary-100">
+                  <h3 className="text-lg font-bold text-secondary-900 mb-4">
                     Ammunition Regulations
                   </h3>
-                  <div className="space-y-3 text-gray-600 text-sm leading-relaxed">
+                  <div className="space-y-3 text-secondary-600 text-sm leading-relaxed">
                     <p>
                       Ammunition and reloading components are subject to federal,
                       state, and local regulations. By placing an order, you
@@ -203,16 +208,16 @@ export default async function TermsOfServicePage() {
           {config.showShippingAndReturns && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Shipping & Returns
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>
                   All ammunition and components are shipped via UPS Ground only.
                   Air shipping is not available for ammunition products due to
@@ -240,16 +245,16 @@ export default async function TermsOfServicePage() {
           {config.showIntellectualProperty && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Intellectual Property
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>
                   All content on this website, including text, graphics, logos,
                   images, and software, is the property of {siteName} or its
@@ -269,16 +274,16 @@ export default async function TermsOfServicePage() {
           {config.showUserReviews && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-yellow-50 rounded-2xl flex items-center justify-center text-yellow-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   User Reviews
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>
                   By submitting a review on our website, you grant {siteName} a
                   non-exclusive, royalty-free, perpetual, and worldwide license
@@ -299,16 +304,16 @@ export default async function TermsOfServicePage() {
           {config.showLimitationOfLiability && (
             <section>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-800 rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-800 rounded flex items-center justify-center text-white flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Limitation of Liability
                 </h2>
               </div>
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
                 <p>
                   To the fullest extent permitted by applicable law, {siteName}{' '}
                   shall not be liable for any indirect, incidental, special,
@@ -322,7 +327,7 @@ export default async function TermsOfServicePage() {
                   paid to us in the {config.liabilityPeriodMonths} months
                   preceding the claim.
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary-500">
                   Some jurisdictions do not allow the exclusion of certain
                   warranties or limitation of liability, so the above limitations
                   may not apply to you.
@@ -334,8 +339,8 @@ export default async function TermsOfServicePage() {
           {/* Governing Law */}
           {config.showGoverningLaw && (
             <section>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
-                <h3 className="text-lg font-bold text-secondary-800 mb-3">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
                   Governing Law
                 </h3>
                 <p>
@@ -353,8 +358,8 @@ export default async function TermsOfServicePage() {
           {/* Severability */}
           {config.showSeverability && (
             <section>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 space-y-4 text-gray-600 leading-relaxed">
-                <h3 className="text-lg font-bold text-secondary-800 mb-3">
+              <div className="bg-white p-8 border border-secondary-100 space-y-4 text-secondary-600 leading-relaxed">
+                <h3 className="text-lg font-bold text-secondary-900 mb-3">
                   Severability
                 </h3>
                 <p>
@@ -369,8 +374,11 @@ export default async function TermsOfServicePage() {
 
           {/* Contact CTA */}
           {config.showContactCta && (
-            <div className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+              <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+              <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+              <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+              <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
               <div className="relative z-10">
                 <h2 className="text-2xl md:text-4xl font-display font-bold text-white mb-6">
                   Have <span className="text-primary-500">Questions?</span>
@@ -381,15 +389,17 @@ export default async function TermsOfServicePage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     href="/contact"
-                    className="px-8 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-all text-sm uppercase tracking-widest"
+                    className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Contact Us
+                    <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Contact Us</span>
                   </Link>
                   <a
                     href={`mailto:${storeConfig.supportEmail}`}
-                    className="px-8 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-sm uppercase tracking-widest border border-white/10"
+                    className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Email Support
+                    <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-white">Email Support</span>
                   </a>
                 </div>
               </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { CategoryWithChildren } from '~/types';
 
@@ -56,9 +57,13 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
       }`}>
         {/* Menu header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-secondary-700">
-          <span className="font-display font-bold text-primary-500 tracking-wider uppercase">
-            {siteName}
-          </span>
+          <Image
+            src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+            alt={siteName}
+            width={300}
+            height={50}
+            className="w-[140px] h-auto"
+          />
           <button
             onClick={onClose}
             className="p-1 text-secondary-400 hover:text-primary-500 transition-colors"
@@ -71,7 +76,7 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
         </div>
 
         {/* Scrollable nav links */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-4">
           {/* Main navigation links */}
           {[
             { href: '/shop', label: 'Shop' },
@@ -153,11 +158,11 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
           )}
 
           {/* Help */}
-          <div className="border-t border-secondary-700 mt-4 pt-4">
+          <div className="border-t border-secondary-700 mt-4 pt-4 px-5 pb-4">
             <Link
               href="/faq"
               onClick={onClose}
-              className="block py-3 px-5 text-secondary-100 hover:text-primary-500 hover:bg-secondary-700 transition-colors font-medium text-sm"
+              className="block py-2.5 px-5 rounded-full border border-primary-500/40 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase text-center hover:border-primary-500 transition-all duration-300"
             >
               Help Center
             </Link>

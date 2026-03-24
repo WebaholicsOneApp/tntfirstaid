@@ -82,26 +82,22 @@ export default async function FaqPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <nav className="container mx-auto px-4 py-4 text-sm text-gray-500">
+      <nav className="container mx-auto px-4 py-4 font-mono text-xs tracking-wider text-secondary-400">
         <Link href="/" className="hover:text-primary-600 transition-colors">
           Home
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-secondary-800 font-medium">FAQ & Help</span>
+        <span className="mx-2 text-secondary-300">/</span>
+        <span className="text-secondary-500 font-medium">FAQ & Help</span>
       </nav>
 
-      {/* Hero Header */}
-      <header className="bg-secondary-900 py-12 md:py-16 relative overflow-hidden text-center">
-        <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
-        <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
-            Frequently Asked{' '}
-            <span className="text-primary-500">Questions</span>
-          </h1>
-          <p className="text-secondary-400 max-w-2xl mx-auto text-lg">
-            Find answers to common questions about our products, shipping,
-            returns, and more.
-          </p>
+      <header className="bg-white border-b border-secondary-100">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Help &amp; Support</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-secondary-900 mb-4">Frequently Asked Questions</h1>
+          <p className="text-secondary-400 text-sm leading-relaxed max-w-2xl">Find answers to common questions about our products, shipping, returns, and more.</p>
         </div>
       </header>
 
@@ -110,7 +106,11 @@ export default async function FaqPage() {
           <div className="space-y-16">
             {faqSections.map((section) => (
               <section key={section.id} id={section.id} className="scroll-mt-48">
-                <h2 className="text-xl font-display font-bold text-secondary-800 mb-8 border-l-4 border-primary-500 pl-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">{section.id}</span>
+                </div>
+                <h2 className="text-xl font-display font-bold text-secondary-900 mb-6">
                   {section.category}
                 </h2>
                 <FaqAccordion questions={section.questions} />
@@ -122,9 +122,9 @@ export default async function FaqPage() {
           <div className="mt-20 grid md:grid-cols-3 gap-6">
             <Link
               href="/contact"
-              className="bg-white p-8 rounded-2xl border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
+              className="bg-white p-8 border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
             >
-              <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -132,16 +132,16 @@ export default async function FaqPage() {
               <h3 className="font-bold text-secondary-800 mb-2 text-xs uppercase tracking-widest">
                 Contact Us
               </h3>
-              <p className="text-gray-500 text-xs">
+              <p className="text-secondary-500 text-xs">
                 Speak with our team directly.
               </p>
             </Link>
 
             <Link
               href="/shipping-returns"
-              className="bg-white p-8 rounded-2xl border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
+              className="bg-white p-8 border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
             >
-              <div className="w-12 h-12 bg-secondary-100 rounded-2xl flex items-center justify-center text-secondary-700 mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-700 mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                 </svg>
@@ -149,16 +149,16 @@ export default async function FaqPage() {
               <h3 className="font-bold text-secondary-800 mb-2 text-xs uppercase tracking-widest">
                 Returns
               </h3>
-              <p className="text-gray-500 text-xs">
+              <p className="text-secondary-500 text-xs">
                 Start a return or exchange.
               </p>
             </Link>
 
             <Link
               href="/shop"
-              className="bg-white p-8 rounded-2xl border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
+              className="bg-white p-8 border border-secondary-100 shadow-lg hover:shadow-xl transition-all text-center group"
             >
-              <div className="w-12 h-12 bg-secondary-800 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-secondary-800 rounded flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
@@ -166,7 +166,7 @@ export default async function FaqPage() {
               <h3 className="font-bold text-secondary-800 mb-2 text-xs uppercase tracking-widest">
                 Shop
               </h3>
-              <p className="text-gray-500 text-xs">
+              <p className="text-secondary-500 text-xs">
                 Browse our product catalog.
               </p>
             </Link>

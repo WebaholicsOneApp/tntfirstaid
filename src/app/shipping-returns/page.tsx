@@ -33,12 +33,12 @@ export default async function ShippingReturnsPage() {
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumbs */}
-      <nav className="container mx-auto px-4 py-4 text-sm text-gray-500">
+      <nav className="container mx-auto px-4 py-4 font-mono text-xs tracking-wider text-secondary-400">
         <Link href="/" className="hover:text-primary-600 transition-colors">
           Home
         </Link>
-        <span className="mx-2">/</span>
-        <span className="text-secondary-800 font-medium">
+        <span className="mx-2 text-secondary-300">/</span>
+        <span className="text-secondary-500 font-medium">
           Shipping, Returns & Exchanges
         </span>
       </nav>
@@ -46,6 +46,10 @@ export default async function ShippingReturnsPage() {
       {/* Hero Header */}
       <header className="bg-secondary-900 py-12 md:py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
+        <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/15 z-10" />
+        <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
+        <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
             Shipping, Returns &{' '}
@@ -54,6 +58,7 @@ export default async function ShippingReturnsPage() {
           <p className="text-secondary-400 max-w-2xl mx-auto text-lg">
             {config.heroSubtitle}
           </p>
+          <div className="mx-auto mt-4 h-[1px] w-[80px] bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
         </div>
       </header>
 
@@ -63,7 +68,7 @@ export default async function ShippingReturnsPage() {
           {config.showAmmoRestrictions && (
             <section id="ammo-restrictions" className="scroll-mt-48">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
@@ -72,8 +77,8 @@ export default async function ShippingReturnsPage() {
                   Ammunition Shipping Restrictions
                 </h2>
               </div>
-              <div className="bg-amber-50 rounded-2xl p-8 md:p-12 border border-amber-200 space-y-6">
-                <p className="text-gray-700 leading-relaxed">
+              <div className="bg-amber-50 p-8 md:p-12 border border-amber-200 space-y-6">
+                <p className="text-secondary-700 leading-relaxed">
                   Ammunition and reloading components are classified as{' '}
                   <span className="font-bold text-secondary-800">
                     ORM-D / Limited Quantity
@@ -108,7 +113,7 @@ export default async function ShippingReturnsPage() {
                       <span className="text-amber-600 font-bold text-sm uppercase whitespace-nowrap mt-0.5">
                         {item.label}
                       </span>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <p className="text-secondary-600 text-sm leading-relaxed">
                         {item.text}
                       </p>
                     </div>
@@ -122,7 +127,7 @@ export default async function ShippingReturnsPage() {
           {config.showReturnsExchanges && (
             <section id="refund-policy" className="scroll-mt-48">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                   </svg>
@@ -132,12 +137,12 @@ export default async function ShippingReturnsPage() {
                 </h2>
               </div>
 
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-8">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-8">
                 <div>
                   <h3 className="text-xl font-bold text-secondary-800 mb-4">
                     {config.returnWindowDays} Day Returns & Exchanges
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4">
+                  <p className="text-secondary-600 leading-relaxed mb-4">
                     You may return or exchange any item(s) in its/their original
                     condition to{' '}
                     <span className="text-primary-600 font-bold">
@@ -146,7 +151,7 @@ export default async function ShippingReturnsPage() {
                     for up to {config.returnWindowDays} days from receipt of
                     shipment.
                   </p>
-                  <p className="text-gray-600 leading-relaxed font-medium">
+                  <p className="text-secondary-600 leading-relaxed font-medium">
                     Products must be in the condition you received them and in the
                     original box and/or packaging. Opened ammunition cannot be
                     returned.
@@ -155,10 +160,10 @@ export default async function ShippingReturnsPage() {
 
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="bg-white p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-red-600 text-sm mb-3">
+                    <h4 className="font-bold text-primary-600 text-sm mb-3">
                       Important Note
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       Ammunition or components that have been opened, used, or
                       are missing the factory packaging cannot be accepted for
                       refund or exchange under any circumstances.
@@ -168,16 +173,16 @@ export default async function ShippingReturnsPage() {
                     <h4 className="font-bold text-secondary-800 text-sm mb-3">
                       What Can Be Returned?
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       Unopened brass, reamers, tools, and accessories in their
                       original packaging. Custom-order items are non-returnable.
                     </p>
                   </div>
                   <div className="bg-white p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-blue-600 text-sm mb-3">
+                    <h4 className="font-bold text-primary-600 text-sm mb-3">
                       Exchanges
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       Need a different caliber or quantity? We offer hassle-free
                       exchanges within {config.returnWindowDays} days. Contact
                       our support team to initiate.
@@ -192,7 +197,7 @@ export default async function ShippingReturnsPage() {
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">{returnShipNote}</p>
+                    <p className="text-secondary-600">{returnShipNote}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-5 h-5 bg-primary-500/10 text-primary-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -200,7 +205,7 @@ export default async function ShippingReturnsPage() {
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-secondary-600">
                       To start a return or exchange, email{' '}
                       <a href={`mailto:${storeConfig.supportEmail}`} className="text-primary-600 font-semibold hover:underline">
                         {storeConfig.supportEmail}
@@ -218,14 +223,14 @@ export default async function ShippingReturnsPage() {
                   <h4 className="font-bold text-secondary-800 text-sm mb-4">
                     Refund Process
                   </h4>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                  <p className="text-secondary-600 text-sm leading-relaxed mb-4">
                     Once your return is received and inspected by our warehouse
                     staff (usually within {config.inspectionTimeHours} hours of
                     receipt), we will process your refund and automatically apply
                     a credit to your credit or debit card within{' '}
                     {config.refundCreditDays} days.
                   </p>
-                  <p className="text-gray-500 text-xs italic">
+                  <p className="text-secondary-500 text-xs italic">
                     Please note that depending on your bank&apos;s policies, it
                     may take an additional {config.bankPostingDaysMin}-
                     {config.bankPostingDaysMax} business days after your credit is
@@ -240,7 +245,7 @@ export default async function ShippingReturnsPage() {
           {config.showPackaging && (
             <section id="packaging" className="scroll-mt-48">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-100 rounded-2xl flex items-center justify-center text-secondary-700 flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-700 flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
@@ -249,7 +254,7 @@ export default async function ShippingReturnsPage() {
                   Packaging
                 </h2>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-secondary-100 leading-relaxed text-gray-600 space-y-4">
+              <div className="bg-white p-8 border border-secondary-100 leading-relaxed text-secondary-600 space-y-4">
                 <p>
                   Products must be returned in the original packaging. If the
                   item came in a box, it must be returned in the same box. If the
@@ -269,7 +274,7 @@ export default async function ShippingReturnsPage() {
           {config.showShippingPolicy && (
             <section id="shipping-policy" className="scroll-mt-48">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-secondary-800 rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-12 h-12 bg-secondary-800 rounded flex items-center justify-center text-white flex-shrink-0">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
@@ -279,14 +284,14 @@ export default async function ShippingReturnsPage() {
                 </h2>
               </div>
 
-              <div className="bg-secondary-50 rounded-2xl p-8 md:p-12 border border-secondary-100 space-y-8">
+              <div className="bg-secondary-50 p-8 md:p-12 border border-secondary-100 space-y-8">
                 <div>
                   <h3 className="text-xl font-bold text-secondary-800 mb-4">
                     {config.freeShipping
                       ? 'Free Shipping on Every Order'
                       : 'Shipping Policy'}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-secondary-600 leading-relaxed">
                     {config.freeShipping ? (
                       <>
                         All orders from{' '}
@@ -314,7 +319,7 @@ export default async function ShippingReturnsPage() {
                     <h4 className="font-bold text-primary-600 text-sm mb-3">
                       Processing Time
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       Orders are processed within{' '}
                       {config.processingTimeDaysMin}--
                       {config.processingTimeDaysMax} business days after payment
@@ -326,7 +331,7 @@ export default async function ShippingReturnsPage() {
                     <h4 className="font-bold text-secondary-800 text-sm mb-3">
                       Delivery Estimates
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       Standard ground delivery within the{' '}
                       {config.shippingRegion} takes{' '}
                       {config.deliveryTimeDaysMin}--
@@ -334,10 +339,10 @@ export default async function ShippingReturnsPage() {
                     </p>
                   </div>
                   <div className="bg-white p-6 rounded-xl border border-secondary-100">
-                    <h4 className="font-bold text-blue-600 text-sm mb-3">
+                    <h4 className="font-bold text-primary-600 text-sm mb-3">
                       Carrier
                     </h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <p className="text-sm text-secondary-500 leading-relaxed">
                       All ammunition and component orders ship via UPS Ground.
                       Non-hazmat accessories may ship via other carriers.
                     </p>
@@ -351,7 +356,7 @@ export default async function ShippingReturnsPage() {
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-secondary-600">
                       <span className="font-semibold text-secondary-800">
                         Order Tracking:
                       </span>{' '}
@@ -364,7 +369,7 @@ export default async function ShippingReturnsPage() {
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-secondary-600">
                       <span className="font-semibold text-secondary-800">
                         Shipping Region:
                       </span>{' '}
@@ -380,7 +385,7 @@ export default async function ShippingReturnsPage() {
                           <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                         </svg>
                       </div>
-                      <p className="text-gray-600">
+                      <p className="text-secondary-600">
                         <span className="font-semibold text-secondary-800">
                           P.O. Boxes:
                         </span>{' '}
@@ -396,7 +401,7 @@ export default async function ShippingReturnsPage() {
                         <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-secondary-600">
                       <span className="font-semibold text-secondary-800">
                         Lost or Damaged Packages:
                       </span>{' '}
@@ -419,8 +424,11 @@ export default async function ShippingReturnsPage() {
 
           {/* Support CTA */}
           {config.showContactCta && (
-            <div className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+              <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+              <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+              <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+              <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
               <div className="relative z-10">
                 <h2 className="text-2xl md:text-4xl font-display font-bold text-white mb-6">
                   Still Have{' '}
@@ -432,15 +440,17 @@ export default async function ShippingReturnsPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     href="/contact"
-                    className="px-8 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-all text-sm uppercase tracking-widest"
+                    className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Contact Support
+                    <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Contact Support</span>
                   </Link>
                   <Link
                     href="/faq"
-                    className="px-8 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-all text-sm uppercase tracking-widest border border-white/10"
+                    className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
                   >
-                    Help Center
+                    <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                    <span className="relative z-10 text-white">Help Center</span>
                   </Link>
                 </div>
               </div>

@@ -85,11 +85,11 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-secondary-100">
+      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100">
         <div className="text-center py-8">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg
-              className="w-8 h-8 text-green-600"
+              className="w-8 h-8 text-primary-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -105,7 +105,7 @@ export default function ContactForm() {
           <h3 className="text-2xl font-display font-bold text-secondary-800 mb-4">
             Message Sent
           </h3>
-          <p className="text-gray-600 mb-8">
+          <p className="text-secondary-600 mb-8">
             Thank you for reaching out. We will get back to you as soon as
             possible.
           </p>
@@ -121,8 +121,7 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full blur-2xl -mr-16 -mt-16" />
+    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
       <h2 className="text-2xl font-display font-bold text-secondary-800 mb-8">
         Send a Message
       </h2>
@@ -136,7 +135,7 @@ export default function ContactForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1">
             Full Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -152,7 +151,7 @@ export default function ContactForm() {
 
         {/* Email */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1">
             Email Address <span className="text-red-500">*</span>
           </label>
           <input
@@ -168,7 +167,7 @@ export default function ContactForm() {
 
         {/* Subject Dropdown */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1">
             Subject
           </label>
           <select
@@ -187,7 +186,7 @@ export default function ContactForm() {
 
         {/* Message */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1">
             Message <span className="text-red-500">*</span>
           </label>
           <textarea

@@ -1,5 +1,6 @@
 import { getFeaturedProducts, getCategoryIdsByNamePattern, getProducts } from '~/lib/data';
-import HeroSection from '~/components/home/HeroSection';
+import HudHeroSection from '~/components/home/HudHeroSection';
+import MarqueeBand from '~/components/home/MarqueeBand';
 import OcdTechnologySection from '~/components/home/OcdTechnologySection';
 import FeatureIconsSection from '~/components/home/FeatureIconsSection';
 import DataDrivenSection from '~/components/home/DataDrivenSection';
@@ -7,8 +8,6 @@ import ShopBrassCarousel from '~/components/home/ShopBrassCarousel';
 import ReamersSection from '~/components/home/ReamersSection';
 import SignaturesSection from '~/components/home/SignaturesSection';
 import FooterCtaBanner from '~/components/home/FooterCtaBanner';
-import AnimatedDivider from '~/components/ui/AnimatedDivider';
-
 export default async function HomePage() {
   // Fetch brass products and reamer/tool products in parallel
   const [brassProducts, reamerProducts] = await Promise.all([
@@ -18,15 +17,13 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
+      <HudHeroSection />
+      <MarqueeBand />
       <OcdTechnologySection />
       <FeatureIconsSection />
       <DataDrivenSection />
-      <AnimatedDivider />
       <ShopBrassCarousel products={brassProducts} />
-      <AnimatedDivider />
       <ReamersSection products={reamerProducts} />
-      <AnimatedDivider />
       <SignaturesSection />
       <FooterCtaBanner />
     </>

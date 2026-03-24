@@ -44,27 +44,24 @@ export default async function ContactPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero */}
-      <header className="relative py-20 md:py-28 overflow-hidden">
+      <header className="relative bg-secondary-900 overflow-hidden min-h-[300px] md:min-h-[400px]">
         <Image
           src="/images/heroes/contact.jpg"
           alt="Precision shooting"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
-            Reach Out
-          </p>
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-            Contact Us
-          </h1>
-          <p className="text-secondary-300 text-lg leading-relaxed">
-            Questions about our products, need order support, or interested in
-            wholesale pricing? We are here to help.
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900/85 via-secondary-900/40 to-black/10" />
+        <div className="container mx-auto px-4 py-14 md:py-20 relative z-10">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400 uppercase">Reach Out</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">Contact Us</h1>
+            <p className="text-white/60 text-sm leading-relaxed max-w-lg">Questions about our products, need order support, or interested in wholesale pricing? We are here to help.</p>
+          </div>
         </div>
       </header>
 
@@ -73,7 +70,11 @@ export default async function ContactPage() {
           {/* Row 1: FAQ (left) + Contact Form (right) */}
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
             <section>
-              <h2 className="text-2xl font-display font-bold text-secondary-800 mb-8">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-px w-6 bg-primary-500" />
+                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Frequently Asked</span>
+              </div>
+              <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6">
                 Frequently Asked Questions
               </h2>
               <FaqAccordion questions={contactFaqs} />
@@ -84,13 +85,17 @@ export default async function ContactPage() {
 
           {/* Row 2: Get In Touch — Map left, contact info right */}
           <section>
-            <h2 className="text-2xl font-display font-bold text-secondary-800 mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Get In Touch</span>
+            </div>
+            <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6">
               Get In Touch
             </h2>
 
             <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
               {/* Map */}
-              <div className="bg-secondary-50 rounded-2xl border border-secondary-100 overflow-hidden">
+              <div className="bg-secondary-50 border border-secondary-100 overflow-hidden">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${storeConfig.mapsQuery}`}
                   target="_blank"
@@ -119,7 +124,7 @@ export default async function ContactPage() {
               <div className="space-y-6">
                 {/* Address */}
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -129,7 +134,7 @@ export default async function ContactPage() {
                     <h3 className="font-bold text-secondary-800 uppercase text-xs tracking-widest mb-1">
                       Address
                     </h3>
-                    <p className="text-gray-600 leading-relaxed text-sm">
+                    <p className="text-secondary-600 leading-relaxed text-sm">
                       {storeConfig.address.split('\n').map((line, i, arr) => (
                         <span key={i}>
                           {line}
@@ -142,7 +147,7 @@ export default async function ContactPage() {
 
                 {/* Phone */}
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
@@ -151,7 +156,7 @@ export default async function ContactPage() {
                     <h3 className="font-bold text-secondary-800 uppercase text-xs tracking-widest mb-1">
                       Phone
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-secondary-600 text-sm">
                       <a
                         href={storeConfig.phoneHref}
                         className="hover:text-primary-600 transition-colors"
@@ -164,7 +169,7 @@ export default async function ContactPage() {
 
                 {/* Email */}
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 flex-shrink-0">
+                  <div className="w-12 h-12 bg-primary-500/10 rounded flex items-center justify-center text-primary-600 flex-shrink-0">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -173,7 +178,7 @@ export default async function ContactPage() {
                     <h3 className="font-bold text-secondary-800 uppercase text-xs tracking-widest mb-1">
                       Email
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-secondary-600 text-sm">
                       <a
                         href={`mailto:${storeConfig.email}`}
                         className="hover:text-primary-600 transition-colors"
@@ -186,7 +191,7 @@ export default async function ContactPage() {
 
                 {/* Hours */}
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-secondary-100 rounded-2xl flex items-center justify-center text-secondary-600 flex-shrink-0">
+                  <div className="w-12 h-12 bg-secondary-100 rounded flex items-center justify-center text-secondary-600 flex-shrink-0">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -195,7 +200,7 @@ export default async function ContactPage() {
                     <h3 className="font-bold text-secondary-800 uppercase text-xs tracking-widest mb-1">
                       Business Hours
                     </h3>
-                    <p className="text-gray-600 text-sm">{storeConfig.hours}</p>
+                    <p className="text-secondary-600 text-sm">{storeConfig.hours}</p>
                   </div>
                 </div>
               </div>

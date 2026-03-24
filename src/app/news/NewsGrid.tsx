@@ -45,7 +45,7 @@ export default function NewsGrid() {
           >
             <Link
               href={`/news/${article.slug}`}
-              className="group bg-white rounded-2xl border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow block"
+              className="group bg-white border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow block"
             >
               {/* Thumbnail */}
               <div className="aspect-[16/10] relative bg-secondary-100 overflow-hidden">
@@ -64,12 +64,12 @@ export default function NewsGrid() {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-primary-600 bg-primary-500/10 px-3 py-1 rounded-full">
                     {article.category}
                   </span>
-                  <time className="text-xs text-gray-400">{article.date}</time>
+                  <time className="text-xs text-secondary-400">{article.date}</time>
                 </div>
                 <h2 className="text-lg font-display font-bold text-secondary-800 mb-2 group-hover:text-primary-600 transition-colors">
                   {article.title}
                 </h2>
-                <p className="text-sm text-gray-500">By {article.author}</p>
+                <p className="text-sm text-secondary-500">By {article.author}</p>
               </div>
             </Link>
           </AnimateIn>

@@ -142,27 +142,24 @@ export default async function DistributorsPage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Hero */}
-      <header className="relative py-24 md:py-36 overflow-hidden">
+      <header className="relative bg-secondary-900 overflow-hidden min-h-[300px] md:min-h-[400px]">
         <Image
           src="/images/heroes/distributors.jpg"
           alt="Alpha Munitions products"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-3xl">
-          <p className="text-primary-500 font-display text-sm uppercase tracking-[0.25em] mb-4">
-            Dealer Network
-          </p>
-          <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
-            Authorized Distributors
-          </h1>
-          <p className="text-secondary-300 text-lg leading-relaxed">
-            {storeConfig.siteName} products are available through our growing
-            network of authorized dealers worldwide.
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-900/85 via-secondary-900/40 to-black/10" />
+        <div className="container mx-auto px-4 py-14 md:py-20 relative z-10">
+          <div className="max-w-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400 uppercase">Dealer Network</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">Authorized Distributors</h1>
+            <p className="text-white/60 text-sm leading-relaxed max-w-lg">{storeConfig.siteName} products are available through our growing network of authorized dealers worldwide.</p>
+          </div>
         </div>
       </header>
 
@@ -171,10 +168,10 @@ export default async function DistributorsPage() {
           {/* Distributor Groups */}
           {distributorsByCountry.map((group) => (
             <section key={group.country}>
-              <h2 className="text-2xl font-display font-bold text-secondary-800 mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6 flex items-center gap-3">
                 <span className="text-3xl">{group.flag}</span>
                 {group.country}
-                <span className="text-sm font-normal text-gray-400">
+                <span className="text-sm font-normal text-secondary-400">
                   ({group.distributors.length})
                 </span>
               </h2>
@@ -182,9 +179,9 @@ export default async function DistributorsPage() {
                 {group.distributors.map((dist) => (
                   <div
                     key={dist.name}
-                    className="bg-white rounded-xl border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
+                    className="bg-white border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
                   >
-                    <h3 className="font-display font-bold text-secondary-800 text-sm">
+                    <h3 className="font-display font-bold text-secondary-900 text-sm">
                       {dist.name}
                     </h3>
 
@@ -233,8 +230,11 @@ export default async function DistributorsPage() {
           ))}
 
           {/* Become a Distributor CTA */}
-          <section className="bg-secondary-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -mr-32 -mt-32" />
+          <section className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+            <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
+            <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
+            <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />
+            <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/25" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
                 Become a Distributor
@@ -247,15 +247,17 @@ export default async function DistributorsPage() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
                   href="/dealer-sign-up"
-                  className="px-10 py-4 bg-primary-500 text-secondary-900 font-bold rounded-xl hover:bg-primary-400 transition-colors text-sm uppercase tracking-widest"
+                  className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-10 py-4"
                 >
-                  Apply Now
+                  <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Apply Now</span>
                 </Link>
                 <a
                   href={storeConfig.phoneHref}
-                  className="px-10 py-4 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 transition-colors text-sm uppercase tracking-widest border border-white/10"
+                  className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-10 py-4"
                 >
-                  Call Us
+                  <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
+                  <span className="relative z-10 text-white">Call Us</span>
                 </a>
               </div>
             </div>

@@ -113,11 +113,11 @@ export default function DealerSignUpForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-secondary-100">
+      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100">
         <div className="text-center py-8">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg
-              className="w-8 h-8 text-green-600"
+              className="w-8 h-8 text-primary-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -133,7 +133,7 @@ export default function DealerSignUpForm() {
           <h3 className="text-2xl font-display font-bold text-secondary-800 mb-4">
             Application Submitted
           </h3>
-          <p className="text-gray-600 mb-8">
+          <p className="text-secondary-600 mb-8">
             Thank you for your interest. A representative will reach out to you
             within 24-48 hours.
           </p>
@@ -163,11 +163,10 @@ export default function DealerSignUpForm() {
   const inputClass =
     'w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm';
   const labelClass =
-    'text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1';
+    'text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1';
 
   return (
-    <div className="bg-white rounded-2xl p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/5 rounded-full blur-2xl -mr-16 -mt-16" />
+    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
 
       {status === 'error' && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">

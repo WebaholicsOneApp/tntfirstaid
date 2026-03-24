@@ -10,9 +10,11 @@ import StockBadge from './StockBadge';
 interface ProductCardProps {
   product: ProductListItem;
   className?: string;
+  theme?: 'light' | 'dark';
 }
 
-export default function ProductCard({ product, className }: ProductCardProps) {
+export default function ProductCard({ product, className, theme = 'light' }: ProductCardProps) {
+  const isDark = theme === 'dark';
   const [imgError, setImgError] = useState(false);
   const imageSrc = imgError
     ? product.fallbackImage
@@ -31,13 +33,18 @@ export default function ProductCard({ product, className }: ProductCardProps) {
     <Link
       href={`/product/${product.slug}`}
       className={cn(
-        'group block rounded-lg border border-secondary-100 bg-white transition-all duration-200',
-        'hover:border-primary-300 hover:shadow-md',
+        'group block border transition-all duration-300 ease-out',
+        isDark
+          ? 'bg-secondary-900 border-primary-500/10 hover:border-primary-500/30 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.12)] active:scale-[0.99] active:translate-y-0'
+          : 'rounded-lg bg-white border-secondary-100 hover:border-primary-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:scale-[0.99] active:translate-y-0',
         className
       )}
     >
       {/* Image */}
-      <div className="relative aspect-[2/3] overflow-hidden rounded-t-lg bg-secondary-50">
+      <div className={cn(
+        'relative aspect-[2/3] overflow-hidden',
+        isDark ? 'bg-secondary-800' : 'rounded-t-lg bg-secondary-50'
+      )}>
         {imageSrc ? (
           <Image
             src={imageSrc}
@@ -64,7 +71,12 @@ export default function ProductCard({ product, className }: ProductCardProps) {
       {/* Content */}
       <div className="p-3 sm:p-4">
         {/* Product name */}
-        <h3 className="text-sm font-medium text-secondary-800 line-clamp-2 leading-snug group-hover:text-primary-600 transition-colors">
+        <h3 className={cn(
+          'text-sm font-medium line-clamp-2 leading-snug transition-colors',
+          isDark
+            ? 'text-secondary-100 group-hover:text-primary-400'
+            : 'text-secondary-800 group-hover:text-primary-600'
+        )}>
           {product.name}
         </h3>
 
@@ -77,17 +89,17 @@ export default function ProductCard({ product, className }: ProductCardProps) {
                   <path
                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
                     fill="currentColor"
-                    className={star <= Math.round(product.averageRating ?? 0) ? 'text-amber-400' : 'text-secondary-200'}
+                    className={star <= Math.round(product.averageRating ?? 0) ? 'text-amber-400' : isDark ? 'text-secondary-600' : 'text-secondary-200'}
                   />
                 </svg>
               ))}
             </div>
-            <span className="text-xs text-secondary-400">({product.totalReviews})</span>
+            <span className={cn('text-xs', isDark ? 'text-secondary-500' : 'text-secondary-400')}>({product.totalReviews})</span>
           </div>
         )}
 
         {/* Price */}
-        <p className="mt-2 text-base font-semibold text-secondary-900">
+        <p className={cn('mt-2 text-base font-semibold', isDark ? 'text-primary-500' : 'text-secondary-900')}>
           {priceDisplay}
         </p>
 
@@ -105,7 +117,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
 
         {/* Select options link */}
         {product.variationCount > 1 && (
-          <p className="mt-1.5 text-xs text-primary-600 font-medium uppercase tracking-wider">
+          <p className={cn('mt-1.5 text-xs font-medium uppercase tracking-wider', isDark ? 'text-primary-500/60' : 'text-primary-600')}>
             Select options
           </p>
         )}
