@@ -64,7 +64,7 @@ export function buildCSPWithNonce(nonce: string, isProduction: boolean): string 
       'https://apis.google.com',
       ...(isProduction ? [] : ['http://localhost:*', 'ws://localhost:*']),
     ],
-    'frame-src': ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com', 'https://www.google.com'],
+    'frame-src': ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com', 'https://www.google.com', 'https://www.youtube-nocookie.com'],
     'frame-ancestors': ["'self'"],
     'form-action': ["'self'"],
     'base-uri': ["'self'"],
