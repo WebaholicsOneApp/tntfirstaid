@@ -7,13 +7,21 @@ import "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
+    qualities: [75],
+    deviceSizes: [640, 1080, 1920],
+    imageSizes: [128, 256, 384],
     remotePatterns: [
+      // AWS S3 (product images)
       { protocol: 'https', hostname: '*.amazonaws.com' },
+      // Azure Blob Storage (OneApp product images)
       { protocol: 'https', hostname: '*.blob.core.windows.net' },
+      // Alpha Munitions CDN
       { protocol: 'https', hostname: 'cdn.alphamunitions.com' },
       { protocol: 'https', hostname: 'alphamunitions.com' },
-      { protocol: 'https', hostname: '**' },
-      { protocol: 'http', hostname: '**' },
+      // Shopify CDN (WPS imported product images)
+      { protocol: 'https', hostname: 'cdn.shopify.com' },
+      // WPS CDN (supplier images)
+      { protocol: 'https', hostname: 'cdn.wpsstatic.com' },
     ],
   },
   reactStrictMode: true,
