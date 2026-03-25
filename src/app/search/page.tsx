@@ -4,6 +4,8 @@ import { getPaginationRange } from '~/lib/utils';
 import ProductGrid from '~/components/products/ProductGrid';
 import Link from 'next/link';
 
+export const revalidate = 60;
+
 interface SearchPageProps {
   searchParams: Promise<{
     q?: string;

@@ -1,5 +1,7 @@
 import { getFeaturedProducts, getCategoryIdsByNamePattern, getProducts } from '~/lib/data';
 import HudHeroSection from '~/components/home/HudHeroSection';
+
+export const revalidate = 300;
 import MarqueeBand from '~/components/home/MarqueeBand';
 import OcdTechnologySection from '~/components/home/OcdTechnologySection';
 import FeatureIconsSection from '~/components/home/FeatureIconsSection';

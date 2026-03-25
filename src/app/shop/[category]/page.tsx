@@ -14,6 +14,8 @@ import ShopPageClient from '~/components/products/ShopPageClient';
 import Breadcrumbs from '~/components/common/Breadcrumbs';
 import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
 
+export const revalidate = 900;
+
 function slugify(text: string): string {
   return text
     .toLowerCase()

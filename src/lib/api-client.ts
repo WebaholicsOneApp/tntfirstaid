@@ -17,8 +17,8 @@ const ONEAPP_API_KEY = process.env.ONEAPP_API_KEY || '';
 const IS_BUILD_PHASE = process.env.NEXT_PHASE === 'phase-production-build';
 
 const DEFAULT_TIMEOUT = 10_000; // 10 seconds
-const MAX_RETRIES = 2;
-const RETRY_DELAY = 500; // ms base delay (multiplied by attempt number)
+const MAX_RETRIES = 1;
+const RETRY_DELAY = 500; // ms base delay (multiplied by attempt number, with jitter)
 
 // ---------------------------------------------------------------------------
 // Cache
@@ -295,17 +295,17 @@ class StorefrontApiClient {
 
   /** GET /categories/:slug */
   getCategoryBySlug<T = unknown>(slug: string) {
-    return this.getCached<T>(`/categories/${encodeURIComponent(slug)}`);
+    return this.getCached<T>(`/categories/${encodeURIComponent(slug)}`, undefined, 5 * 60_000);
   }
 
   /** GET /categories/:id/hierarchy */
   getCategoryHierarchy<T = unknown>(categoryId: number) {
-    return this.getCached<T>(`/categories/${categoryId}/hierarchy`);
+    return this.getCached<T>(`/categories/${categoryId}/hierarchy`, undefined, 5 * 60_000);
   }
 
   /** GET /categories/:id/descendants */
   getCategoryDescendants<T = unknown>(categoryId: number) {
-    return this.getCached<T>(`/categories/${categoryId}/descendants`);
+    return this.getCached<T>(`/categories/${categoryId}/descendants`, undefined, 5 * 60_000);
   }
 
   // --------------------------------------------------------------------------

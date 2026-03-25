@@ -5,6 +5,8 @@ import ShopPageClient from '~/components/products/ShopPageClient';
 import Breadcrumbs from '~/components/common/Breadcrumbs';
 import Link from 'next/link';
 
+export const revalidate = 900;
+
 export const metadata: Metadata = {
   title: 'Shop',
   description: 'Browse our selection of premium ammunition and reloading supplies.',

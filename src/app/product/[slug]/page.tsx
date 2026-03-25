@@ -9,6 +9,8 @@ import ProductGrid from '~/components/products/ProductGrid';
 import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
 import type { ReviewAggregate } from '~/types/review';
 
+export const revalidate = 900;
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }

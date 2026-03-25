@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { getStoreConfig } from '~/lib/store-config.server';
 import NewsGrid from './NewsGrid';
 
+export const revalidate = 3600;
+
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
   return {
