@@ -14,6 +14,7 @@
 
 const ONEAPP_API_URL = process.env.ONEAPP_API_URL || 'http://localhost:3001';
 const ONEAPP_API_KEY = process.env.ONEAPP_API_KEY || '';
+const IS_BUILD_PHASE = process.env.NEXT_PHASE === 'phase-production-build';
 
 const DEFAULT_TIMEOUT = 10_000; // 10 seconds
 const MAX_RETRIES = 2;
@@ -98,6 +99,13 @@ class StorefrontApiClient {
     options?: RequestOptions,
   ): Promise<T> {
     const { params, body, timeout = DEFAULT_TIMEOUT } = options || {};
+
+    // During Vercel build, the OneApp API is unreachable. Fail fast so
+    // callers hit their existing fallback paths immediately instead of
+    // waiting through 10s timeout × 3 attempts per page.
+    if (IS_BUILD_PHASE) {
+      throw new Error(`Skipped API call during build: ${method} ${path}`);
+    }
 
     let url = `${this.baseUrl}${path}`;
     if (params) {

@@ -11,14 +11,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let categories: { categoryName: string }[] = [];
 
   try {
-    const [p, c] = await Promise.all([
-      getProducts({}, 'newest', { page: 1, pageSize: 10000 }),
+    const PAGE_SIZE = 100;
+    let allProducts: { slug: string }[] = [];
+    let page = 1;
+    let hasMore = true;
+
+    const [firstPage, c] = await Promise.all([
+      getProducts({}, 'newest', { page: 1, pageSize: PAGE_SIZE }),
       getTopLevelCategories(),
     ]);
-    productsResult = p;
+
+    allProducts = firstPage.products;
+    hasMore = firstPage.products.length === PAGE_SIZE;
     categories = c;
+    page = 2;
+
+    while (hasMore) {
+      const result = await getProducts({}, 'newest', { page, pageSize: PAGE_SIZE });
+      allProducts = allProducts.concat(result.products);
+      hasMore = result.products.length === PAGE_SIZE;
+      page++;
+    }
+
+    productsResult = { products: allProducts };
   } catch {
-    // DB may not be configured — return static pages only
+    // API may be unreachable during build — return static pages only
   }
 
   const staticPages: MetadataRoute.Sitemap = [
