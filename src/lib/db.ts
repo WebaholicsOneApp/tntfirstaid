@@ -8,6 +8,8 @@
 
 import { getApiClient, clearCache } from './api-client';
 
+const IS_BUILD_PHASE = process.env.NEXT_PHASE === 'phase-production-build';
+
 // ---------------------------------------------------------------------------
 // API config response shape (subset we care about)
 // ---------------------------------------------------------------------------
@@ -73,7 +75,9 @@ export async function getStorefrontBranding(): Promise<StorefrontBrandingConfig>
       mapsQuery: contact.mapsQuery,
     };
   } catch (error) {
-    console.error('[db.ts] Failed to fetch storefront branding via API:', error);
+    if (!IS_BUILD_PHASE) {
+      console.error('[db.ts] Failed to fetch storefront branding via API:', error);
+    }
     return {};
   }
 }
@@ -102,7 +106,9 @@ export async function getPolicyTemplates(): Promise<PolicyTemplatesConfig> {
       shipping_returns: policies.shippingPolicy ?? policies.returnPolicy ?? undefined,
     };
   } catch (error) {
-    console.error('[db.ts] Failed to fetch policy templates via API:', error);
+    if (!IS_BUILD_PHASE) {
+      console.error('[db.ts] Failed to fetch policy templates via API:', error);
+    }
     return {};
   }
 }

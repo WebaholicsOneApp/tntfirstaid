@@ -25,6 +25,7 @@ export default function VerifyClient() {
         const res = await fetch('/api/auth/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
           body: JSON.stringify({ token }),
         });
         if (!res.ok) {

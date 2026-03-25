@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { login } from '~/lib/auth/auth-api';
-import { setCustomerToken } from '~/lib/auth/cookies';
+import { COOKIE_NAME } from '~/lib/auth/cookies';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '~/lib/ratelimit';
+
+const MAX_AGE = 30 * 24 * 60 * 60; // 30 days
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -22,10 +24,17 @@ export async function POST(request: Request) {
 
     const data = await login(email, password);
 
-    // Set httpOnly cookie with the customer JWT
-    await setCustomerToken(data.token);
+    // Set httpOnly cookie directly on the response object
+    const response = NextResponse.json({ customer: data.customer });
+    response.cookies.set(COOKIE_NAME, data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: MAX_AGE,
+    });
 
-    return NextResponse.json({ customer: data.customer });
+    return response;
   } catch {
     // Generic error to prevent enumeration
     return NextResponse.json(
