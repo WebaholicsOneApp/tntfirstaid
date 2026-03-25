@@ -53,7 +53,7 @@ export default async function PrivacyPolicyPage() {
         <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
         <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
             Privacy <span className="text-primary-500">Policy</span>
           </h1>
           <p className="text-secondary-400 max-w-2xl mx-auto text-lg">
@@ -443,17 +443,20 @@ export default async function PrivacyPolicyPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     href="/contact"
-                    className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
+                    className="group inline-flex items-center gap-3 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                   >
-                    <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-                    <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Contact Us</span>
+                    Contact Us
+                    <span className="w-5 h-5 rounded-full bg-secondary-950/10 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                      </svg>
+                    </span>
                   </Link>
                   <a
                     href={`mailto:${storeConfig.supportEmail}`}
-                    className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
+                    className="inline-flex items-center rounded-full border border-primary-500/40 px-8 py-3.5 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase hover:border-primary-500 hover:text-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                   >
-                    <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-                    <span className="relative z-10 text-white">Email Support</span>
+                    Email Support
                   </a>
                 </div>
               </div>

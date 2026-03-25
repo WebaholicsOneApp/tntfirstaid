@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '~/lib/cart';
+import { useAuth } from '~/lib/auth';
 import type { CategoryWithChildren } from '~/types';
 import MobileMenu from './MobileMenu';
 import MegaMenu from '~/components/navigation/MegaMenu';
@@ -36,10 +37,13 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
   const [contactDropdownOpen, setContactDropdownOpen] = useState(false);
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const megaMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const contactDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const accountDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { cart, openCart } = useCart();
+  const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -195,16 +199,82 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
               </svg>
             </button>
 
-            {/* Account icon */}
-            <Link
-              href="/account"
-              className="p-2 text-primary-400 hover:text-white transition-colors"
-              aria-label="My account"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </Link>
+            {/* Account icon — hidden when auth is disabled */}
+            {customerAuthEnabled && !isAuthenticated && (
+              <Link
+                href="/account"
+                className="p-2 text-primary-400 hover:text-white transition-colors"
+                aria-label="Sign in"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </Link>
+            )}
+            {customerAuthEnabled && isAuthenticated && (
+              <div
+                className="relative"
+                onMouseEnter={() => {
+                  if (accountDropdownTimeoutRef.current) clearTimeout(accountDropdownTimeoutRef.current);
+                  setAccountDropdownOpen(true);
+                }}
+                onMouseLeave={() => {
+                  accountDropdownTimeoutRef.current = setTimeout(() => setAccountDropdownOpen(false), 200);
+                }}
+              >
+                <Link
+                  href="/account/dashboard"
+                  className="p-2 text-primary-400 hover:text-white transition-colors block"
+                  aria-label="My account"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                  </svg>
+                </Link>
+                {accountDropdownOpen && (
+                  <div className="absolute top-full right-0 mt-1 min-w-[160px] bg-secondary-800 border border-secondary-700 rounded-md shadow-xl py-1 z-50">
+                    <Link
+                      href="/account/dashboard"
+                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      onClick={() => setAccountDropdownOpen(false)}
+                    >
+                      My Account
+                    </Link>
+                    <Link
+                      href="/account/profile"
+                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      onClick={() => setAccountDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href="/account/orders"
+                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      onClick={() => setAccountDropdownOpen(false)}
+                    >
+                      Orders
+                    </Link>
+                    <Link
+                      href="/account/security"
+                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      onClick={() => setAccountDropdownOpen(false)}
+                    >
+                      Security
+                    </Link>
+                    <div className="border-t border-secondary-700 my-1" />
+                    <button
+                      onClick={() => {
+                        setAccountDropdownOpen(false);
+                        logout();
+                      }}
+                      className="text-sm text-red-400 hover:text-red-300 hover:bg-secondary-700 px-4 py-2 w-full text-left transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Cart icon */}
             <button

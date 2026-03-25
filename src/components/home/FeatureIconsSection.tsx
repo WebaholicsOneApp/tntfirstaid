@@ -22,9 +22,8 @@ export default function FeatureIconsSection() {
               Why Alpha
             </span>
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-secondary-900 leading-tight tracking-tight">
-            Built to a<br />
-            <em className="not-italic text-primary-600">Higher Standard</em>
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-900 leading-tight">
+            Built to a Higher Standard
           </h2>
         </div>
 

@@ -9,6 +9,7 @@ import {
   getClientIp,
   rateLimitResponse,
 } from '~/lib/ratelimit';
+import { getCheckoutCustomer } from '~/lib/auth/get-checkout-customer';
 
 // Lazy initialize Stripe
 let stripe: Stripe | null = null;
@@ -66,6 +67,9 @@ export async function POST(request: Request) {
 
     const validatedItems = items as CheckoutItem[];
 
+    // Look up logged-in customer (if any) for receipt email and metadata
+    const customer = await getCheckoutCustomer();
+
     // Calculate total in cents
     const subtotal = validatedItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
@@ -81,11 +85,16 @@ export async function POST(request: Request) {
       automatic_payment_methods: {
         enabled: true,
       },
+      ...(customer?.email && { receipt_email: customer.email }),
       metadata: {
         orderType: 'storefront_express_checkout',
         itemCount: String(validatedItems.length),
         subtotal: String(subtotal),
         tax: String(tax),
+        ...(customer && {
+          customerId: String(customer.id),
+          customerEmail: customer.email,
+        }),
         // Store item details for order creation
         items: JSON.stringify(
           validatedItems.map((item) => ({

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import { ProductImage } from '~/components/ui/ProductImage';
 import { useCart } from '~/lib/cart/CartContext';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
 
@@ -77,10 +77,10 @@ export default function CartPageClient() {
                   <li key={item.id} className="px-6 py-4 flex gap-4">
                     <Link
                       href={`/product/${item.productSlug}`}
-                      className="relative w-24 h-24 bg-secondary-50 rounded-xl overflow-hidden flex-shrink-0"
+                      className="relative w-24 h-24 bg-secondary-50 rounded-lg overflow-hidden flex-shrink-0"
                     >
                       {item.image ? (
-                        <Image
+                        <ProductImage
                           src={getImageUrl(item.image)}
                           alt={item.name}
                           fill
@@ -104,7 +104,7 @@ export default function CartPageClient() {
                         {item.name}
                       </Link>
                       {item.variation && (
-                        <p className="font-mono text-[0.6rem] tracking-[0.1em] text-secondary-400 uppercase mt-0.5">{item.variation}</p>
+                        <p className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase mt-0.5">{item.variation}</p>
                       )}
                       {item.manufacturerNo && (
                         <p className="font-mono text-[0.6rem] tracking-[0.1em] text-secondary-400 mt-0.5">SKU: {item.manufacturerNo}</p>
@@ -134,7 +134,7 @@ export default function CartPageClient() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          <span className="font-mono text-sm font-semibold text-secondary-900">
+                          <span className="text-sm font-semibold text-secondary-900">
                             {formatCentsToDollars(item.price * item.quantity)}
                           </span>
                           <button
@@ -165,7 +165,7 @@ export default function CartPageClient() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-secondary-500">Subtotal</span>
-                  <span className="font-mono font-medium text-secondary-900">
+                  <span className="font-medium text-secondary-900">
                     {formatCentsToDollars(cart.subtotal)}
                   </span>
                 </div>

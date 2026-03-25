@@ -33,6 +33,9 @@ interface StorefrontApiConfig {
     shippingPolicy?: Record<string, unknown>;
     returnPolicy?: Record<string, unknown>;
   };
+  features?: {
+    customerAuthEnabled?: boolean;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -106,4 +109,17 @@ export async function getPolicyTemplates(): Promise<PolicyTemplatesConfig> {
 
 export function clearPolicyCache(): void {
   clearCache('/config');
+}
+
+// ---------------------------------------------------------------------------
+// Customer Auth Feature Flag
+// ---------------------------------------------------------------------------
+
+export async function getCustomerAuthEnabled(): Promise<boolean> {
+  try {
+    const config = await getApiClient().getConfig<StorefrontApiConfig>();
+    return !!config.features?.customerAuthEnabled;
+  } catch {
+    return false;
+  }
 }

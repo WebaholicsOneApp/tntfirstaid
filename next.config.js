@@ -22,6 +22,8 @@ const config = {
       { protocol: 'https', hostname: 'cdn.shopify.com' },
       // WPS CDN (supplier images)
       { protocol: 'https', hostname: 'cdn.wpsstatic.com' },
+      // Catch-all for unknown supplier domains (rendered unoptimized via ProductImage)
+      { protocol: 'https', hostname: '**' },
     ],
   },
   reactStrictMode: true,

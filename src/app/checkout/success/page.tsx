@@ -51,33 +51,33 @@ function SuccessContent() {
   }, [clearCart, sessionId, orderId]);
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-neutral-100 p-8 text-center">
+    <div className="min-h-screen bg-secondary-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-secondary-100 p-8 text-center">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-neutral-900 mb-4">
+        <h1 className="text-3xl font-display font-bold text-secondary-900 mb-4">
           Order <span className="text-green-600">Confirmed!</span>
         </h1>
 
         {loading ? (
           <div className="py-8">
             <div className="animate-spin w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full mx-auto" />
-            <p className="text-sm text-neutral-400 mt-4">Processing your order...</p>
+            <p className="text-sm text-secondary-400 mt-4">Processing your order...</p>
           </div>
         ) : (
           <>
             {orderInfo?.orderNumber && (
               <div className="mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
                 <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Order Number</p>
-                <p className="text-2xl font-bold text-neutral-900">{orderInfo.orderNumber}</p>
+                <p className="text-2xl font-bold text-secondary-900">{orderInfo.orderNumber}</p>
               </div>
             )}
 
-            <p className="text-neutral-600 mb-8 leading-relaxed">
+            <p className="text-secondary-600 mb-8 leading-relaxed">
               Thank you for your purchase! We&apos;ve sent a confirmation email with your order details.
             </p>
           </>
@@ -98,8 +98,8 @@ function SuccessContent() {
           </Link>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-neutral-100">
-          <p className="text-xs text-neutral-400 font-bold uppercase tracking-widest mb-4">Need Help?</p>
+        <div className="mt-12 pt-8 border-t border-secondary-100">
+          <p className="text-xs text-secondary-400 font-bold uppercase tracking-widest mb-4">Need Help?</p>
           <div className="flex justify-center gap-6">
             <Link href="/contact" className="font-mono text-[0.7rem] tracking-[0.15em] text-primary-600 hover:text-primary-500 uppercase transition-colors">
               Contact Us
@@ -114,7 +114,7 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full" />
       </div>
     }>

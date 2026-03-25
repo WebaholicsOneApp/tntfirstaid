@@ -51,7 +51,7 @@ export default async function ShippingReturnsPage() {
         <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/15 z-10" />
         <div className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-primary-500/15 z-10" />
         <div className="container mx-auto px-4 relative z-10 text-center">
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
             Shipping, Returns &{' '}
             <span className="text-primary-500">Exchanges</span>
           </h1>
@@ -73,7 +73,7 @@ export default async function ShippingReturnsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Ammunition Shipping Restrictions
                 </h2>
               </div>
@@ -132,7 +132,7 @@ export default async function ShippingReturnsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Returns & Exchanges
                 </h2>
               </div>
@@ -250,7 +250,7 @@ export default async function ShippingReturnsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Packaging
                 </h2>
               </div>
@@ -279,7 +279,7 @@ export default async function ShippingReturnsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                   </svg>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-800">
+                <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary-900">
                   Shipping Policy
                 </h2>
               </div>
@@ -440,17 +440,20 @@ export default async function ShippingReturnsPage() {
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     href="/contact"
-                    className="group relative inline-block overflow-hidden border border-primary-500 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
+                    className="group inline-flex items-center gap-3 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                   >
-                    <span className="absolute inset-0 -translate-x-full bg-primary-500 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-                    <span className="relative z-10 text-primary-500 group-hover:text-secondary-900 transition-colors duration-500">Contact Support</span>
+                    Contact Support
+                    <span className="w-5 h-5 rounded-full bg-secondary-950/10 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                      </svg>
+                    </span>
                   </Link>
                   <Link
                     href="/faq"
-                    className="group relative inline-block overflow-hidden border border-white/30 font-mono text-sm tracking-[0.2em] uppercase px-8 py-4"
+                    className="inline-flex items-center rounded-full border border-primary-500/40 px-8 py-3.5 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase hover:border-primary-500 hover:text-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                   >
-                    <span className="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-                    <span className="relative z-10 text-white">Help Center</span>
+                    Help Center
                   </Link>
                 </div>
               </div>

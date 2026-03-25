@@ -11,6 +11,8 @@ import {
   getClientIp,
   rateLimitResponse,
 } from '~/lib/ratelimit';
+import { getCheckoutCustomer } from '~/lib/auth/get-checkout-customer';
+import { getOrCreateStripeCustomer } from '~/lib/stripe/get-or-create-stripe-customer';
 
 // Lazy initialize Stripe to avoid build-time errors when API key is missing
 let stripe: Stripe | null = null;
@@ -145,10 +147,18 @@ export async function POST(request: Request) {
       ? `${SITE_URL}${cancelUrl}`
       : cancelUrl;
 
+    // If a customer is logged in, find or create a Stripe Customer so
+    // the checkout form is pre-filled with their name, email, phone, and address.
+    const customer = await getCheckoutCustomer();
+    const stripeCustomerId = customer
+      ? await getOrCreateStripeCustomer(getStripe(), customer)
+      : null;
+
     // Create checkout session
     // Using automatic_payment_methods to show all enabled methods from Stripe Dashboard
     // (PayPal, Apple Pay, Google Pay, Affirm, cards, etc.)
     const session = await getStripe().checkout.sessions.create({
+      ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
       line_items: lineItems,
       mode: 'payment',
       success_url: fullSuccessUrl,

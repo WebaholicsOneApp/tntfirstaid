@@ -129,7 +129,7 @@ export default function OcdTechnologySection() {
               />
             </div>
 
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-secondary-900 leading-tight">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-900 leading-tight">
               Alpha Munitions Ultra Premium Rifle Brass with OCD (Optimized Case Design) Technology.
             </h2>
 
@@ -141,7 +141,7 @@ export default function OcdTechnologySection() {
               {points.map((point, i) => (
                 <li
                   key={i}
-                  className="pl-4 border-l-[2px] border-primary-500/40 text-secondary-500 text-sm leading-relaxed hover:border-primary-500 transition-colors duration-300"
+                  className="pl-4 border-l-[2px] border-primary-500/40 text-secondary-400 text-sm leading-relaxed hover:border-primary-500 transition-colors duration-300"
                 >
                   {point}
                 </li>

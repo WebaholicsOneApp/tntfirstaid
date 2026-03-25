@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { ProductImage } from '~/components/ui/ProductImage';
 import Link from 'next/link';
 import { useState } from 'react';
 import type { ProductListItem } from '~/types';
@@ -46,7 +46,7 @@ export default function ProductCard({ product, className, theme = 'light' }: Pro
         isDark ? 'bg-secondary-800' : 'rounded-t-lg bg-secondary-50'
       )}>
         {imageSrc ? (
-          <Image
+          <ProductImage
             src={imageSrc}
             alt={product.name}
             fill

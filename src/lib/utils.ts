@@ -113,8 +113,11 @@ export function getPaginationRange(
  */
 export function getImageUrl(url: string | null | undefined): string {
   if (!url) return '/placeholder-product.svg';
-  // If it's already a full URL, return as-is
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  // Upgrade http to https — DB has mixed protocols but next/image config only allows https
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+  if (url.startsWith('https://')) {
     return url;
   }
   // Otherwise, assume it's a relative path
@@ -176,4 +179,41 @@ export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
  */
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
+}
+
+/**
+ * Known high-volume CDN hosts that should go through Vercel Image Optimization.
+ * Unknown hosts are served unoptimized (no cost, no errors).
+ */
+const OPTIMIZED_IMAGE_HOSTS = new Set([
+  'cdn.shopify.com',
+  'cdn.wpsstatic.com',
+  'd32vzsop7y1h3k.cloudfront.net',
+  'images.rockymountainatvmc.com',
+  'm.media-amazon.com',
+  'i5.walmartimages.com',
+  'i.ebayimg.com',
+  'images.unsplash.com',
+]);
+
+export function isOptimizedImageHost(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname;
+    if (OPTIMIZED_IMAGE_HOSTS.has(hostname)) return true;
+    // Wildcard: *.blob.core.windows.net (Azure Blob Storage)
+    return hostname.endsWith('.blob.core.windows.net');
+  } catch {
+    return true; // relative paths are local — always optimized
+  }
+}
+
+/**
+ * Format digits into (555) 123-4567 pattern
+ */
+export function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 10);
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 }

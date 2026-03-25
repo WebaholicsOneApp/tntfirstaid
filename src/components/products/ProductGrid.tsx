@@ -33,7 +33,7 @@ export default function ProductGrid({ products, className }: ProductGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6',
+        'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 py-1 -my-1',
         className
       )}
     >

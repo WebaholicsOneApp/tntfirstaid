@@ -94,7 +94,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
 
         {/* Product name + SKU */}
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-secondary-800 leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-secondary-900 leading-tight">
             {product.name}
           </h1>
           {selectedVariation?.manufacturerNo && (

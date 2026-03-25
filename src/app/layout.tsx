@@ -6,8 +6,13 @@ import NextTopLoader from 'nextjs-toploader';
 import { getNonce } from '~/lib/get-nonce';
 import { NonceProvider } from '~/lib/nonce-context';
 import { CartProvider } from '~/lib/cart';
+import { AuthProvider } from '~/lib/auth';
 import { NavigationLoadingProvider } from '~/lib/navigation-loading-context';
 import { getStoreConfig } from '~/lib/store-config.server';
+import { getCustomerAuthEnabled } from '~/lib/db';
+import { getCustomerToken } from '~/lib/auth/cookies';
+import { getMe } from '~/lib/auth/auth-api';
+import type { Customer } from '~/types/auth';
 import { generatePalette, SHADES } from '~/lib/color-utils';
 import StickyHeader from '~/components/layout/StickyHeader';
 import HeaderWrapper from '~/components/layout/HeaderWrapper';
@@ -62,6 +67,21 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const nonce = await getNonce();
   const storeConfig = await getStoreConfig();
+  const customerAuthEnabled = await getCustomerAuthEnabled();
+
+  // Hydrate auth state from cookie (best-effort, non-blocking)
+  let initialCustomer: Customer | null = null;
+  if (customerAuthEnabled) {
+    try {
+      const token = await getCustomerToken();
+      if (token) {
+        const data = await getMe(token);
+        initialCustomer = data.customer;
+      }
+    } catch {
+      // Token expired or invalid — start logged out
+    }
+  }
 
   // Generate dynamic color palettes from branding
   const primaryPalette = generatePalette(storeConfig.primaryColor);
@@ -82,6 +102,7 @@ export default async function RootLayout({
       >
         <NextTopLoader color={storeConfig.primaryColor} showSpinner={false} />
         <NonceProvider nonce={nonce}>
+          <AuthProvider initialCustomer={initialCustomer} customerAuthEnabled={customerAuthEnabled}>
           <CartProvider>
             <NavigationLoadingProvider>
               <StickyHeader>
@@ -102,6 +123,7 @@ export default async function RootLayout({
               <CartDrawer />
             </NavigationLoadingProvider>
           </CartProvider>
+          </AuthProvider>
         </NonceProvider>
       </body>
     </html>

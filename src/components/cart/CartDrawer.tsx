@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ProductImage } from '~/components/ui/ProductImage';
 import { useCart } from '~/lib/cart';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
 
@@ -115,7 +115,7 @@ export default function CartDrawer() {
                       className="relative w-20 h-20 bg-secondary-50 rounded-lg overflow-hidden flex-shrink-0"
                     >
                       {item.image ? (
-                        <Image
+                        <ProductImage
                           src={getImageUrl(item.image)}
                           alt={item.name}
                           fill

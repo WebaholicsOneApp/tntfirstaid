@@ -23,7 +23,7 @@ export default function SignaturesSection() {
 
           {/* Pull quote */}
           <blockquote className="mb-6">
-            <p className="font-serif italic text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-secondary-800 leading-snug">
+            <p className="font-display italic text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-secondary-800 leading-snug">
               &ldquo;To produce the finest rifle brass available anywhere in the world.&rdquo;
             </p>
           </blockquote>

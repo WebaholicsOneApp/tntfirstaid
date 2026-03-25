@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CategoryWithChildren } from '~/types';
+import { useAuth } from '~/lib/auth';
 
 function slugify(text: string): string {
   return text
@@ -23,6 +24,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, siteName, categories }: MobileMenuProps) {
+  const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -103,6 +105,66 @@ export default function MobileMenu({ isOpen, onClose, siteName, categories }: Mo
           >
             Dealer Sign Up
           </Link>
+
+          {/* Account link — hidden when auth is disabled */}
+          {customerAuthEnabled && !isAuthenticated && (
+            <div className="border-t border-secondary-700 mt-4 pt-4">
+              <Link
+                href="/account"
+                onClick={onClose}
+                className="flex items-center gap-3 py-3 px-5 text-secondary-100 hover:text-primary-500 hover:bg-secondary-700 transition-colors font-medium uppercase tracking-wider text-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Sign In
+              </Link>
+            </div>
+          )}
+          {customerAuthEnabled && isAuthenticated && (
+            <div className="border-t border-secondary-700 mt-4 pt-4">
+              <Link
+                href="/account/dashboard"
+                onClick={onClose}
+                className="flex items-center gap-3 py-3 px-5 text-secondary-100 hover:text-primary-500 hover:bg-secondary-700 transition-colors font-medium uppercase tracking-wider text-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                My Account
+              </Link>
+              <Link
+                href="/account/profile"
+                onClick={onClose}
+                className="block py-2.5 px-8 text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
+              >
+                Profile
+              </Link>
+              <Link
+                href="/account/orders"
+                onClick={onClose}
+                className="block py-2.5 px-8 text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
+              >
+                Orders
+              </Link>
+              <Link
+                href="/account/security"
+                onClick={onClose}
+                className="block py-2.5 px-8 text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 transition-colors text-sm"
+              >
+                Security
+              </Link>
+              <button
+                onClick={() => {
+                  onClose();
+                  logout();
+                }}
+                className="block py-2.5 px-8 text-red-400 hover:text-red-300 hover:bg-secondary-700 transition-colors text-sm w-full text-left"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
 
           {/* Category links */}
           {categories && categories.length > 0 && (

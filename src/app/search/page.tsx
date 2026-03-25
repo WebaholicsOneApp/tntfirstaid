@@ -44,7 +44,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-        <h1 className="text-2xl font-display font-bold text-secondary-800 mb-2">
+        <h1 className="text-2xl font-display font-bold text-secondary-900 mb-2">
           Search Products
         </h1>
         <p className="text-secondary-500">
@@ -65,7 +65,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         <p className="font-mono text-[0.65rem] tracking-[0.3em] text-secondary-400 uppercase mb-3">
           {'// Search //'}
         </p>
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-800">
+        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900">
           Search Results
         </h1>
         <div className="mt-3 h-[1px] w-[60px] bg-gradient-to-r from-primary-500 to-transparent" />

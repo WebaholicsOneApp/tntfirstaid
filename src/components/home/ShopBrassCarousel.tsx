@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { ProductImage } from '~/components/ui/ProductImage';
 import Link from 'next/link';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ProductListItem } from '~/types';
@@ -83,7 +83,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
                   Featured Brass
                 </span>
               </div>
-              <h2 className="font-display text-4xl sm:text-5xl font-bold text-secondary-900 leading-tight">
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-900 leading-tight">
                 Shop Brass
               </h2>
               <p className="mt-2 font-mono text-[0.65rem] tracking-[0.15em] text-secondary-300 uppercase">
@@ -102,7 +102,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
           <div
             ref={scrollRef}
             onScroll={updateScrollState}
-            className="flex gap-4 overflow-x-auto pb-2 -mb-2 snap-x snap-mandatory"
+            className="flex gap-4 overflow-x-auto pt-2 -mt-2 pb-2 -mb-2 snap-x snap-mandatory"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {hasDbProducts ? (
@@ -116,10 +116,10 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
                 <Link
                   key={item.slug}
                   href={`/product/${item.slug}`}
-                  className="flex-shrink-0 w-[200px] sm:w-[220px] snap-start group block bg-white rounded-2xl border border-secondary-100 hover:border-primary-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.07)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] overflow-hidden"
+                  className="flex-shrink-0 w-[200px] sm:w-[220px] snap-start group block bg-white rounded-lg border border-secondary-100 hover:border-primary-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:scale-[0.99] active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden bg-secondary-50">
-                    <Image
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-t-lg bg-secondary-50">
+                    <ProductImage
                       src={item.image}
                       alt={item.name}
                       fill
@@ -127,21 +127,16 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
                       sizes="220px"
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-mono text-[0.6rem] tracking-[0.15em] text-secondary-600 uppercase group-hover:text-primary-600 transition-colors duration-300 line-clamp-2 leading-relaxed">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-sm font-medium text-secondary-800 group-hover:text-primary-600 transition-colors duration-300 line-clamp-2 leading-snug">
                       {item.name}
                     </h3>
-                    <p className="mt-2 font-display text-base font-bold text-secondary-900">
+                    <p className="mt-2 text-base font-semibold text-secondary-900">
                       {item.price}
                     </p>
-                    <div className="mt-2 flex items-center gap-1">
-                      <span className="text-[0.6rem] font-mono tracking-[0.12em] text-primary-600 uppercase">
-                        Select Options
-                      </span>
-                      <svg className="w-2.5 h-2.5 text-primary-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                      </svg>
-                    </div>
+                    <p className="mt-1.5 text-xs font-medium uppercase tracking-wider text-primary-600">
+                      Select Options
+                    </p>
                   </div>
                 </Link>
               ))

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ProductImage } from '~/components/ui/ProductImage';
 import { useDebounce, useSearchSuggestions, useRecentSearches } from '~/hooks';
 import { formatCentsToDollars } from '~/lib/utils';
 import type { SearchSuggestionsResponse } from '~/types';
@@ -61,7 +62,7 @@ function InlineSuggestions({
             >
               <div className="w-10 h-10 bg-secondary-100 rounded overflow-hidden flex-shrink-0">
                 {product.primaryImage ? (
-                  <Image
+                  <ProductImage
                     src={product.primaryImage}
                     alt={product.name}
                     width={40}

@@ -119,7 +119,7 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
 
       {/* Page heading */}
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-800">
+        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900">
           {category.categoryName}
         </h1>
       </div>

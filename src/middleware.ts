@@ -43,6 +43,7 @@ function buildCSPWithNonce(nonce: string, isProduction: boolean): string {
       'https://apis.google.com',
       'https://staging.oneapp.today',
       'https://oneapp.today',
+      'https://api.zippopotam.us',
       ...(isProduction ? [] : ['http://localhost:*', 'ws://localhost:*']),
     ],
     'frame-src': ["'self'", 'https://js.stripe.com', 'https://hooks.stripe.com', 'https://www.google.com', 'https://maps.google.com', 'https://www.youtube-nocookie.com'],
@@ -151,10 +152,34 @@ function getCorsHeaders(origin: string | null): Record<string, string> {
 // Middleware Function
 // ============================================
 
+// Auth-protected routes (require customer token cookie)
+const AUTH_PROTECTED = ['/account/dashboard', '/account/orders', '/account/security', '/account/profile'];
+const AUTH_COOKIE = 'alpha-customer-token';
+
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin');
   const pathname = request.nextUrl.pathname;
   const isProduction = process.env.NODE_ENV === 'production';
+
+  // ---------- Auth route protection ----------
+  const hasToken = request.cookies.has(AUTH_COOKIE);
+
+  // Protected account pages: redirect to login if no token
+  if (AUTH_PROTECTED.some((p) => pathname.startsWith(p)) && !hasToken) {
+    return NextResponse.redirect(new URL('/account', request.url));
+  }
+
+  // Login page: redirect to dashboard if already authenticated
+  if (pathname === '/account' && hasToken) {
+    // Server components signal expired tokens via ?expired=1 to break redirect loops
+    if (request.nextUrl.searchParams.get('expired') === '1') {
+      const response = NextResponse.redirect(new URL('/account', request.url));
+      response.cookies.delete(AUTH_COOKIE);
+      return response;
+    }
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/account/dashboard';
+    return NextResponse.redirect(new URL(redirectTo, request.url));
+  }
 
   // Generate a new nonce for this request
   const nonce = generateNonce();
