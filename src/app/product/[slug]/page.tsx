@@ -7,7 +7,7 @@ import JsonLd from '~/components/common/JsonLd';
 import ProductDetailClient from '~/components/products/ProductDetailClient';
 import ProductGrid from '~/components/products/ProductGrid';
 import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
-import type { ReviewAggregate } from '~/types/review';
+
 
 export const revalidate = 900;
 
@@ -83,6 +83,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
     brand: product.brandName
       ? { '@type': 'Brand', name: product.brandName }
       : undefined,
+    ...(reviewAggregate && reviewAggregate.totalReviews > 0
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: reviewAggregate.averageRating.toFixed(1),
+            reviewCount: reviewAggregate.totalReviews,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
     offers: {
       '@type': product.variations.length > 1 ? 'AggregateOffer' : 'Offer',
       priceCurrency: 'USD',

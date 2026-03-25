@@ -12,9 +12,6 @@ import { AuthProvider } from '~/lib/auth';
 import { NavigationLoadingProvider } from '~/lib/navigation-loading-context';
 import { getStoreConfig } from '~/lib/store-config.server';
 import { getCustomerAuthEnabled } from '~/lib/db';
-import { getCustomerToken } from '~/lib/auth/cookies';
-import { getMe } from '~/lib/auth/auth-api';
-import type { Customer } from '~/types/auth';
 import { generatePalette, SHADES } from '~/lib/color-utils';
 import StickyHeader from '~/components/layout/StickyHeader';
 import HeaderWrapper from '~/components/layout/HeaderWrapper';
@@ -67,23 +64,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const nonce = await getNonce();
-  const storeConfig = await getStoreConfig();
-  const customerAuthEnabled = await getCustomerAuthEnabled();
+  // Parallel fetches — these are independent and share the /config cache key
+  const [nonce, storeConfig, customerAuthEnabled] = await Promise.all([
+    getNonce(),
+    getStoreConfig(),
+    getCustomerAuthEnabled(),
+  ]);
 
-  // Hydrate auth state from cookie (best-effort, non-blocking)
-  let initialCustomer: Customer | null = null;
-  if (customerAuthEnabled) {
-    try {
-      const token = await getCustomerToken();
-      if (token) {
-        const data = await getMe(token);
-        initialCustomer = data.customer;
-      }
-    } catch {
-      // Token expired or invalid — start logged out
-    }
-  }
+  // Auth hydration is handled client-side by AuthProvider to avoid
+  // blocking the entire layout render on getMe() (which has a 10s timeout).
+  // AuthProvider will call /api/auth/me on mount when customerAuthEnabled is true.
 
   // Generate dynamic color palettes from branding
   const primaryPalette = generatePalette(storeConfig.primaryColor);
@@ -104,7 +94,7 @@ export default async function RootLayout({
       >
         <NextTopLoader color={storeConfig.primaryColor} showSpinner={false} />
         <NonceProvider nonce={nonce}>
-          <AuthProvider initialCustomer={initialCustomer} customerAuthEnabled={customerAuthEnabled}>
+          <AuthProvider initialCustomer={null} customerAuthEnabled={customerAuthEnabled}>
           <CartProvider>
             <NavigationLoadingProvider>
               <StickyHeader>

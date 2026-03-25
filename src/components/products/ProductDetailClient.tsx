@@ -9,7 +9,8 @@ import ProductGallery from './ProductGallery';
 import VariantSelector from './VariantSelector';
 import AddToCartButton from './AddToCartButton';
 import StockBadge from './StockBadge';
-import ReviewsSection, { StarRating } from './ReviewsSection';
+import ReviewsSection from './ReviewsSection';
+import StarRating from './StarRating';
 
 interface ProductDetailClientProps {
   product: ProductDetail;
@@ -271,7 +272,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
               </div>
             )}
             {activeTab === 'reviews' && (
-              <ReviewsSection productId={product.id} aggregate={reviewAggregate ?? null} />
+              <ReviewsSection productId={product.id} productName={product.name} aggregate={reviewAggregate ?? null} />
             )}
           </div>
         </div>

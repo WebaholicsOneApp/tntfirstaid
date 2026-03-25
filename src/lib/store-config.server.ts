@@ -1,11 +1,16 @@
 /**
  * Server-only store config that merges DB branding with env defaults.
  * Do NOT import this file from client components -- it uses the database.
+ *
+ * Wrapped with React.cache() so that generateMetadata() and the layout/page
+ * component share the same result within a single request (request-level dedup
+ * on top of the API client's in-memory TTL cache).
  */
+import { cache } from 'react';
 import { getStorefrontBranding } from './db';
 import { storeConfig, type StoreConfig } from './store-config';
 
-export async function getStoreConfig(): Promise<StoreConfig> {
+export const getStoreConfig = cache(async (): Promise<StoreConfig> => {
   let branding: Awaited<ReturnType<typeof getStorefrontBranding>>;
   try {
     branding = await getStorefrontBranding();
@@ -26,4 +31,4 @@ export async function getStoreConfig(): Promise<StoreConfig> {
     ...(branding.primaryColor && { primaryColor: branding.primaryColor }),
     ...(branding.secondaryColor && { secondaryColor: branding.secondaryColor }),
   };
-}
+});

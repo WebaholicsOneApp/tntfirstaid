@@ -350,9 +350,19 @@ class StorefrontApiClient {
   // Reviews
   // --------------------------------------------------------------------------
 
+  /** GET /reviews/feed */
+  getReviewsFeed<T = unknown>(params?: Record<string, string | number | boolean | undefined | null>) {
+    return this.getCached<T>('/reviews/feed', params);
+  }
+
   /** GET /reviews/product/:productId */
   getProductReviews<T = unknown>(productId: number, params?: Record<string, string | number | boolean | undefined | null>) {
     return this.getCached<T>(`/reviews/product/${productId}`, params);
+  }
+
+  /** GET /reviews/product/:productId/images */
+  getProductReviewImages<T = unknown>(productId: number) {
+    return this.getCached<T>(`/reviews/product/${productId}/images`);
   }
 
   /** POST /reviews/submit */

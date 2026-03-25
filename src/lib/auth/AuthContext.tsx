@@ -5,6 +5,8 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
+  useRef,
   type ReactNode,
 } from 'react';
 import type { Customer } from '~/types/auth';
@@ -32,7 +34,10 @@ export function AuthProvider({
   customerAuthEnabled,
 }: AuthProviderProps) {
   const [customer, setCustomer] = useState<Customer | null>(initialCustomer);
-  const [isLoading, setIsLoading] = useState(false);
+  // Start loading if auth is enabled but server didn't provide initial customer
+  // (client-side hydration via /api/auth/me will resolve it)
+  const [isLoading, setIsLoading] = useState(customerAuthEnabled && !initialCustomer);
+  const didHydrate = useRef(false);
 
   const logout = useCallback(async () => {
     setIsLoading(true);
@@ -60,6 +65,16 @@ export function AuthProvider({
       setCustomer(null);
     }
     setIsLoading(false);
+  }, []);
+
+  // Client-side auth hydration: when the server skips getMe() to avoid
+  // blocking the layout, hydrate auth state on mount via the API route.
+  useEffect(() => {
+    if (customerAuthEnabled && !initialCustomer && !didHydrate.current) {
+      didHydrate.current = true;
+      refreshUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

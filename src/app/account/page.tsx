@@ -14,13 +14,22 @@ export default function AccountPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/account/dashboard';
-  const { isAuthenticated, customerAuthEnabled } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, customerAuthEnabled } = useAuth();
   const [tab, setTab] = useState<Tab>('magic-link');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Wait for client-side auth hydration before deciding
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Spinner className="w-6 h-6 text-primary-500" />
+      </div>
+    );
+  }
 
   // Redirect authenticated users to their destination
   if (isAuthenticated) {

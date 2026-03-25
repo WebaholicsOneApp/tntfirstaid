@@ -27,29 +27,6 @@ const config = {
     ],
   },
   reactStrictMode: true,
-  // Externalize Knex optional DB drivers for webpack bundling
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        'better-sqlite3': 'commonjs better-sqlite3',
-        'sqlite3': 'commonjs sqlite3',
-        'tedious': 'commonjs tedious',
-        'mysql': 'commonjs mysql',
-        'mysql2': 'commonjs mysql2',
-        'oracledb': 'commonjs oracledb',
-        'pg-query-stream': 'commonjs pg-query-stream',
-      });
-    }
-    return config;
-  },
-  // Turbopack also needs these marked as external
-  serverExternalPackages: [
-    'pg', 'pg-native', 'pg-query-stream', 'knex',
-    'better-sqlite3', 'sqlite3', 'tedious',
-    'mysql', 'mysql2', 'oracledb',
-  ],
-  turbopack: {},
   async headers() {
     return [
       {

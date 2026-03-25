@@ -1,5 +1,10 @@
+import dynamic from 'next/dynamic';
 import { getFeaturedProducts, getCategoryIdsByNamePattern, getProducts } from '~/lib/data';
-import HudHeroSection from '~/components/home/HudHeroSection';
+
+const HudHeroSection = dynamic(
+  () => import('~/components/home/HudHeroSection'),
+  { loading: () => <div className="h-screen bg-secondary-950" /> },
+);
 
 export const revalidate = 300;
 import MarqueeBand from '~/components/home/MarqueeBand';

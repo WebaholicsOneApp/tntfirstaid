@@ -18,10 +18,10 @@ export default function DataDrivenSection() {
           {/* ── Left: full-bleed image ───────────────────── */}
           <AnimateIn
             animation="slide-right"
-            className="relative aspect-[4/3] sm:aspect-auto sm:min-h-[350px] lg:min-h-[540px]"
+            className="relative aspect-[4/3] sm:aspect-auto sm:min-h-[350px] lg:min-h-[540px] overflow-hidden rounded-r-[8rem]"
           >
             <Image
-              src="https://alphamunitions.com/wp-content/uploads/2019/05/databanner.jpg"
+              src="/images/hero-homepage.jpg"
               alt="Shooter at range — Data driven performance"
               fill
               className="object-cover"
@@ -33,7 +33,7 @@ export default function DataDrivenSection() {
           <AnimateIn
             animation="fade-up"
             delay={150}
-            className="relative flex items-center bg-white border-l border-secondary-100 p-10 lg:p-16"
+            className="relative flex items-center bg-white p-10 lg:p-16"
           >
             <div className="w-full">
 
