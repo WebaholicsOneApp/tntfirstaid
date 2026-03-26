@@ -24,6 +24,9 @@ export const env = createEnv({
 
     // CORS
     CORS_ALLOWED_ORIGINS: z.string().optional(),
+
+    // Dev checkout bypass (never enable in production)
+    DEV_CHECKOUT_BYPASS: z.string().optional(),
   },
 
   client: {
@@ -75,6 +78,9 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_HOURS: process.env.NEXT_PUBLIC_STORE_HOURS,
     NEXT_PUBLIC_MAPS_QUERY: process.env.NEXT_PUBLIC_MAPS_QUERY,
     NEXT_PUBLIC_LOGO_URL: process.env.NEXT_PUBLIC_LOGO_URL,
+
+    // Dev checkout bypass
+    DEV_CHECKOUT_BYPASS: process.env.DEV_CHECKOUT_BYPASS,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -1,5 +1,8 @@
-import { NextResponse } from 'next/server';
 import { getApiClient } from '~/lib/api-client';
+import CheckoutPaymentClient from './CheckoutPaymentClient';
+import type { PaymentConfig } from './CheckoutPaymentClient';
+
+export const dynamic = 'force-dynamic';
 
 interface StorefrontCheckoutConfigResponse {
   payment?: {
@@ -17,18 +20,20 @@ interface StorefrontCheckoutConfigResponse {
   };
 }
 
-export async function GET() {
-  try {
-    const config = await getApiClient().getConfig<StorefrontCheckoutConfigResponse>();
+export default async function CheckoutPaymentPage() {
+  let paymentConfig: PaymentConfig | null = null;
 
-    return NextResponse.json({
+  try {
+    const config =
+      await getApiClient().getConfig<StorefrontCheckoutConfigResponse>();
+    paymentConfig = {
       providerType: config.payment?.providerType || null,
-      status: config.payment?.status || 'not_configured',
+      status: (config.payment?.status ||
+        'not_configured') as PaymentConfig['status'],
       stripePublishableKey: config.payment?.stripePublishableKey || null,
       stripeConnectAccountId: config.payment?.stripeConnectAccountId || null,
       authNetApiLoginId: config.payment?.authNetApiLoginId || null,
       authNetClientKey: config.payment?.authNetClientKey || null,
-      authNetEnvironment: config.payment?.authNetEnvironment || null,
       authNetAcceptJsUrl: config.payment?.authNetAcceptJsUrl || null,
       expressCheckoutEnabled: !!config.payment?.expressCheckoutEnabled,
       checkoutMode: config.payment?.checkoutMode || null,
@@ -36,12 +41,10 @@ export async function GET() {
       devBypass:
         process.env.NODE_ENV !== 'production' &&
         process.env.DEV_CHECKOUT_BYPASS === 'true',
-    });
+    };
   } catch (error) {
-    console.error('[checkout/config] Failed to fetch payment config:', error);
-    return NextResponse.json(
-      { error: 'Failed to load checkout configuration' },
-      { status: 500 },
-    );
+    console.error('[checkout/payment] Failed to fetch payment config:', error);
   }
+
+  return <CheckoutPaymentClient paymentConfig={paymentConfig} />;
 }

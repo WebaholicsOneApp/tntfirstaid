@@ -1,0 +1,127 @@
+'use client';
+
+import { useState } from 'react';
+import { Spinner } from '~/components/ui/Spinner';
+
+interface CartItem {
+  id: number;
+  productId: number;
+  name: string;
+  variation?: string | null;
+  manufacturerNo?: string | null;
+  image?: string | null;
+  quantity: number;
+  price: number;
+}
+
+interface PlaceOrderPanelProps {
+  items: CartItem[];
+  email: string;
+  shippingAddress: {
+    name: string;
+    line1: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
+  onSuccess: (data: { orderId: number; orderNumber: string | null }) => void;
+  onError: (message: string) => void;
+}
+
+export default function PlaceOrderPanel({
+  items,
+  email,
+  shippingAddress,
+  onSuccess,
+  onError,
+}: PlaceOrderPanelProps) {
+  const [sendEmail, setSendEmail] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!shippingAddress.name || !email || !shippingAddress.line1 || !shippingAddress.city || !shippingAddress.state || !shippingAddress.postalCode) {
+      onError('Please fill in all shipping fields before placing your order.');
+      return;
+    }
+
+    setIsPending(true);
+
+    try {
+      const response = await fetch('/api/dev-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: email,
+          items: items.map((item) => ({
+            variationId: item.id,
+            productId: item.productId,
+            name: item.name,
+            variation: item.variation || null,
+            manufacturerNo: item.manufacturerNo || null,
+            imageUrl: item.image || null,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          shippingAddress: {
+            name: shippingAddress.name,
+            line1: shippingAddress.line1,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            postalCode: shippingAddress.postalCode,
+            country: 'US',
+          },
+          sendEmail,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = (await response.json()) as { error?: string };
+        throw new Error(data.error || 'Failed to create order');
+      }
+
+      const data = (await response.json()) as {
+        orderId: number;
+        orderNumber?: string | null;
+      };
+
+      onSuccess({
+        orderId: data.orderId,
+        orderNumber: data.orderNumber ?? null,
+      });
+    } catch (err) {
+      console.error('[PlaceOrder] Error:', err);
+      onError(err instanceof Error ? err.message : 'Failed to create order');
+      setIsPending(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <label className="flex items-center gap-2.5">
+        <input
+          type="checkbox"
+          checked={sendEmail}
+          onChange={(e) => setSendEmail(e.target.checked)}
+          className="h-4 w-4 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
+        />
+        <span className="text-sm text-secondary-600">Send order confirmation email</span>
+      </label>
+
+      <button
+        onClick={handleSubmit}
+        disabled={isPending}
+        className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-secondary-900 px-6 py-4 text-sm font-semibold tracking-wide text-white transition-all hover:bg-secondary-800 active:scale-[0.98] disabled:opacity-50"
+      >
+        {isPending && <Spinner />}
+        {isPending ? 'Processing Order...' : 'Place Order'}
+      </button>
+
+      <div className="flex items-center justify-center gap-2 pt-1">
+        <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          Test Mode
+        </span>
+      </div>
+    </div>
+  );
+}
