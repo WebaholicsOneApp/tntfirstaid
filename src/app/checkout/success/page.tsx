@@ -16,6 +16,7 @@ function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const orderId = searchParams.get('order_id');
+  const orderNumberParam = searchParams.get('order_number');
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,6 +27,15 @@ function SuccessContent() {
     // Fetch order information from either session_id or order_id
     const fetchOrderInfo = async () => {
       try {
+        if (orderId && orderNumberParam) {
+          setOrderInfo({
+            orderId,
+            orderNumber: orderNumberParam,
+            customerEmail: null,
+          });
+          return;
+        }
+
         let response: Response | null = null;
 
         if (sessionId) {
@@ -48,7 +58,7 @@ function SuccessContent() {
     };
 
     fetchOrderInfo();
-  }, [clearCart, sessionId, orderId]);
+  }, [clearCart, sessionId, orderId, orderNumberParam]);
 
   return (
     <div className="min-h-screen bg-secondary-50 flex items-center justify-center p-4">

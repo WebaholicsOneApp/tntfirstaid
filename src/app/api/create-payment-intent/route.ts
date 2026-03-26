@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import {
   validateCheckoutItems,
   type CheckoutItem,
@@ -9,23 +8,7 @@ import {
   getClientIp,
   rateLimitResponse,
 } from '~/lib/ratelimit';
-import { getCheckoutCustomer } from '~/lib/auth/get-checkout-customer';
-
-// Lazy initialize Stripe
-let stripe: Stripe | null = null;
-
-function getStripe(): Stripe {
-  if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY;
-    if (!apiKey) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
-    }
-    stripe = new Stripe(apiKey, {
-      apiVersion: '2026-02-25.clover',
-    });
-  }
-  return stripe;
-}
+import { getApiClient } from '~/lib/api-client';
 
 export async function POST(request: Request) {
   // Rate limit (10 per minute per IP)
@@ -54,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items } = body as Record<string, unknown>;
+    const { items, shippingAddress } = body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -67,62 +50,36 @@ export async function POST(request: Request) {
 
     const validatedItems = items as CheckoutItem[];
 
-    // Look up logged-in customer (if any) for receipt email and metadata
-    const customer = await getCheckoutCustomer();
-
-    // Calculate total in cents
-    const subtotal = validatedItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    const tax = Math.round(subtotal * 0.08); // ~8% tax
-    const total = subtotal + tax;
-
-    // Create PaymentIntent with automatic payment methods
-    const paymentIntent = await getStripe().paymentIntents.create({
-      amount: total,
-      currency: 'usd',
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      ...(customer?.email && { receipt_email: customer.email }),
-      metadata: {
-        orderType: 'storefront_express_checkout',
-        itemCount: String(validatedItems.length),
-        subtotal: String(subtotal),
-        tax: String(tax),
-        ...(customer && {
-          customerId: String(customer.id),
-          customerEmail: customer.email,
-        }),
-        // Store item details for order creation
-        items: JSON.stringify(
-          validatedItems.map((item) => ({
-            variationId: item.variationId,
-            productId: item.productId,
-            name: item.name,
-            variation: item.variation || null,
-            manufacturerNo: item.manufacturerNo || null,
-            price: item.price,
-            quantity: item.quantity,
-            imageUrl: item.imageUrl || null,
-          }))
-        ),
-      },
+    const paymentIntent = await getApiClient().post<{
+      clientSecret: string;
+      paymentIntentId: string;
+      amount: number;
+      subtotal: number;
+      tax: number;
+      publishableKey?: string;
+      stripeConnectAccountId?: string;
+    }>('/checkout/payment-intent', {
+      items: validatedItems.map((item) => ({
+        variationId: item.variationId,
+        quantity: item.quantity,
+      })),
+      ...(shippingAddress ? { shippingAddress } : {}),
     });
 
     return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id,
-      amount: total,
-      subtotal,
-      tax,
+      clientSecret: paymentIntent.clientSecret,
+      paymentIntentId: paymentIntent.paymentIntentId,
+      amount: paymentIntent.amount,
+      subtotal: paymentIntent.subtotal,
+      tax: paymentIntent.tax,
+      publishableKey: paymentIntent.publishableKey || null,
+      stripeConnectAccountId: paymentIntent.stripeConnectAccountId || null,
     });
   } catch (error: unknown) {
-    console.error('PaymentIntent Error:', error);
+    console.error('PaymentIntent proxy error:', error);
     return NextResponse.json(
-      { message: 'Failed to create payment. Please try again.' },
-      { status: 500 }
+      { message: error instanceof Error ? error.message : 'Failed to create payment. Please try again.' },
+      { status: 500 },
     );
   }
 }

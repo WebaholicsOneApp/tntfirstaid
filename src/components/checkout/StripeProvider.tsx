@@ -2,17 +2,36 @@
 
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import type { StripeElementsOptions } from '@stripe/stripe-js';
+import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+const stripePromiseCache = new Map<string, Promise<Stripe | null>>();
 
 interface StripeProviderProps {
   children: React.ReactNode;
   clientSecret: string;
   amount: number;
   primaryColor?: string;
+  publishableKey: string;
+  stripeAccountId?: string | null;
+}
+
+function getStripePromise(
+  publishableKey: string,
+  stripeAccountId?: string | null,
+): Promise<Stripe | null> {
+  const cacheKey = `${publishableKey}:${stripeAccountId || 'platform'}`;
+
+  if (!stripePromiseCache.has(cacheKey)) {
+    stripePromiseCache.set(
+      cacheKey,
+      loadStripe(
+        publishableKey,
+        stripeAccountId ? { stripeAccount: stripeAccountId } : undefined,
+      ),
+    );
+  }
+
+  return stripePromiseCache.get(cacheKey)!;
 }
 
 export default function StripeProvider({
@@ -20,6 +39,8 @@ export default function StripeProvider({
   clientSecret,
   amount: _amount,
   primaryColor,
+  publishableKey,
+  stripeAccountId,
 }: StripeProviderProps) {
   const options: StripeElementsOptions = {
     clientSecret,
@@ -37,7 +58,10 @@ export default function StripeProvider({
   };
 
   return (
-    <Elements stripe={stripePromise} options={options}>
+    <Elements
+      stripe={getStripePromise(publishableKey, stripeAccountId)}
+      options={options}
+    >
       {children}
     </Elements>
   );

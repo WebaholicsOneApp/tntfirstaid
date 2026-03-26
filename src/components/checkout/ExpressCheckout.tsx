@@ -94,36 +94,38 @@ export default function ExpressCheckout({
     }
   };
 
-  // Don't render anything if no payment methods available
-  if (!isReady) {
-    return null;
-  }
-
   return (
     <div className="express-checkout-container">
-      <ExpressCheckoutElement
-        onConfirm={handleConfirm}
-        onReady={handleReady}
-        options={{
-          buttonType: {
-            applePay: 'buy',
-            googlePay: 'buy',
-          },
-          buttonTheme: {
-            applePay: 'black',
-            googlePay: 'black',
-          },
-          layout: {
-            maxColumns: 2,
-            maxRows: 1,
-          },
-          paymentMethods: {
-            applePay: 'always',
-            googlePay: 'always',
-            link: 'auto',
-          },
-        }}
-      />
+      {!isReady && (
+        <p className="mb-3 text-xs text-secondary-400">
+          Checking Apple Pay and Google Pay availability...
+        </p>
+      )}
+      <div className={isReady ? '' : 'pointer-events-none opacity-0'}>
+        <ExpressCheckoutElement
+          onConfirm={handleConfirm}
+          onReady={handleReady}
+          options={{
+            buttonType: {
+              applePay: 'buy',
+              googlePay: 'buy',
+            },
+            buttonTheme: {
+              applePay: 'black',
+              googlePay: 'black',
+            },
+            layout: {
+              maxColumns: 2,
+              maxRows: 1,
+            },
+            paymentMethods: {
+              applePay: 'always',
+              googlePay: 'always',
+              link: 'auto',
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }

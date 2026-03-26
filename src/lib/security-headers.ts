@@ -105,6 +105,9 @@ export function getDefaultCSPDirectives(): CSPDirectives {
       ...(isProduction ? [] : ["'unsafe-inline'", "'unsafe-eval'"]),
       // Stripe
       'https://js.stripe.com',
+      // Authorize.net
+      'https://js.authorize.net',
+      'https://jstest.authorize.net',
       'https://maps.googleapis.com',
     ],
     'style-src': [
@@ -128,6 +131,9 @@ export function getDefaultCSPDirectives(): CSPDirectives {
       siteUrl,
       // Stripe
       'https://api.stripe.com',
+      // Authorize.net
+      'https://api.authorize.net',
+      'https://apitest.authorize.net',
       'https://maps.googleapis.com',
       // Allow localhost in development
       ...(isProduction ? [] : ['http://localhost:*', 'ws://localhost:*']),
@@ -136,6 +142,8 @@ export function getDefaultCSPDirectives(): CSPDirectives {
       "'self'",
       'https://js.stripe.com',
       'https://hooks.stripe.com',
+      'https://accept.authorize.net',
+      'https://test.authorize.net',
     ],
     'frame-ancestors': ["'self'"],
     'form-action': ["'self'"],
@@ -168,7 +176,7 @@ export function getDefaultConfig(): SecurityHeadersConfig {
       'microphone': [],
       'geolocation': [],
       'interest-cohort': [], // Block FLoC
-      'payment': ['self', 'https://js.stripe.com'],
+      'payment': ['self', 'https://js.stripe.com', 'https://js.authorize.net', 'https://jstest.authorize.net'],
     },
     crossOriginEmbedderPolicy: 'unsafe-none', // Required for cross-origin images
     crossOriginOpenerPolicy: 'same-origin-allow-popups', // Allow Stripe popups
