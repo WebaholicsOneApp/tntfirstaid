@@ -39,17 +39,17 @@
 .product-description strong { @apply text-secondary-800; }
 
 /* Selection color */
-::selection { background-color: #fef3c7; color: #1A1A1A; }
+::selection { background-color: var(--primary-100); color: var(--secondary-900); }
 
 /* Scrollbar: hidden by default, visible on hover */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; transition: background 0.3s; }
-html:hover ::-webkit-scrollbar-thumb { background: #e9c360; }
+html:hover ::-webkit-scrollbar-thumb { background: var(--primary-500); }
 
 /* Firefox */
 html { scrollbar-width: thin; scrollbar-color: transparent transparent; }
-html:hover { scrollbar-color: #e9c360 transparent; }
+html:hover { scrollbar-color: var(--primary-500) transparent; }
 
 /* Animations */
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
@@ -83,9 +83,9 @@ html:hover { scrollbar-color: #e9c360 transparent; }
 .hero-shimmer {
   background: linear-gradient(
     105deg,
-    #e9c360 0%, #e9c360 35%,
-    #fef9e7 45%, #ffffff 50%, #fef9e7 55%,
-    #e9c360 65%, #e9c360 100%
+    var(--primary-500) 0%, var(--primary-500) 35%,
+    var(--primary-50) 45%, #ffffff 50%, var(--primary-50) 55%,
+    var(--primary-500) 65%, var(--primary-500) 100%
   );
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -110,6 +110,25 @@ html:hover { scrollbar-color: #e9c360 transparent; }
 }
 .animate-marquee-scroll {
   animation: marquee-scroll 35s linear infinite;
+}
+
+/* Skeleton shimmer — warm gold-tinted loading sweep */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--primary-50) 0%,
+    var(--primary-100) 40%,
+    var(--primary-200) 50%,
+    var(--primary-100) 60%,
+    var(--primary-50) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  border-radius: 0.5rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

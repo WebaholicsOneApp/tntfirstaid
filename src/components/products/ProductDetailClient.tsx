@@ -18,7 +18,7 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ product, reviewAggregate }: ProductDetailClientProps) {
-  const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
 
   // Find the default variation — first in-stock variation, or just the first
   const defaultVariation = useMemo(() => {
@@ -110,7 +110,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
         {/* Star rating summary */}
         {reviewAggregate && reviewAggregate.totalReviews > 0 && (
           <button
-            onClick={() => setActiveTab('reviews')}
+            onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <StarRating rating={reviewAggregate.averageRating} />
@@ -212,17 +212,6 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
             >
               Specifications
             </button>
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
-                activeTab === 'reviews'
-                  ? 'border-primary-500 text-primary-700'
-                  : 'border-transparent text-secondary-500 hover:text-secondary-700'
-              )}
-            >
-              Reviews{reviewAggregate && reviewAggregate.totalReviews > 0 ? ` (${reviewAggregate.totalReviews})` : ''}
-            </button>
           </div>
 
           <div className="pt-4">
@@ -271,11 +260,13 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
                 )}
               </div>
             )}
-            {activeTab === 'reviews' && (
-              <ReviewsSection productId={product.id} productName={product.name} aggregate={reviewAggregate ?? null} />
-            )}
           </div>
         </div>
+      </div>
+
+      {/* Reviews — standalone section below product detail */}
+      <div className="col-span-full">
+        <ReviewsSection productId={product.id} productName={product.name} aggregate={reviewAggregate ?? null} />
       </div>
     </div>
   );

@@ -29,9 +29,21 @@ export async function GET(
       sort,
     });
 
-    // Map API response keys to what the frontend component expects
+    // Normalize: OneApp API returns images as plain URL strings,
+    // but the frontend expects { id, imageUrl, thumbnailUrl } objects
+    const rawReviews = ((data as Record<string, unknown>).data ?? (data as Record<string, unknown>).reviews ?? []) as Record<string, unknown>[];
+    const reviews = rawReviews.map((review) => ({
+      ...review,
+      images: (Array.isArray(review.images) ? review.images : []).map((img: unknown, i: number) => {
+        if (typeof img === 'string') {
+          return { id: i, imageUrl: img, thumbnailUrl: null };
+        }
+        return img;
+      }),
+    }));
+
     return NextResponse.json({
-      reviews: (data as Record<string, unknown>).data ?? (data as Record<string, unknown>).reviews ?? [],
+      reviews,
       aggregate: (data as Record<string, unknown>).aggregate ?? null,
       pagination: (data as Record<string, unknown>).pagination ?? { page: 1, limit: 10, total: 0, totalPages: 0 },
     });
