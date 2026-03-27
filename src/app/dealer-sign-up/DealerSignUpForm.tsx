@@ -35,12 +35,14 @@ export default function DealerSignUpForm() {
   });
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete(name); return n; });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,36 +50,21 @@ export default function DealerSignUpForm() {
     setStatus('submitting');
     setErrorMessage('');
 
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+    const errors = new Set<string>();
+    if (!formData.firstName.trim()) errors.add('firstName');
+    if (!formData.lastName.trim()) errors.add('lastName');
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.add('email');
+    if (formData.email.trim() !== formData.confirmEmail.trim()) errors.add('confirmEmail');
+    if (!formData.companyName.trim()) errors.add('companyName');
+    if (!formData.sellType) errors.add('sellType');
+    if (formData.sellType === 'Other' && !formData.sellTypeOther.trim()) errors.add('sellTypeOther');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
       setStatus('error');
-      setErrorMessage('First and last name are required.');
+      setErrorMessage('Please fill in all required fields.');
       return;
     }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setStatus('error');
-      setErrorMessage('A valid email address is required.');
-      return;
-    }
-    if (formData.email.trim() !== formData.confirmEmail.trim()) {
-      setStatus('error');
-      setErrorMessage('Email addresses do not match.');
-      return;
-    }
-    if (!formData.companyName.trim()) {
-      setStatus('error');
-      setErrorMessage('Company name is required.');
-      return;
-    }
-    if (!formData.sellType) {
-      setStatus('error');
-      setErrorMessage('Please select where you sell.');
-      return;
-    }
-    if (formData.sellType === 'Other' && !formData.sellTypeOther.trim()) {
-      setStatus('error');
-      setErrorMessage('Please specify where you sell.');
-      return;
-    }
+    setFieldErrors(new Set());
 
     const sellDescription =
       formData.sellType === 'Other'
@@ -140,6 +127,7 @@ export default function DealerSignUpForm() {
           <button
             onClick={() => {
               setStatus('idle');
+              setFieldErrors(new Set());
               setFormData({
                 firstName: '',
                 lastName: '',
@@ -160,8 +148,8 @@ export default function DealerSignUpForm() {
     );
   }
 
-  const inputClass =
-    'w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm';
+  const inputClass = (field: string) =>
+    `w-full px-5 py-4 bg-secondary-50 border ${fieldErrors.has(field) ? 'border-red-400' : 'border-secondary-100'} rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm`;
   const labelClass =
     'text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1';
 
@@ -187,7 +175,7 @@ export default function DealerSignUpForm() {
               value={formData.firstName}
               onChange={handleChange}
               required
-              className={inputClass}
+              className={inputClass('firstName')}
               placeholder="John"
             />
           </div>
@@ -201,7 +189,7 @@ export default function DealerSignUpForm() {
               value={formData.lastName}
               onChange={handleChange}
               required
-              className={inputClass}
+              className={inputClass('lastName')}
               placeholder="Doe"
             />
           </div>
@@ -218,7 +206,7 @@ export default function DealerSignUpForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            className={inputClass}
+            className={inputClass('email')}
             placeholder="john@company.com"
           />
         </div>
@@ -234,7 +222,7 @@ export default function DealerSignUpForm() {
             value={formData.confirmEmail}
             onChange={handleChange}
             required
-            className={inputClass}
+            className={inputClass('confirmEmail')}
             placeholder="john@company.com"
           />
         </div>
@@ -250,7 +238,7 @@ export default function DealerSignUpForm() {
             value={formData.companyName}
             onChange={handleChange}
             required
-            className={inputClass}
+            className={inputClass('companyName')}
             placeholder="Acme Firearms LLC"
           />
         </div>
@@ -260,7 +248,7 @@ export default function DealerSignUpForm() {
           <label className={labelClass}>
             Where do you sell? <span className="text-red-500">*</span>
           </label>
-          <div className="space-y-2">
+          <div className={`space-y-2 ${fieldErrors.has('sellType') ? 'ring-1 ring-red-400 rounded-lg p-2' : ''}`}>
             {SELL_OPTIONS.map((opt) => (
               <label
                 key={opt.value}
@@ -288,7 +276,7 @@ export default function DealerSignUpForm() {
               name="sellTypeOther"
               value={formData.sellTypeOther}
               onChange={handleChange}
-              className={inputClass}
+              className={inputClass('sellTypeOther')}
               placeholder="Please specify..."
             />
           )}
@@ -302,7 +290,7 @@ export default function DealerSignUpForm() {
             value={formData.comments}
             onChange={handleChange}
             rows={4}
-            className={`${inputClass} resize-none`}
+            className={`${inputClass('comments')} resize-none`}
             placeholder="Any additional information..."
           />
         </div>

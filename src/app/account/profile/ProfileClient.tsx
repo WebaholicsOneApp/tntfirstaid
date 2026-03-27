@@ -49,6 +49,7 @@ export default function ProfileClient({ customer: initialCustomer }: ProfileClie
 
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
   const [zipLookupStatus, setZipLookupStatus] = useState<'idle' | 'loading' | 'found' | 'not-found'>('idle');
   const zipAbortRef = useRef<AbortController | null>(null);
 
@@ -104,6 +105,19 @@ export default function ProfileClient({ customer: initialCustomer }: ProfileClie
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side validation
+    const errors = new Set<string>();
+    if (!firstName.trim()) errors.add('firstName');
+    if (!lastName.trim()) errors.add('lastName');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
+      setFormState('error');
+      setErrorMessage('First and last name are required.');
+      return;
+    }
+    setFieldErrors(new Set());
+
     setFormState('submitting');
     setErrorMessage('');
 
@@ -182,10 +196,13 @@ export default function ProfileClient({ customer: initialCustomer }: ProfileClie
                 id="first-name"
                 type="text"
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('firstName'); return n; });
+                }}
                 autoComplete="given-name"
                 placeholder="John"
-                className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+                className={`w-full border ${fieldErrors.has('firstName') ? 'border-red-400' : 'border-secondary-200'} rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200`}
               />
             </div>
 
@@ -200,10 +217,13 @@ export default function ProfileClient({ customer: initialCustomer }: ProfileClie
                 id="last-name"
                 type="text"
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={(e) => {
+                  setLastName(e.target.value);
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('lastName'); return n; });
+                }}
                 autoComplete="family-name"
                 placeholder="Doe"
-                className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+                className={`w-full border ${fieldErrors.has('lastName') ? 'border-red-400' : 'border-secondary-200'} rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200`}
               />
             </div>
           </div>

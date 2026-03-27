@@ -28,6 +28,7 @@ export default function ContactForm() {
   });
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -36,6 +37,7 @@ export default function ContactForm() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete(name); return n; });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,16 +46,17 @@ export default function ContactForm() {
     setErrorMessage('');
 
     // Client-side validation
-    if (!formData.name.trim()) {
+    const errors = new Set<string>();
+    if (!formData.name.trim()) errors.add('name');
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.add('email');
+    if (!formData.message.trim()) errors.add('message');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
       setStatus('error');
-      setErrorMessage('Name is required.');
+      setErrorMessage('Please fill in all required fields.');
       return;
     }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setStatus('error');
-      setErrorMessage('A valid email address is required.');
-      return;
-    }
+    setFieldErrors(new Set());
 
     try {
       const response = await fetch('/api/contact', {
@@ -110,7 +113,7 @@ export default function ContactForm() {
             possible.
           </p>
           <button
-            onClick={() => setStatus('idle')}
+            onClick={() => { setStatus('idle'); setFieldErrors(new Set()); }}
             className="rounded-full border border-primary-500/40 px-8 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-primary-500 uppercase hover:border-primary-500 hover:text-primary-400 active:scale-[0.98] transition-all duration-300"
           >
             Send Another Message
@@ -144,7 +147,7 @@ export default function ContactForm() {
             value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+            className={`w-full px-5 py-4 bg-secondary-50 border ${fieldErrors.has('name') ? 'border-red-400' : 'border-secondary-100'} rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm`}
             placeholder="John Doe"
           />
         </div>
@@ -160,7 +163,7 @@ export default function ContactForm() {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm"
+            className={`w-full px-5 py-4 bg-secondary-50 border ${fieldErrors.has('email') ? 'border-red-400' : 'border-secondary-100'} rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm`}
             placeholder="john@example.com"
           />
         </div>
@@ -195,7 +198,7 @@ export default function ContactForm() {
             onChange={handleChange}
             required
             rows={5}
-            className="w-full px-5 py-4 bg-secondary-50 border border-secondary-100 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm resize-none"
+            className={`w-full px-5 py-4 bg-secondary-50 border ${fieldErrors.has('message') ? 'border-red-400' : 'border-secondary-100'} rounded-xl focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-colors text-sm resize-none`}
             placeholder="How can we help you?"
           />
         </div>

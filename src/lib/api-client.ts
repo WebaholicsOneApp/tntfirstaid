@@ -80,6 +80,7 @@ interface RequestOptions {
   params?: Record<string, string | number | boolean | undefined | null>;
   body?: unknown;
   timeout?: number;
+  customerToken?: string;
 }
 
 class StorefrontApiClient {
@@ -98,7 +99,7 @@ class StorefrontApiClient {
     path: string,
     options?: RequestOptions,
   ): Promise<T> {
-    const { params, body, timeout = DEFAULT_TIMEOUT } = options || {};
+    const { params, body, timeout = DEFAULT_TIMEOUT, customerToken } = options || {};
 
     // During Vercel build, the OneApp API is unreachable. Fail fast so
     // callers hit their existing fallback paths immediately instead of
@@ -123,6 +124,10 @@ class StorefrontApiClient {
       'Content-Type': 'application/json',
       'X-Storefront-Api-Key': this.apiKey,
     };
+
+    if (customerToken) {
+      headers['X-Customer-Token'] = customerToken;
+    }
 
     let lastError: Error | null = null;
 
@@ -356,7 +361,10 @@ class StorefrontApiClient {
   }
 
   /** GET /reviews/product/:productId */
-  getProductReviews<T = unknown>(productId: number, params?: Record<string, string | number | boolean | undefined | null>) {
+  getProductReviews<T = unknown>(
+    productId: number,
+    params?: Record<string, string | number | boolean | undefined | null>,
+  ) {
     return this.getCached<T>(`/reviews/product/${productId}`, params);
   }
 

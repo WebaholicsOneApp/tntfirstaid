@@ -24,6 +24,7 @@ export default function CheckoutAuthPrompt({
   const [email, setEmail] = useState('');
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   // When user verifies magic link in another tab and comes back, refresh auth state
   useEffect(() => {
@@ -130,10 +131,12 @@ export default function CheckoutAuthPrompt({
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) {
+      setFieldErrors(new Set(['email']));
       setFormState('error');
       setErrorMessage('Please enter your email address.');
       return;
     }
+    setFieldErrors(new Set());
     setFormState('submitting');
     setErrorMessage('');
     try {
@@ -191,10 +194,13 @@ export default function CheckoutAuthPrompt({
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('email'); return n; });
+              }}
               autoComplete="email"
               placeholder="you@example.com"
-              className="flex-1 min-w-0 border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+              className={`flex-1 min-w-0 border ${fieldErrors.has('email') ? 'border-red-400' : 'border-secondary-200'} rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200`}
             />
             <button
               type="submit"

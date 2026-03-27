@@ -25,12 +25,13 @@ export const EMPTY_SHIPPING: ShippingFields = {
 interface ShippingFormProps {
   data: ShippingFields;
   onChange: (field: keyof ShippingFields, value: string) => void;
+  fieldErrors?: Set<string>;
 }
 
-const inputClass =
-  'w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40';
+const inputClass = (field: string, fieldErrors?: Set<string>) =>
+  `w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ${fieldErrors?.has(field) ? 'ring-1 ring-red-400' : 'ring-1 ring-black/[0.06]'} placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40`;
 
-export default function ShippingForm({ data, onChange }: ShippingFormProps) {
+export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFormProps) {
   return (
     <div className="space-y-4">
       <div>
@@ -44,7 +45,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('name', e.target.value)}
           placeholder="John Doe"
           autoComplete="name"
-          className={inputClass}
+          className={inputClass('name', fieldErrors)}
         />
       </div>
 
@@ -59,7 +60,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('email', e.target.value)}
           placeholder="john@example.com"
           autoComplete="email"
-          className={inputClass}
+          className={inputClass('email', fieldErrors)}
         />
       </div>
 
@@ -74,7 +75,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('phone', e.target.value)}
           placeholder="(555) 123-4567"
           autoComplete="tel"
-          className={inputClass}
+          className={inputClass('phone', fieldErrors)}
         />
       </div>
 
@@ -89,7 +90,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('line1', e.target.value)}
           placeholder="123 Main St"
           autoComplete="address-line1"
-          className={inputClass}
+          className={inputClass('line1', fieldErrors)}
         />
       </div>
 
@@ -104,7 +105,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('line2', e.target.value)}
           placeholder="Apt 4B"
           autoComplete="address-line2"
-          className={inputClass}
+          className={inputClass('line2', fieldErrors)}
         />
       </div>
 
@@ -120,7 +121,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
             onChange={(e) => onChange('city', e.target.value)}
             placeholder="Salt Lake City"
             autoComplete="address-level2"
-            className={inputClass}
+            className={inputClass('city', fieldErrors)}
           />
         </div>
         <div>
@@ -134,7 +135,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
             onChange={(e) => onChange('state', e.target.value)}
             placeholder="UT"
             autoComplete="address-level1"
-            className={inputClass}
+            className={inputClass('state', fieldErrors)}
           />
         </div>
         <div>
@@ -148,7 +149,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
             onChange={(e) => onChange('postalCode', e.target.value)}
             placeholder="84101"
             autoComplete="postal-code"
-            className={inputClass}
+            className={inputClass('postalCode', fieldErrors)}
           />
         </div>
       </div>
@@ -164,7 +165,7 @@ export default function ShippingForm({ data, onChange }: ShippingFormProps) {
           onChange={(e) => onChange('country', e.target.value.toUpperCase())}
           placeholder="US"
           autoComplete="country"
-          className={inputClass}
+          className={inputClass('country', fieldErrors)}
         />
       </div>
     </div>

@@ -37,6 +37,7 @@ export default function ReviewForm({
   const [customerEmail, setCustomerEmail] = useState(prefillEmail || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
   const [success, setSuccess] = useState(false);
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
@@ -93,26 +94,17 @@ export default function ReviewForm({
     setError(null);
 
     // Client-side validation
-    if (rating === 0) {
-      setError('Please select a star rating');
+    const errors = new Set<string>();
+    if (rating === 0) errors.add('rating');
+    if (content.trim().length < 10) errors.add('content');
+    if (customerName.trim().length < 2) errors.add('customerName');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.add('customerEmail');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
+      setError('Please fix the highlighted fields.');
       return;
     }
-
-    if (content.trim().length < 10) {
-      setError('Review must be at least 10 characters');
-      return;
-    }
-
-    if (customerName.trim().length < 2) {
-      setError('Please enter your name');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      setError('Please enter a valid email address');
-      return;
-    }
+    setFieldErrors(new Set());
 
     setIsSubmitting(true);
 
@@ -237,12 +229,17 @@ export default function ReviewForm({
               <label className="block text-sm font-medium text-secondary-700 mb-2">
                 Your Rating <span className="text-red-500">*</span>
               </label>
-              <StarRating
-                rating={rating}
-                size="lg"
-                interactive
-                onChange={setRating}
-              />
+              <div className={fieldErrors.has('rating') ? 'inline-block ring-1 ring-red-400 rounded-lg p-1' : 'inline-block'}>
+                <StarRating
+                  rating={rating}
+                  size="lg"
+                  interactive
+                  onChange={(val) => {
+                    setRating(val);
+                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('rating'); return n; });
+                  }}
+                />
+              </div>
               {rating > 0 && (
                 <span className="text-sm text-secondary-500 mt-1 block">
                   {rating === 1 && 'Poor'}
@@ -280,13 +277,16 @@ export default function ReviewForm({
               <textarea
                 id="review-content"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('content'); return n; });
+                }}
                 placeholder="Share your experience with this product..."
                 rows={4}
                 maxLength={5000}
-                className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-secondary-700
+                className={`w-full px-4 py-3 border ${fieldErrors.has('content') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
                   placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors resize-none"
+                  focus:border-primary-500 transition-colors resize-none`}
               />
               <span className="text-xs text-secondary-400 mt-1 block">
                 {content.length}/5000 characters (minimum 10)
@@ -367,12 +367,15 @@ export default function ReviewForm({
                 id="review-name"
                 type="text"
                 value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                onChange={(e) => {
+                  setCustomerName(e.target.value);
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('customerName'); return n; });
+                }}
                 placeholder="John D."
                 maxLength={100}
-                className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-secondary-700
+                className={`w-full px-4 py-3 border ${fieldErrors.has('customerName') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
                   placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors"
+                  focus:border-primary-500 transition-colors`}
               />
             </div>
 
@@ -385,11 +388,14 @@ export default function ReviewForm({
                 id="review-email"
                 type="email"
                 value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
+                onChange={(e) => {
+                  setCustomerEmail(e.target.value);
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('customerEmail'); return n; });
+                }}
                 placeholder="john@example.com"
-                className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-secondary-700
+                className={`w-full px-4 py-3 border ${fieldErrors.has('customerEmail') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
                   placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors"
+                  focus:border-primary-500 transition-colors`}
               />
               <span className="text-xs text-secondary-400 mt-1 block">
                 Your email will not be published

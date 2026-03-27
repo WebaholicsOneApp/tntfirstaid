@@ -82,6 +82,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
 
   // Shipping form state (single object for all fields)
   const [shipping, setShipping] = useState<ShippingFields>(EMPTY_SHIPPING);
+  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(new Set());
 
   // ---- Redirect to shop if cart is empty ----
   useEffect(() => {
@@ -188,6 +189,12 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
   const handleShippingChange = useCallback(
     (field: keyof ShippingFields, value: string) => {
       setShipping((prev) => ({ ...prev, [field]: value }));
+      setShippingFieldErrors((prev) => {
+        if (!prev.size) return prev;
+        const n = new Set(prev);
+        n.delete(field);
+        return n;
+      });
     },
     [],
   );
@@ -356,17 +363,19 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
 
   // ---- "Continue to Review" (dev bypass → confirm page) ----
   const handleContinueToReview = useCallback(() => {
-    if (
-      !shipping.name.trim() ||
-      !shipping.email.trim() ||
-      !shipping.line1.trim() ||
-      !shipping.city.trim() ||
-      !shipping.state.trim() ||
-      !shipping.postalCode.trim()
-    ) {
+    const shipErrors = new Set<string>();
+    if (!shipping.name.trim()) shipErrors.add('name');
+    if (!shipping.email.trim()) shipErrors.add('email');
+    if (!shipping.line1.trim()) shipErrors.add('line1');
+    if (!shipping.city.trim()) shipErrors.add('city');
+    if (!shipping.state.trim()) shipErrors.add('state');
+    if (!shipping.postalCode.trim()) shipErrors.add('postalCode');
+    if (shipErrors.size > 0) {
+      setShippingFieldErrors(shipErrors);
       setError('Please fill in all shipping fields before continuing.');
       return;
     }
+    setShippingFieldErrors(new Set());
 
     const sessionData: CheckoutSessionData = {
       shipping: {
@@ -441,6 +450,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
           shippingData={shipping}
           onSuccess={handleAuthorizeNetSuccess}
           onError={handleAuthorizeNetError}
+          onShippingFieldErrors={setShippingFieldErrors}
         />
       );
     }
@@ -601,7 +611,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
                   </div>
                 )}
 
-                <ShippingForm data={shipping} onChange={handleShippingChange} />
+                <ShippingForm data={shipping} onChange={handleShippingChange} fieldErrors={shippingFieldErrors} />
               </div>
             </div>
 

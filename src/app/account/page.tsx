@@ -21,6 +21,7 @@ export default function AccountPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   // Wait for client-side auth hydration before deciding
   if (authLoading) {
@@ -55,10 +56,12 @@ export default function AccountPage() {
     e.preventDefault();
     const trimmed = email.trim();
     if (!trimmed) {
+      setFieldErrors(new Set(['email']));
       setFormState('error');
       setErrorMessage('Please enter your email address.');
       return;
     }
+    setFieldErrors(new Set());
     setFormState('submitting');
     setErrorMessage('');
     try {
@@ -77,11 +80,16 @@ export default function AccountPage() {
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = email.trim();
-    if (!trimmed || !password) {
+    const errors = new Set<string>();
+    if (!trimmed) errors.add('email');
+    if (!password) errors.add('password');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
       setFormState('error');
       setErrorMessage('Please enter your email and password.');
       return;
     }
+    setFieldErrors(new Set());
     setFormState('submitting');
     setErrorMessage('');
     try {
@@ -161,7 +169,7 @@ export default function AccountPage() {
           {/* Tab toggle */}
           <div className="flex bg-secondary-50 rounded-lg p-1 mb-6">
             <button
-              onClick={() => { setTab('magic-link'); setFormState('idle'); setErrorMessage(''); }}
+              onClick={() => { setTab('magic-link'); setFormState('idle'); setErrorMessage(''); setFieldErrors(new Set()); }}
               className={`flex-1 py-2 text-[0.65rem] font-mono tracking-[0.1em] uppercase rounded-md transition-all duration-200 ${
                 tab === 'magic-link'
                   ? 'bg-white text-secondary-900 shadow-sm'
@@ -171,7 +179,7 @@ export default function AccountPage() {
               Email Link
             </button>
             <button
-              onClick={() => { setTab('password'); setFormState('idle'); setErrorMessage(''); }}
+              onClick={() => { setTab('password'); setFormState('idle'); setErrorMessage(''); setFieldErrors(new Set()); }}
               className={`flex-1 py-2 text-[0.65rem] font-mono tracking-[0.1em] uppercase rounded-md transition-all duration-200 ${
                 tab === 'password'
                   ? 'bg-white text-secondary-900 shadow-sm'
@@ -196,10 +204,10 @@ export default function AccountPage() {
                   id="magic-email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setFieldErrors((prev) => { const next = new Set(prev); next.delete('email'); return next; }); }}
                   autoComplete="email"
                   placeholder="you@example.com"
-                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+                  className={`w-full border rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200 ${fieldErrors.has('email') ? 'border-red-400' : 'border-secondary-200'}`}
                 />
               </div>
 
@@ -244,10 +252,10 @@ export default function AccountPage() {
                   id="login-email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setFieldErrors((prev) => { const next = new Set(prev); next.delete('email'); return next; }); }}
                   autoComplete="email"
                   placeholder="you@example.com"
-                  className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+                  className={`w-full border rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200 ${fieldErrors.has('email') ? 'border-red-400' : 'border-secondary-200'}`}
                 />
               </div>
 
@@ -263,10 +271,10 @@ export default function AccountPage() {
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); setFieldErrors((prev) => { const next = new Set(prev); next.delete('password'); return next; }); }}
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className="w-full border border-secondary-200 rounded-lg px-4 py-3 pr-12 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+                    className={`w-full border rounded-lg px-4 py-3 pr-12 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200 ${fieldErrors.has('password') ? 'border-red-400' : 'border-secondary-200'}`}
                   />
                   <button
                     type="button"

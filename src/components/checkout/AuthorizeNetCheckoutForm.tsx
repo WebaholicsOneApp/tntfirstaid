@@ -45,6 +45,7 @@ interface AuthorizeNetCheckoutFormProps {
   shippingData: ShippingFields;
   onSuccess: (result: { orderId: number; orderNumber: string | null }) => void;
   onError: (message: string) => void;
+  onShippingFieldErrors?: (errors: Set<string>) => void;
 }
 
 type ScriptStatus = 'loading' | 'ready' | 'error';
@@ -101,6 +102,7 @@ export default function AuthorizeNetCheckoutForm({
   shippingData,
   onSuccess,
   onError,
+  onShippingFieldErrors,
 }: AuthorizeNetCheckoutFormProps) {
   const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('loading');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,6 +110,8 @@ export default function AuthorizeNetCheckoutForm({
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cardCode, setCardCode] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
+  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
@@ -210,32 +214,32 @@ export default function AuthorizeNetCheckoutForm({
     setLocalError(null);
     onError('');
 
-    if (!shippingData.email.trim()) {
-      const message = 'Email address is required. Please fill in the shipping form above.';
-      setLocalError(message);
-      onError(message);
-      return;
-    }
+    const cardErrors = new Set<string>();
+    const shipErrors = new Set<string>();
 
-    if (
-      !shippingData.name.trim() ||
-      !shippingData.line1.trim() ||
-      !shippingData.city.trim() ||
-      !shippingData.state.trim() ||
-      !shippingData.postalCode.trim()
-    ) {
-      const message = 'Complete the shipping address above before submitting payment.';
-      setLocalError(message);
-      onError(message);
-      return;
-    }
+    if (!shippingData.email.trim()) shipErrors.add('email');
+    if (!shippingData.name.trim()) shipErrors.add('name');
+    if (!shippingData.line1.trim()) shipErrors.add('line1');
+    if (!shippingData.city.trim()) shipErrors.add('city');
+    if (!shippingData.state.trim()) shipErrors.add('state');
+    if (!shippingData.postalCode.trim()) shipErrors.add('postalCode');
+    if (cardNumber.replace(/\D/g, '').length < 13) cardErrors.add('cardNumber');
+    if (cardCode.replace(/\D/g, '').length < 3) cardErrors.add('cardCode');
 
-    if (cardNumber.replace(/\D/g, '').length < 13 || cardCode.replace(/\D/g, '').length < 3) {
-      const message = 'Enter a valid card number and security code.';
+    if (shipErrors.size > 0 || cardErrors.size > 0) {
+      setFieldErrors(cardErrors);
+      setShippingFieldErrors(shipErrors);
+      onShippingFieldErrors?.(shipErrors);
+      const message = shipErrors.size > 0
+        ? 'Complete the shipping address above before submitting payment.'
+        : 'Enter a valid card number and security code.';
       setLocalError(message);
       onError(message);
       return;
     }
+    setFieldErrors(new Set());
+    setShippingFieldErrors(new Set());
+    onShippingFieldErrors?.(new Set());
 
     setIsSubmitting(true);
 
@@ -336,8 +340,11 @@ export default function AuthorizeNetCheckoutForm({
                 inputMode="numeric"
                 autoComplete="cc-number"
                 value={cardNumber}
-                onChange={(event) => setCardNumber(formatCardNumber(event.target.value))}
-                className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                onChange={(event) => {
+                  setCardNumber(formatCardNumber(event.target.value));
+                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('cardNumber'); return n; });
+                }}
+                className={`w-full rounded-xl border ${fieldErrors.has('cardNumber') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
                 placeholder="4111 1111 1111 1111"
                 required
               />
@@ -366,8 +373,11 @@ export default function AuthorizeNetCheckoutForm({
                   inputMode="numeric"
                   autoComplete="cc-csc"
                   value={cardCode}
-                  onChange={(event) => setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                  onChange={(event) => {
+                    setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4));
+                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('cardCode'); return n; });
+                  }}
+                  className={`w-full rounded-xl border ${fieldErrors.has('cardCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
                   placeholder="CVV"
                   required
                 />

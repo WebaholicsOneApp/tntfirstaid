@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mark review as helpful via API (handles validation, increment/decrement server-side)
+    // Mark review as helpful via API
     const result = await getApiClient().markReviewHelpful<{
       success: boolean;
       helpfulCount: number;

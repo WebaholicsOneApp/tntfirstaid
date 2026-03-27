@@ -60,6 +60,7 @@ function ReviewPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Token validation
@@ -152,9 +153,17 @@ function ReviewPageContent() {
     e.preventDefault();
     setError(null);
 
-    if (!selectedProduct) { setError('Please select a product'); return; }
-    if (rating === 0) { setError('Please select a star rating'); return; }
-    if (content.trim().length < 10) { setError('Review must be at least 10 characters'); return; }
+    const errors = new Set<string>();
+    if (!selectedProduct) errors.add('product');
+    if (rating === 0) errors.add('rating');
+    if (content.trim().length < 10) errors.add('content');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
+      setError('Please fix the highlighted fields.');
+      return;
+    }
+    setFieldErrors(new Set());
+    if (!selectedProduct) return;
 
     setIsSubmitting(true);
 
@@ -221,6 +230,7 @@ function ReviewPageContent() {
     setContent('');
     setImages([]);
     setError(null);
+    setFieldErrors(new Set());
   };
 
   // --- Loading State ---
@@ -480,12 +490,17 @@ function ReviewPageContent() {
           {/* Star Rating */}
           <div className="px-8 py-4 text-center">
             <div className="flex justify-center">
-              <StarRating
-                rating={rating}
-                size="2xl"
-                interactive
-                onChange={setRating}
-              />
+              <div className={fieldErrors.has('rating') ? 'inline-block ring-1 ring-red-400 rounded-lg p-1' : 'inline-block'}>
+                <StarRating
+                  rating={rating}
+                  size="2xl"
+                  interactive
+                  onChange={(val) => {
+                    setRating(val);
+                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('rating'); return n; });
+                  }}
+                />
+              </div>
             </div>
             <div className="h-6 mt-2">
               {rating > 0 && (
@@ -527,13 +542,16 @@ function ReviewPageContent() {
                 <textarea
                   id="review-content"
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e) => {
+                    setContent(e.target.value);
+                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('content'); return n; });
+                  }}
                   placeholder="Share your experience with this product..."
                   rows={4}
                   maxLength={5000}
-                  className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-secondary-700
+                  className={`w-full px-4 py-3 border ${fieldErrors.has('content') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
                     placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                    focus:border-primary-500 transition-colors resize-none"
+                    focus:border-primary-500 transition-colors resize-none`}
                 />
                 <span className="text-xs text-secondary-400 mt-1 block">
                   {content.length}/5000 characters (minimum 10)

@@ -19,21 +19,24 @@ export default function SecurityClient({ customer: initialCustomer }: SecurityCl
   const [confirmPassword, setConfirmPassword] = useState('');
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Client-side validation
-    if (newPassword.length < 8) {
+    const errors = new Set<string>();
+    if (newPassword.length < 8) errors.add('newPassword');
+    if (newPassword !== confirmPassword) errors.add('confirmPassword');
+    if (errors.size > 0) {
+      setFieldErrors(errors);
       setFormState('error');
-      setErrorMessage('Password must be at least 8 characters.');
+      setErrorMessage(
+        errors.has('newPassword') ? 'Password must be at least 8 characters.' : 'Passwords do not match.'
+      );
       return;
     }
-    if (newPassword !== confirmPassword) {
-      setFormState('error');
-      setErrorMessage('Passwords do not match.');
-      return;
-    }
+    setFieldErrors(new Set());
 
     setFormState('submitting');
     setErrorMessage('');
@@ -107,10 +110,13 @@ export default function SecurityClient({ customer: initialCustomer }: SecurityCl
             id="new-password"
             type="password"
             value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            onChange={(e) => {
+              setNewPassword(e.target.value);
+              if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('newPassword'); return n; });
+            }}
             autoComplete="new-password"
             placeholder="••••••••"
-            className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+            className={`w-full border ${fieldErrors.has('newPassword') ? 'border-red-400' : 'border-secondary-200'} rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200`}
           />
         </div>
 
@@ -125,10 +131,13 @@ export default function SecurityClient({ customer: initialCustomer }: SecurityCl
             id="confirm-password"
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('confirmPassword'); return n; });
+            }}
             autoComplete="new-password"
             placeholder="••••••••"
-            className="w-full border border-secondary-200 rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200"
+            className={`w-full border ${fieldErrors.has('confirmPassword') ? 'border-red-400' : 'border-secondary-200'} rounded-lg px-4 py-3 text-sm text-secondary-900 bg-white placeholder:text-secondary-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all duration-200`}
           />
         </div>
 
