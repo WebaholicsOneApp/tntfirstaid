@@ -17,12 +17,15 @@ interface CartItem {
 interface PlaceOrderPanelProps {
   items: CartItem[];
   email: string;
+  phone?: string;
   shippingAddress: {
     name: string;
     line1: string;
+    line2?: string;
     city: string;
     state: string;
     postalCode: string;
+    country?: string;
   };
   onSuccess: (data: { orderId: number; orderNumber: string | null }) => void;
   onError: (message: string) => void;
@@ -31,6 +34,7 @@ interface PlaceOrderPanelProps {
 export default function PlaceOrderPanel({
   items,
   email,
+  phone,
   shippingAddress,
   onSuccess,
   onError,
@@ -52,6 +56,7 @@ export default function PlaceOrderPanel({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerEmail: email,
+          ...(phone ? { phoneNumber: phone } : {}),
           items: items.map((item) => ({
             variationId: item.id,
             productId: item.productId,
@@ -65,10 +70,11 @@ export default function PlaceOrderPanel({
           shippingAddress: {
             name: shippingAddress.name,
             line1: shippingAddress.line1,
+            ...(shippingAddress.line2 ? { line2: shippingAddress.line2 } : {}),
             city: shippingAddress.city,
             state: shippingAddress.state,
             postalCode: shippingAddress.postalCode,
-            country: 'US',
+            country: shippingAddress.country || 'US',
           },
           sendEmail,
         }),

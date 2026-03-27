@@ -285,12 +285,15 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 <PlaceOrderPanel
                   items={cart.items}
                   email={checkoutData.shipping.email}
+                  phone={checkoutData.shipping.phone}
                   shippingAddress={{
                     name: checkoutData.shipping.name,
                     line1: checkoutData.shipping.line1,
+                    line2: checkoutData.shipping.line2,
                     city: checkoutData.shipping.city,
                     state: checkoutData.shipping.state,
                     postalCode: checkoutData.shipping.postalCode,
+                    country: checkoutData.shipping.country,
                   }}
                   onSuccess={handlePlaceOrderSuccess}
                   onError={handlePlaceOrderError}

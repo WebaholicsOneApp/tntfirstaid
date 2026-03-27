@@ -357,12 +357,12 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
   // ---- "Continue to Review" (dev bypass → confirm page) ----
   const handleContinueToReview = useCallback(() => {
     if (
-      !shipping.name ||
-      !shipping.email ||
-      !shipping.line1 ||
-      !shipping.city ||
-      !shipping.state ||
-      !shipping.postalCode
+      !shipping.name.trim() ||
+      !shipping.email.trim() ||
+      !shipping.line1.trim() ||
+      !shipping.city.trim() ||
+      !shipping.state.trim() ||
+      !shipping.postalCode.trim()
     ) {
       setError('Please fill in all shipping fields before continuing.');
       return;

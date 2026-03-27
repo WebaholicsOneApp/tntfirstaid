@@ -115,7 +115,7 @@ export async function POST(request: Request) {
         successUrl: fullSuccessUrl,
         cancelUrl: fullCancelUrl,
         ...(resolvedEmail ? { customerEmail: resolvedEmail } : {}),
-        ...(shippingAddress && typeof shippingAddress === 'object'
+        ...(shippingAddress && typeof shippingAddress === 'object' && !Array.isArray(shippingAddress)
           ? { shippingAddress }
           : {}),
       },
