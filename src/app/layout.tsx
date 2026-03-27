@@ -53,9 +53,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: `${storeConfig.siteName} - Premium ammunition and reloading supplies`,
     icons: [
-      { rel: 'icon', url: storeConfig.logoUrl || '/favicon.ico', sizes: 'any' },
-      { rel: 'icon', url: storeConfig.logoUrl || '/favicon.png', type: 'image/png' },
-      { rel: 'apple-touch-icon', url: storeConfig.logoUrl || '/apple-touch-icon.png' },
+      { rel: 'icon', url: '/favicon.ico', sizes: 'any' },
+      { rel: 'icon', url: '/favicon.png', type: 'image/png' },
+      { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
     ],
     metadataBase: new URL(storeConfig.siteUrl),
   };
