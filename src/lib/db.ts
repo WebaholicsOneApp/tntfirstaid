@@ -19,6 +19,11 @@ interface StorefrontApiConfig {
     logoUrl?: string;
     primaryColor?: string;
     secondaryColor?: string;
+    overrides?: {
+      logo?: boolean;
+      colors?: boolean;
+      storeInfo?: boolean;
+    };
   };
   contact?: {
     email?: string;
@@ -55,6 +60,9 @@ export interface StorefrontBrandingConfig {
   supportEmail?: string;
   storeHours?: string;
   mapsQuery?: string;
+  overrideLogo?: boolean;
+  overrideColors?: boolean;
+  overrideStoreInfo?: boolean;
 }
 
 export async function getStorefrontBranding(): Promise<StorefrontBrandingConfig> {
@@ -73,6 +81,9 @@ export async function getStorefrontBranding(): Promise<StorefrontBrandingConfig>
       supportEmail: contact.supportEmail,
       storeHours: contact.storeHours,
       mapsQuery: contact.mapsQuery,
+      overrideLogo: branding.overrides?.logo,
+      overrideColors: branding.overrides?.colors,
+      overrideStoreInfo: branding.overrides?.storeInfo,
     };
   } catch (error) {
     if (!IS_BUILD_PHASE) {

@@ -12,6 +12,7 @@ import { SearchOverlay } from '~/components/search/SearchOverlay';
 
 interface HeaderProps {
   siteName?: string;
+  logoUrl?: string;
   categories?: CategoryWithChildren[];
 }
 
@@ -32,7 +33,7 @@ const navLinks = [
   },
 ];
 
-export default function Header({ siteName = 'Alpha Munitions', categories }: HeaderProps) {
+export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/images/logo.png', categories }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
@@ -94,7 +95,7 @@ export default function Header({ siteName = 'Alpha Munitions', categories }: Hea
 
             <Link href="/" className="flex items-center">
               <Image
-                src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+                src={logoUrl}
                 alt={siteName}
                 width={300}
                 height={50}

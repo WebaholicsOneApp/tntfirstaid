@@ -4,10 +4,11 @@ import type { StoreConfig } from '~/lib/store-config';
 
 interface FooterProps {
   siteName?: string;
+  logoUrl?: string;
   storeConfig?: StoreConfig;
 }
 
-export default function Footer({ siteName = 'Alpha Munitions', storeConfig }: FooterProps) {
+export default function Footer({ siteName = 'Alpha Munitions', logoUrl = '/images/logo.png', storeConfig }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -20,7 +21,7 @@ export default function Footer({ siteName = 'Alpha Munitions', storeConfig }: Fo
         <div className="text-center mb-10">
           <Link href="/" className="inline-block mb-3">
             <Image
-              src="https://alphamunitions.com/wp-content/uploads/2019/06/Alpha-Logo-Gold1.png"
+              src={logoUrl}
               alt={siteName}
               width={200}
               height={60}
