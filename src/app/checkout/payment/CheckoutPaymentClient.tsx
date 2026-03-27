@@ -7,6 +7,8 @@ import { ProductImage } from '~/components/ui/ProductImage';
 import AuthorizeNetCheckoutForm from '~/components/checkout/AuthorizeNetCheckoutForm';
 import CheckoutAuthPrompt from '~/components/checkout/CheckoutAuthPrompt';
 import ExpressCheckout from '~/components/checkout/ExpressCheckout';
+import SavedDetailsCard from '~/components/checkout/SavedDetailsCard';
+import ShippingForm, { EMPTY_SHIPPING, type ShippingFields } from '~/components/checkout/ShippingForm';
 import StripeProvider from '~/components/checkout/StripeProvider';
 import { useAuth } from '~/lib/auth/AuthContext';
 import { useCart } from '~/lib/cart/CartContext';
@@ -37,13 +39,18 @@ export interface CheckoutSessionData {
   shipping: {
     name: string;
     email: string;
+    phone?: string;
     line1: string;
+    line2?: string;
     city: string;
     state: string;
     postalCode: string;
+    country?: string;
   };
   sendEmail: boolean;
 }
+
+export type { ShippingFields };
 
 // ---------------------------------------------------------------------------
 // Component
@@ -73,13 +80,8 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
   );
   const [expressCheckoutReady, setExpressCheckoutReady] = useState(false);
 
-  // Shipping form state
-  const [shippingName, setShippingName] = useState('');
-  const [shippingEmail, setShippingEmail] = useState('');
-  const [shippingLine1, setShippingLine1] = useState('');
-  const [shippingCity, setShippingCity] = useState('');
-  const [shippingState, setShippingState] = useState('');
-  const [shippingPostalCode, setShippingPostalCode] = useState('');
+  // Shipping form state (single object for all fields)
+  const [shipping, setShipping] = useState<ShippingFields>(EMPTY_SHIPPING);
 
   // ---- Redirect to shop if cart is empty ----
   useEffect(() => {
@@ -97,12 +99,17 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
       if (saved) {
         const data = JSON.parse(saved) as CheckoutSessionData;
         if (data.shipping) {
-          setShippingName(data.shipping.name || '');
-          setShippingEmail(data.shipping.email || '');
-          setShippingLine1(data.shipping.line1 || '');
-          setShippingCity(data.shipping.city || '');
-          setShippingState(data.shipping.state || '');
-          setShippingPostalCode(data.shipping.postalCode || '');
+          setShipping({
+            name: data.shipping.name || '',
+            email: data.shipping.email || '',
+            phone: data.shipping.phone || '',
+            line1: data.shipping.line1 || '',
+            line2: data.shipping.line2 || '',
+            city: data.shipping.city || '',
+            state: data.shipping.state || '',
+            postalCode: data.shipping.postalCode || '',
+            country: data.shipping.country || 'US',
+          });
         }
       }
     } catch {
@@ -178,6 +185,13 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
 
   // ---- Handlers ----
 
+  const handleShippingChange = useCallback(
+    (field: keyof ShippingFields, value: string) => {
+      setShipping((prev) => ({ ...prev, [field]: value }));
+    },
+    [],
+  );
+
   const handleExpressCheckoutSuccess = useCallback(
     async (stripePaymentIntentId: string, paymentMethod: string) => {
       setIsLoading(true);
@@ -189,7 +203,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             stripePaymentIntentId,
-            customerEmail: 'express-checkout@alphamunitions.com',
+            customerEmail: shipping.email.trim() || 'express-checkout@alphamunitions.com',
             paymentMethod,
             items: cart.items.map((item) => ({
               variationId: item.id,
@@ -207,12 +221,13 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
             tax: estimatedTax,
             total,
             shippingAddress: {
-              name: 'Express Checkout',
-              line1: '',
-              city: '',
-              state: '',
-              postalCode: '',
-              country: 'US',
+              name: shipping.name.trim() || 'Express Checkout',
+              line1: shipping.line1.trim(),
+              line2: shipping.line2.trim() || undefined,
+              city: shipping.city.trim(),
+              state: shipping.state.trim(),
+              postalCode: shipping.postalCode.trim(),
+              country: shipping.country.trim() || 'US',
             },
           }),
         });
@@ -244,7 +259,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
         setIsLoading(false);
       }
     },
-    [cart, estimatedTax, total, clearCart, router],
+    [cart, estimatedTax, total, clearCart, router, shipping],
   );
 
   const handleExpressCheckoutError = useCallback((message: string) => {
@@ -272,6 +287,20 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
           })),
           successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/checkout`,
+          ...(shipping.email.trim() ? { customerEmail: shipping.email.trim() } : {}),
+          ...(shipping.name.trim()
+            ? {
+                shippingAddress: {
+                  name: shipping.name.trim(),
+                  line1: shipping.line1.trim(),
+                  line2: shipping.line2.trim() || undefined,
+                  city: shipping.city.trim(),
+                  state: shipping.state.trim(),
+                  postalCode: shipping.postalCode.trim(),
+                  country: shipping.country.trim() || 'US',
+                },
+              }
+            : {}),
         }),
       });
 
@@ -306,36 +335,34 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
   // ---- "Use saved details" (opt-in prefill from account profile) ----
   const handleUseSavedDetails = useCallback(() => {
     if (!customer) return;
-    setShippingName(`${customer.firstName || ''}${customer.lastName ? ` ${customer.lastName}` : ''}`.trim());
-    setShippingEmail(customer.email);
-    if (customer.defaultAddress) {
-      setShippingLine1(customer.defaultAddress.line1);
-      setShippingCity(customer.defaultAddress.city);
-      setShippingState(customer.defaultAddress.state);
-      setShippingPostalCode(customer.defaultAddress.postalCode);
-    }
+    setShipping({
+      name: `${customer.firstName || ''}${customer.lastName ? ` ${customer.lastName}` : ''}`.trim(),
+      email: customer.email,
+      phone: customer.phone || '',
+      line1: customer.defaultAddress?.line1 || '',
+      line2: customer.defaultAddress?.line2 || '',
+      city: customer.defaultAddress?.city || '',
+      state: customer.defaultAddress?.state || '',
+      postalCode: customer.defaultAddress?.postalCode || '',
+      country: customer.defaultAddress?.country || 'US',
+    });
     setSavedDetailsApplied(true);
   }, [customer]);
 
   const handleClearSavedDetails = useCallback(() => {
-    setShippingName('');
-    setShippingEmail('');
-    setShippingLine1('');
-    setShippingCity('');
-    setShippingState('');
-    setShippingPostalCode('');
+    setShipping(EMPTY_SHIPPING);
     setSavedDetailsApplied(false);
   }, []);
 
   // ---- "Continue to Review" (dev bypass → confirm page) ----
   const handleContinueToReview = useCallback(() => {
     if (
-      !shippingName ||
-      !shippingEmail ||
-      !shippingLine1 ||
-      !shippingCity ||
-      !shippingState ||
-      !shippingPostalCode
+      !shipping.name ||
+      !shipping.email ||
+      !shipping.line1 ||
+      !shipping.city ||
+      !shipping.state ||
+      !shipping.postalCode
     ) {
       setError('Please fill in all shipping fields before continuing.');
       return;
@@ -343,20 +370,23 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
 
     const sessionData: CheckoutSessionData = {
       shipping: {
-        name: shippingName,
-        email: shippingEmail,
-        line1: shippingLine1,
-        city: shippingCity,
-        state: shippingState,
-        postalCode: shippingPostalCode,
+        name: shipping.name,
+        email: shipping.email,
+        phone: shipping.phone || undefined,
+        line1: shipping.line1,
+        line2: shipping.line2 || undefined,
+        city: shipping.city,
+        state: shipping.state,
+        postalCode: shipping.postalCode,
+        country: shipping.country || undefined,
       },
       sendEmail: false,
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
     router.push('/checkout/confirm');
-  }, [shippingName, shippingEmail, shippingLine1, shippingCity, shippingState, shippingPostalCode, router]);
+  }, [shipping, router]);
 
-  // ---- Render checkout panel ----
+  // ---- Render checkout panel (payment-specific content only) ----
   const renderCheckoutPanel = () => {
     if (paymentConfig?.devBypass) {
       return (
@@ -408,6 +438,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
             quantity: item.quantity,
           }))}
           totalLabel={formatCentsToDollars(total)}
+          shippingData={shipping}
           onSuccess={handleAuthorizeNetSuccess}
           onError={handleAuthorizeNetError}
         />
@@ -548,165 +579,41 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
               Back to Review
             </Link>
 
-            {/* Shipping form — dev bypass only (real providers handle shipping internally) */}
-            {paymentConfig?.devBypass && (
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="h-px w-6 bg-primary-500" />
-                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                      Shipping Information
-                    </span>
-                  </div>
-
-                  {/* Saved address card */}
-                  {isAuthenticated && customer && (
-                    <div className="mb-6">
-                      {savedDetailsApplied ? (
-                        <div className="flex items-center justify-between rounded-xl border border-green-200/60 bg-green-50 px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-sm font-medium text-green-800">Saved details applied</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={handleClearSavedDetails}
-                            className="font-mono text-[0.65rem] tracking-[0.1em] uppercase text-green-700 transition-colors hover:text-green-900"
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="rounded-xl border border-primary-200/40 bg-primary-50/50 p-4">
-                          <p className="mb-1 font-mono text-[0.55rem] tracking-[0.2em] uppercase text-secondary-400">
-                            Saved Details
-                          </p>
-                          <p className="text-sm font-medium text-secondary-900">
-                            {customer.firstName} {customer.lastName}
-                          </p>
-                          {customer.defaultAddress && (
-                            <p className="text-sm text-secondary-600">
-                              {customer.defaultAddress.line1}, {customer.defaultAddress.city}, {customer.defaultAddress.state} {customer.defaultAddress.postalCode}
-                            </p>
-                          )}
-                          <p className="text-sm text-secondary-500">{customer.email}</p>
-                          <button
-                            type="button"
-                            onClick={handleUseSavedDetails}
-                            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-secondary-900 px-4 py-1.5 font-mono text-[0.6rem] tracking-[0.15em] uppercase text-white transition-colors hover:bg-secondary-800"
-                          >
-                            <span>Use saved details</span>
-                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="shipping-name" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                        Full Name
-                      </label>
-                      <input
-                        id="shipping-name"
-                        type="text"
-                        value={shippingName}
-                        onChange={(e) => setShippingName(e.target.value)}
-                        placeholder="John Doe"
-                        className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="shipping-email" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                        Email
-                      </label>
-                      <input
-                        id="shipping-email"
-                        type="email"
-                        value={shippingEmail}
-                        onChange={(e) => setShippingEmail(e.target.value)}
-                        placeholder="john@example.com"
-                        className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="shipping-address" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                        Address
-                      </label>
-                      <input
-                        id="shipping-address"
-                        type="text"
-                        value={shippingLine1}
-                        onChange={(e) => setShippingLine1(e.target.value)}
-                        placeholder="123 Main St"
-                        className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label htmlFor="shipping-city" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                          City
-                        </label>
-                        <input
-                          id="shipping-city"
-                          type="text"
-                          value={shippingCity}
-                          onChange={(e) => setShippingCity(e.target.value)}
-                          placeholder="Salt Lake City"
-                          className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="shipping-state" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                          State
-                        </label>
-                        <input
-                          id="shipping-state"
-                          type="text"
-                          value={shippingState}
-                          onChange={(e) => setShippingState(e.target.value)}
-                          placeholder="UT"
-                          className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="shipping-zip" className="mb-1.5 block text-sm font-medium text-secondary-700">
-                          ZIP
-                        </label>
-                        <input
-                          id="shipping-zip"
-                          type="text"
-                          value={shippingPostalCode}
-                          onChange={(e) => setShippingPostalCode(e.target.value)}
-                          placeholder="84101"
-                          className="w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ring-1 ring-black/[0.06] placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                        />
-                      </div>
-                    </div>
-                  </div>
+            {/* Shipping form — ALWAYS visible for all providers */}
+            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                    Shipping Information
+                  </span>
                 </div>
+
+                {/* Saved address card — shown for ALL providers when authenticated */}
+                {isAuthenticated && customer && (
+                  <div className="mb-6">
+                    <SavedDetailsCard
+                      customer={customer}
+                      isApplied={savedDetailsApplied}
+                      onApply={handleUseSavedDetails}
+                      onClear={handleClearSavedDetails}
+                    />
+                  </div>
+                )}
+
+                <ShippingForm data={shipping} onChange={handleShippingChange} />
               </div>
-            )}
+            </div>
 
             {/* Payment / Continue card */}
             <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
               <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                {!paymentConfig?.devBypass && (
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="h-px w-6 bg-primary-500" />
-                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                      Payment Method
-                    </span>
-                  </div>
-                )}
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="h-px w-6 bg-primary-500" />
+                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                    Payment Method
+                  </span>
+                </div>
 
                 {error && (
                   <div className="mb-6 rounded-xl border border-red-200/80 bg-red-50 p-4">

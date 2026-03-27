@@ -18,10 +18,13 @@ interface CheckoutSessionData {
   shipping: {
     name: string;
     email: string;
+    phone?: string;
     line1: string;
+    line2?: string;
     city: string;
     state: string;
     postalCode: string;
+    country?: string;
   };
   sendEmail: boolean;
 }
@@ -222,11 +225,20 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 <div className="space-y-1 text-sm text-secondary-700">
                   <p className="font-medium text-secondary-900">{checkoutData.shipping.name}</p>
                   <p>{checkoutData.shipping.line1}</p>
+                  {checkoutData.shipping.line2 && (
+                    <p>{checkoutData.shipping.line2}</p>
+                  )}
                   <p>
                     {checkoutData.shipping.city}, {checkoutData.shipping.state}{' '}
                     {checkoutData.shipping.postalCode}
+                    {checkoutData.shipping.country && checkoutData.shipping.country !== 'US' && (
+                      <>, {checkoutData.shipping.country}</>
+                    )}
                   </p>
                   <p className="text-secondary-500">{checkoutData.shipping.email}</p>
+                  {checkoutData.shipping.phone && (
+                    <p className="text-secondary-500">{checkoutData.shipping.phone}</p>
+                  )}
                 </div>
               </div>
             </div>

@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, successUrl, cancelUrl } = body as Record<string, unknown>;
+    const { items, successUrl, cancelUrl, customerEmail, shippingAddress } = body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -99,6 +99,12 @@ export async function POST(request: Request) {
       : cancelUrl;
 
     const customer = await getCheckoutCustomer();
+    // Prefer email from shipping form, then authenticated customer, then omit
+    const resolvedEmail =
+      (typeof customerEmail === 'string' && customerEmail.trim()) ||
+      customer?.email ||
+      undefined;
+
     const session = await getApiClient().post<{ url?: string; checkoutUrl?: string }>(
       '/checkout/session',
       {
@@ -108,7 +114,10 @@ export async function POST(request: Request) {
         })),
         successUrl: fullSuccessUrl,
         cancelUrl: fullCancelUrl,
-        ...(customer?.email ? { customerEmail: customer.email } : {}),
+        ...(resolvedEmail ? { customerEmail: resolvedEmail } : {}),
+        ...(shippingAddress && typeof shippingAddress === 'object'
+          ? { shippingAddress }
+          : {}),
       },
     );
 
