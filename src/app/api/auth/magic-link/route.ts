@@ -7,9 +7,9 @@ export async function POST(request: Request) {
   const rl = await checkRateLimit(ip, 'strict');
   if (!rl.success) return rateLimitResponse(rl);
 
-  let body: { email?: string };
+  let body: { email?: string; redirect?: string };
   try {
-    body = (await request.json()) as { email?: string };
+    body = (await request.json()) as { email?: string; redirect?: string };
   } catch {
     return NextResponse.json({ error: 'Email is required' }, { status: 400 });
   }
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await requestMagicLink(email);
+    await requestMagicLink(email, body.redirect);
   } catch {
     // Swallow errors — always return generic success to prevent email enumeration
   }

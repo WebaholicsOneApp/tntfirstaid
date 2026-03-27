@@ -35,11 +35,13 @@ async function handleResponse<T>(res: Response): Promise<T> {
 // Public auth endpoints (no customer JWT required)
 // ---------------------------------------------------------------------------
 
-export async function requestMagicLink(email: string): Promise<{ success: boolean }> {
+export async function requestMagicLink(email: string, redirect?: string): Promise<{ success: boolean }> {
+  const payload: { email: string; redirect?: string } = { email };
+  if (redirect) payload.redirect = redirect;
   const res = await fetch(`${BASE}/magic-link`, {
     method: 'POST',
     headers: headers(),
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(payload),
   });
   return handleResponse(res);
 }

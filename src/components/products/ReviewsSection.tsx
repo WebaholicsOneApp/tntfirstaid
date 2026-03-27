@@ -7,6 +7,8 @@ import RatingBreakdown from './RatingBreakdown';
 import ReviewCard from './ReviewCard';
 import ReviewForm from './ReviewForm';
 import ReviewGallery from './ReviewGallery';
+import { useAuth } from '~/lib/auth';
+import AuthPromptModal from '~/components/ui/AuthPromptModal';
 import type { ImageWithReview } from './ReviewGallery';
 import type { Review, ReviewAggregate, ReviewSortOption } from '~/types/review';
 
@@ -21,6 +23,7 @@ export default function ReviewsSection({
   productName,
   aggregate: initialAggregate,
 }: ReviewsSectionProps) {
+  const { customer, isAuthenticated, customerAuthEnabled } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [aggregate, setAggregate] = useState<ReviewAggregate | null>(
     initialAggregate ?? null
@@ -34,6 +37,7 @@ export default function ReviewsSection({
     null
   );
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Collect all images from all reviews
   const allImages = useMemo(() => {
@@ -99,6 +103,14 @@ export default function ReviewsSection({
     setRatingFilter(rating);
   };
 
+  const handleWriteReviewClick = () => {
+    if (!isAuthenticated && customerAuthEnabled) {
+      setShowAuthModal(true);
+      return;
+    }
+    setShowForm(true);
+  };
+
   // When a review card image is clicked, find its global index in allImages
   const handleImageClick = (imageUrl: string) => {
     const index = allImages.findIndex((img) => img.imageUrl === imageUrl);
@@ -151,7 +163,7 @@ export default function ReviewsSection({
             Be the first to share your experience with this product.
           </p>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={handleWriteReviewClick}
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white
               font-semibold rounded-full hover:bg-primary-700
               transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]
@@ -206,7 +218,7 @@ export default function ReviewsSection({
 
                   {/* Write a Review CTA */}
                   <button
-                    onClick={() => setShowForm(true)}
+                    onClick={handleWriteReviewClick}
                     className="mt-3 inline-flex items-center gap-2 px-5 py-2.5
                       bg-primary-600 text-white text-sm font-semibold rounded-full
                       hover:bg-primary-700 transition-all duration-300
@@ -481,6 +493,8 @@ export default function ReviewsSection({
         <ReviewForm
           productId={productId}
           productName={productName}
+          prefillName={customer ? `${customer.firstName} ${customer.lastName}`.trim() : undefined}
+          prefillEmail={customer?.email}
           onClose={() => setShowForm(false)}
           onSuccess={() => {
             setShowForm(false);
@@ -491,6 +505,15 @@ export default function ReviewsSection({
           }}
         />
       )}
+
+      {/* Auth prompt for write-a-review */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Sign in to write a review"
+        subtitle="Sign in to share your experience with this product."
+        onAuthenticated={() => setShowForm(true)}
+      />
 
       {/* Image Gallery */}
       <ReviewGallery

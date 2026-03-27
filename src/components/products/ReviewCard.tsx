@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import StarRating from './StarRating';
+import { useAuth } from '~/lib/auth';
+import AuthPromptModal from '~/components/ui/AuthPromptModal';
 import type { Review } from '~/types/review';
 
 interface ReviewCardProps {
@@ -11,22 +13,19 @@ interface ReviewCardProps {
 }
 
 export default function ReviewCard({ review, onImageClick }: ReviewCardProps) {
+  const { isAuthenticated, customerAuthEnabled } = useAuth();
   const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount ?? 0);
   const [hasVoted, setHasVoted] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Check if user has already voted
   useEffect(() => {
-    const votedReviews = JSON.parse(
-      localStorage.getItem('votedReviews') || '[]'
-    );
+    const votedReviews = JSON.parse(localStorage.getItem('votedReviews') || '[]');
     setHasVoted(votedReviews.includes(review.id));
   }, [review.id]);
 
-  const handleHelpfulClick = async () => {
-    if (isVoting) return;
-
+  const submitVote = async () => {
     setIsVoting(true);
     try {
       const res = await fetch('/api/reviews/helpful', {
@@ -42,26 +41,40 @@ export default function ReviewCard({ review, onImageClick }: ReviewCardProps) {
         const data = await res.json();
         setHelpfulCount(data.helpfulCount);
 
+        const newVoted = !hasVoted;
+        setHasVoted(newVoted);
+
+        // Sync localStorage
         const votedReviews = JSON.parse(
           localStorage.getItem('votedReviews') || '[]'
         );
-        if (hasVoted) {
-          const filtered = votedReviews.filter(
-            (id: number) => id !== review.id
-          );
-          localStorage.setItem('votedReviews', JSON.stringify(filtered));
-          setHasVoted(false);
+        if (newVoted) {
+          if (!votedReviews.includes(review.id)) {
+            votedReviews.push(review.id);
+          }
         } else {
-          votedReviews.push(review.id);
-          localStorage.setItem('votedReviews', JSON.stringify(votedReviews));
-          setHasVoted(true);
+          const idx = votedReviews.indexOf(review.id);
+          if (idx !== -1) votedReviews.splice(idx, 1);
         }
+        localStorage.setItem('votedReviews', JSON.stringify(votedReviews));
       }
     } catch (error) {
       console.error('Failed to vote:', error);
     } finally {
       setIsVoting(false);
     }
+  };
+
+  const handleHelpfulClick = async () => {
+    if (isVoting) return;
+
+    // Auth gate: require sign-in if auth is enabled and user isn't authenticated
+    if (!isAuthenticated && customerAuthEnabled) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    await submitVote();
   };
 
   const formatDate = (dateString: string) => {
@@ -208,6 +221,18 @@ export default function ReviewCard({ review, onImageClick }: ReviewCardProps) {
           {isVoting ? '...' : `Helpful (${helpfulCount})`}
         </button>
       </div>
+
+      {/* Auth prompt modal for helpful voting */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Sign in to continue"
+        subtitle="Sign in to mark reviews as helpful."
+        onAuthenticated={() => {
+          // Auto-fire the vote after successful password login (skip auth check)
+          submitVote();
+        }}
+      />
     </div>
   );
 }
