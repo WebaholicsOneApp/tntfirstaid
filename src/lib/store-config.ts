@@ -18,7 +18,7 @@ export const storeConfig = {
   mapsQuery:
     process.env.NEXT_PUBLIC_MAPS_QUERY ||
     'Alpha+Munitions+American+Fork+UT',
-  logoUrl: process.env.NEXT_PUBLIC_LOGO_URL || '/images/logo.png',
+  logoUrl: process.env.NEXT_PUBLIC_LOGO_URL || '/images/alpha-logo-wide.png',
   primaryColor: process.env.NEXT_PUBLIC_PRIMARY_COLOR || '#e9c360',
   secondaryColor: process.env.NEXT_PUBLIC_SECONDARY_COLOR || '#1A1A1A',
 };

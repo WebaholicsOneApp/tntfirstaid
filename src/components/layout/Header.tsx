@@ -33,7 +33,7 @@ const navLinks = [
   },
 ];
 
-export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/images/logo.png', categories }: HeaderProps) {
+export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/images/alpha-logo-wide.png', categories }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);

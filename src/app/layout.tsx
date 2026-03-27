@@ -110,7 +110,7 @@ export default async function RootLayout({
 
               <Footer
                 siteName={storeConfig.siteName}
-                logoUrl={storeConfig.logoUrl}
+                logoUrl="/apple-touch-icon.png"
                 storeConfig={storeConfig}
               />
 

@@ -8,7 +8,7 @@ interface FooterProps {
   storeConfig?: StoreConfig;
 }
 
-export default function Footer({ siteName = 'Alpha Munitions', logoUrl = '/images/logo.png', storeConfig }: FooterProps) {
+export default function Footer({ siteName = 'Alpha Munitions', logoUrl = '/apple-touch-icon.png', storeConfig }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
