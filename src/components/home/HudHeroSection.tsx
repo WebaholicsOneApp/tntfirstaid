@@ -144,7 +144,7 @@ export default function HudHeroSection() {
       {!prefersReducedMotion && (
         <div className="pointer-events-none absolute inset-0 overflow-hidden bg-black">
           <iframe
-            src="https://www.youtube-nocookie.com/embed/QyWs5N81rZY?autoplay=1&mute=1&loop=1&playlist=QyWs5N81rZY&controls=0&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&playsinline=1"
+            src="https://www.youtube-nocookie.com/embed/nzs_jJTMMBs?autoplay=1&mute=1&loop=1&playlist=nzs_jJTMMBs&controls=0&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3&playsinline=1"
             allow="autoplay; encrypted-media"
             title=""
             aria-hidden="true"
