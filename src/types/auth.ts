@@ -45,7 +45,16 @@ export interface Order {
   status: string;
   createdAt: string;
   total: number; // cents
+  subtotal?: number;
+  shipping?: number;
+  tax?: number;
   items: OrderItem[];
+  paymentMethod?: {
+    type: string;
+    brand?: string;
+    last4?: string;
+    label: string;
+  } | null;
   tracking?: {
     carrier: string;
     trackingNumber: string;
