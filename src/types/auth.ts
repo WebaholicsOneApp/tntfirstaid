@@ -15,6 +15,7 @@ export interface Customer {
   phone?: string;
   hasPassword: boolean;
   defaultAddress?: ShippingAddress;
+  defaultBillingAddress?: ShippingAddress;
   stats?: {
     orderCount: number;
     lifetimeValueCents: number;
