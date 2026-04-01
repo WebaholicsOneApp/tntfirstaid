@@ -118,12 +118,12 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
                   href={`/product/${item.slug}`}
                   className="flex-shrink-0 w-[200px] sm:w-[220px] snap-start group block bg-white rounded-lg border border-secondary-100 hover:border-primary-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:scale-[0.99] active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-t-lg bg-secondary-50">
+                  <div className="relative aspect-[2/3] overflow-hidden rounded-t-lg bg-white">
                     <ProductImage
                       src={item.image}
                       alt={item.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                      className="object-contain group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
                       sizes="220px"
                     />
                   </div>

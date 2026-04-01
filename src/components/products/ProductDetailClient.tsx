@@ -10,6 +10,7 @@ import VariantSelector from './VariantSelector';
 import AddToCartButton from './AddToCartButton';
 import StockBadge from './StockBadge';
 import ReviewsSection from './ReviewsSection';
+import RecommendationGrid from './RecommendationGrid';
 import StarRating from './StarRating';
 
 interface ProductDetailClientProps {
@@ -263,6 +264,18 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
           </div>
         </div>
       </div>
+
+      {/* Related products — above reviews */}
+      {product.relatedProducts.filter(r => r.inStock).length > 0 && (
+        <div className="col-span-full mt-8 mb-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-px w-6 bg-primary-500" />
+            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
+          </div>
+          <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">You May Also Like</h2>
+          <RecommendationGrid products={product.relatedProducts.filter(r => r.inStock).slice(0, 5)} />
+        </div>
+      )}
 
       {/* Reviews — standalone section below product detail */}
       <div className="col-span-full">

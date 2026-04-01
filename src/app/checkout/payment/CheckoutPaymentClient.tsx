@@ -652,7 +652,7 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
                   <ul className="mb-5 space-y-3">
                     {cart.items.map((item) => (
                       <li key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-secondary-50 ring-1 ring-black/[0.04]">
+                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
                           {item.image ? (
                             <ProductImage
                               src={getImageUrl(item.image)}

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { getFeaturedProducts, getCategoryIdsByNamePattern, getProducts } from '~/lib/data';
 
@@ -15,13 +16,35 @@ import ShopBrassCarousel from '~/components/home/ShopBrassCarousel';
 import ReamersSection from '~/components/home/ReamersSection';
 import SignaturesSection from '~/components/home/SignaturesSection';
 import FooterCtaBanner from '~/components/home/FooterCtaBanner';
-export default async function HomePage() {
-  // Fetch brass products and reamer/tool products in parallel
-  const [brassProducts, reamerProducts] = await Promise.all([
-    getBrassProducts(),
-    getReamerProducts(),
-  ]);
 
+function CarouselSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <section className="relative overflow-hidden bg-white py-20 sm:py-28">
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="h-px w-6 bg-secondary-200" />
+            <div className="skeleton h-3 w-24" />
+          </div>
+          <div className="skeleton h-10 w-48" />
+        </div>
+        <div className="flex gap-4 overflow-hidden">
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="shrink-0 w-[220px] rounded-lg border border-secondary-100 overflow-hidden" style={{ animationDelay: `${i * 100}ms` }}>
+              <div className="skeleton aspect-[3/4] !rounded-none" style={{ animationDelay: `${i * 100}ms` }} />
+              <div className="p-3 space-y-2">
+                <div className="skeleton h-4 w-3/4" style={{ animationDelay: `${i * 100 + 50}ms` }} />
+                <div className="skeleton h-4 w-1/3" style={{ animationDelay: `${i * 100 + 100}ms` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
   return (
     <>
       <HudHeroSection />
@@ -29,12 +52,26 @@ export default async function HomePage() {
       <OcdTechnologySection />
       <FeatureIconsSection />
       <DataDrivenSection />
-      <ShopBrassCarousel products={brassProducts} />
-      <ReamersSection products={reamerProducts} />
+      <Suspense fallback={<CarouselSkeleton count={6} />}>
+        <BrassCarouselLoader />
+      </Suspense>
+      <Suspense fallback={<CarouselSkeleton count={4} />}>
+        <ReamersSectionLoader />
+      </Suspense>
       <SignaturesSection />
       <FooterCtaBanner />
     </>
   );
+}
+
+async function BrassCarouselLoader() {
+  const products = await getBrassProducts();
+  return <ShopBrassCarousel products={products} />;
+}
+
+async function ReamersSectionLoader() {
+  const products = await getReamerProducts();
+  return <ReamersSection products={products} />;
 }
 
 async function getBrassProducts() {

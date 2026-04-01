@@ -64,29 +64,30 @@ export default function ShopPageClient({
   return (
     <div>
       {/* Toolbar row — full width, button never moves */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          {/* Desktop filter toggle — stationary, only text changes */}
-          <button
-            onClick={() => setFiltersVisible(v => !v)}
-            className="hidden lg:flex items-center gap-3 px-4 py-3 font-mono text-xs tracking-wider uppercase bg-secondary-50 border border-secondary-200 text-secondary-600 hover:bg-secondary-100 transition-colors duration-200 cursor-pointer"
-          >
-            {filterIcon}
-            {filtersVisible ? 'Hide Filters' : 'Show Filters'}
-          </button>
-        </div>
+      <div className="flex items-center justify-between mb-6 gap-3">
+        {/* Desktop filter toggle */}
+        <button
+          onClick={() => setFiltersVisible(v => !v)}
+          className="hidden lg:flex items-center gap-3 px-4 py-3 font-mono text-xs tracking-wider uppercase bg-secondary-50 border border-secondary-200 rounded-full text-secondary-600 hover:bg-secondary-100 transition-colors duration-200 cursor-pointer"
+        >
+          {filterIcon}
+          {filtersVisible ? 'Hide Filters' : 'Show Filters'}
+        </button>
 
-        <div className="flex items-center gap-3">
-          {/* Mobile filter toggle */}
+        {/* Mobile: Filter + Sort on same row */}
+        <div className="flex items-center gap-2 lg:hidden w-full">
           <button
             onClick={() => setMobileFiltersOpen(true)}
-            className="lg:hidden flex items-center gap-1.5 px-3 py-2 text-sm border border-secondary-200 rounded-md text-secondary-600 hover:bg-secondary-50 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2.5 text-sm border border-secondary-200 rounded-full text-secondary-600 hover:bg-secondary-50 transition-colors flex-shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
             Filters
           </button>
+          <div className="flex-1">
+            <SortSelectWrapper />
+          </div>
         </div>
       </div>
 
@@ -110,12 +111,14 @@ export default function ShopPageClient({
 
         {/* Product grid — expands to fill when sidebar collapses */}
         <div className="flex-1 min-w-0">
-          {/* Count + sort — aligned with grid */}
+          {/* Count + sort — desktop only */}
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-secondary-500">
               Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalCount)} of {totalCount} results
             </p>
-            <SortSelectWrapper />
+            <div className="hidden lg:block">
+              <SortSelectWrapper />
+            </div>
           </div>
 
           <ProductGridLoadingWrapper>

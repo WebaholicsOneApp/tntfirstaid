@@ -157,6 +157,7 @@ function toProductListItem(card: any): ProductListItem {
     maxMap: card.maxMap ?? null,
     inStock: card.inStock ?? false,
     variationCount: card.variationCount ?? 1,
+    variationId: card.variationId ?? null,
     ...(card.averageRating != null && { averageRating: card.averageRating }),
     ...(card.totalReviews != null && { totalReviews: card.totalReviews }),
   };
@@ -314,14 +315,22 @@ export async function getCategoryTreeForStorefront(): Promise<CategoryWithChildr
  * Get all categories
  */
 export async function getCategories(): Promise<Category[]> {
-  try {
-    const api = getApiClient();
-    const resp = await api.getCategories<{ categories: any[] }>();
-    return (resp?.categories || []).map(toCategory);
-  } catch (err) {
-    console.error('[getCategories] API call failed:', err instanceof Error ? err.message : err);
-    return [];
-  }
+  const cacheKey = 'categories:all';
+  const cached = getCachedLong<Category[]>(cacheKey);
+  if (cached) return cached;
+
+  return coalesceRequest(cacheKey, async () => {
+    try {
+      const api = getApiClient();
+      const resp = await api.getCategories<{ categories: any[] }>();
+      const categories = (resp?.categories || []).map(toCategory);
+      setCache(cacheKey, categories);
+      return categories;
+    } catch (err) {
+      console.error('[getCategories] API call failed:', err instanceof Error ? err.message : err);
+      return [];
+    }
+  });
 }
 
 /**
@@ -445,7 +454,7 @@ const SORT_MAP: Record<string, string> = {
   price_desc: 'price-desc',
   newest: 'newest',
   oldest: 'oldest',
-  top_rated: 'newest',
+  top_rated: 'rating-desc',
   relevance: 'relevance',
 };
 
@@ -696,6 +705,45 @@ export async function getProductDetailBySlug(slug: string): Promise<ProductDetai
       const detail = toProductDetail(data, relatedProducts);
 
       // If no variations with valid prices, product cannot be displayed
+      if (detail.variations.length === 0) {
+        setCache(missCacheKey, true);
+        return null;
+      }
+
+      setCache(cacheKey, detail);
+      return detail;
+    } catch {
+      setCache(missCacheKey, true);
+      return null;
+    }
+  });
+}
+
+/**
+ * Lightweight product detail — skips recommendations fetch for faster loading (used by QuickAddModal)
+ */
+export async function getProductDetailOnly(slug: string): Promise<ProductDetail | null> {
+  const cacheKey = `productDetailOnly:${slug}`;
+  const missCacheKey = `productDetailOnlyMiss:${slug}`;
+  const cached = getCachedLong<ProductDetail>(cacheKey);
+  if (cached) return cached;
+  if (getCachedLong<boolean>(missCacheKey)) return null;
+
+  return coalesceRequest(cacheKey, async () => {
+    const cachedAgain = getCachedLong<ProductDetail>(cacheKey);
+    if (cachedAgain) return cachedAgain;
+
+    try {
+      const api = getApiClient();
+      const response = await api.getProductBySlug<any>(slug);
+      const data = response?.product ?? response;
+      if (!data) {
+        setCache(missCacheKey, true);
+        return null;
+      }
+
+      const detail = toProductDetail(data);
+
       if (detail.variations.length === 0) {
         setCache(missCacheKey, true);
         return null;

@@ -48,12 +48,17 @@ function setCache<T>(key: string, data: T, ttl: number): void {
   cache.set(key, { data, expiresAt: Date.now() + ttl });
 }
 
+/** In-flight request coalescing — concurrent calls to the same key share one promise. */
+const pendingRequests = new Map<string, Promise<unknown>>();
+
 /** Clear the entire cache or a single key. */
 export function clearCache(key?: string): void {
   if (key) {
     cache.delete(key);
+    pendingRequests.delete(key);
   } else {
     cache.clear();
+    pendingRequests.clear();
   }
 }
 
@@ -230,9 +235,21 @@ class StorefrontApiClient {
     const cached = getCached<T>(cacheKey);
     if (cached !== undefined) return cached;
 
-    const data = await this.get<T>(path, params);
-    setCache(cacheKey, data, ttl);
-    return data;
+    // Coalesce concurrent requests for the same cache key
+    const pending = pendingRequests.get(cacheKey);
+    if (pending) return pending as Promise<T>;
+
+    const promise = this.get<T>(path, params).then((data) => {
+      setCache(cacheKey, data, ttl);
+      pendingRequests.delete(cacheKey);
+      return data;
+    }).catch((err) => {
+      pendingRequests.delete(cacheKey);
+      throw err;
+    });
+
+    pendingRequests.set(cacheKey, promise);
+    return promise;
   }
 
   // --------------------------------------------------------------------------

@@ -5,7 +5,6 @@ import { stripHtml } from '~/lib/sanitize';
 import Breadcrumbs from '~/components/common/Breadcrumbs';
 import JsonLd from '~/components/common/JsonLd';
 import ProductDetailClient from '~/components/products/ProductDetailClient';
-import ProductGrid from '~/components/products/ProductGrid';
 import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
 
 
@@ -123,15 +122,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {/* Product detail */}
       <ProductDetailClient product={product} reviewAggregate={reviewAggregate} />
 
-      {/* Related products */}
-      {product.relatedProducts.length > 0 && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-display font-bold text-secondary-900 mb-6">
-            You May Also Like
-          </h2>
-          <ProductGrid products={product.relatedProducts.slice(0, 4)} />
-        </section>
-      )}
     </div>
   );
 }

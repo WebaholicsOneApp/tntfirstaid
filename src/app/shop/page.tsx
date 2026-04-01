@@ -80,21 +80,22 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page heading */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="h-px w-6 bg-primary-500" />
-          <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">All Products</span>
+      <div className="mb-10 border-b border-secondary-100 pb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="h-px w-8 bg-primary-500" />
+          <span className="font-mono text-[0.6rem] tracking-[0.35em] text-secondary-400 uppercase">All Products</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900">
-          Shop
-        </h1>
-        <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
-          className="mt-3"
-        />
-        <p className="mt-2 text-secondary-500">
-          Browse our selection of premium ammunition and reloading supplies.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900 tracking-tight">
+              Shop
+            </h1>
+            <Breadcrumbs
+              items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
+              className="mt-2"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Shop content */}
@@ -109,8 +110,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <nav aria-label="Pagination" className="mt-10 flex justify-center">
-          <div className="flex items-center gap-1">
+        <nav aria-label="Pagination" className="mt-12 flex justify-center">
+          <div className="flex items-center gap-1.5">
             {/* Previous */}
             {page > 1 && (
               <PaginationLink page={page - 1} params={params} label="Previous">
@@ -179,8 +180,8 @@ function PaginationLink({
       aria-current={isActive ? 'page' : undefined}
       className={
         isActive
-          ? 'w-10 h-10 flex items-center justify-center rounded-md bg-primary-500 text-secondary-900 text-sm font-semibold'
-          : 'w-10 h-10 flex items-center justify-center rounded-md border border-secondary-200 text-secondary-600 text-sm hover:bg-secondary-50 transition-colors'
+          ? 'w-10 h-11 flex items-center justify-center bg-primary-500 text-secondary-900 text-sm font-mono font-semibold tracking-tight'
+          : 'w-10 h-11 flex items-center justify-center border border-secondary-200 text-secondary-500 text-sm hover:border-secondary-300 hover:text-secondary-800 hover:bg-secondary-50 transition-colors'
       }
     >
       {children}

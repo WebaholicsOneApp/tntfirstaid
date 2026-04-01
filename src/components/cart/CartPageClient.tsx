@@ -1,12 +1,32 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import RecommendationGrid from '~/components/products/RecommendationGrid';
 import { ProductImage } from '~/components/ui/ProductImage';
 import { useCart } from '~/lib/cart/CartContext';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
+import type { ProductListItem } from '~/types';
 
 export default function CartPageClient() {
   const { cart, removeItem, updateQuantity } = useCart();
+  const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
+  const [recsLoading, setRecsLoading] = useState(false);
+
+  useEffect(() => {
+    if (cart.items.length === 0) return;
+    const productIds = cart.items.map(item => item.productId).filter(Boolean);
+    if (productIds.length === 0) return;
+
+    setRecsLoading(true);
+    fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.recommendations) setRecommendations(data.recommendations);
+      })
+      .catch(() => {})
+      .finally(() => setRecsLoading(false));
+  }, [cart.items]);
 
   if (cart.items.length === 0) {
     return (
@@ -77,7 +97,7 @@ export default function CartPageClient() {
                   <li key={item.id} className="px-6 py-4 flex gap-4">
                     <Link
                       href={`/product/${item.productSlug}`}
-                      className="relative w-24 h-24 bg-secondary-50 rounded-lg overflow-hidden flex-shrink-0"
+                      className="relative w-24 h-24 bg-white rounded-lg overflow-hidden flex-shrink-0"
                     >
                       {item.image ? (
                         <ProductImage
@@ -205,6 +225,18 @@ export default function CartPageClient() {
             </div>
           </div>
         </div>
+
+        {/* You May Also Like */}
+        {(recommendations.filter(r => r.inStock).length > 0 || recsLoading) && (
+          <section className="mt-16">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
+            </div>
+            <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">Frequently Bought Together</h2>
+            <RecommendationGrid products={recommendations.filter(r => r.inStock).slice(0, 5)} loading={recsLoading} />
+          </section>
+        )}
       </div>
     </div>
   );

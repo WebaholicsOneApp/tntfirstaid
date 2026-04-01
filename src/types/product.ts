@@ -122,6 +122,7 @@ export interface ProductListItem {
   maxMap?: number | null; // in cents (for MAP ranges)
   inStock: boolean;
   variationCount: number;
+  variationId?: number | null;
   averageRating?: number;
   totalReviews?: number;
 }

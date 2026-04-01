@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import RecommendationGrid from '~/components/products/RecommendationGrid';
 import { ProductImage } from '~/components/ui/ProductImage';
 import PlaceOrderPanel from '~/components/checkout/PlaceOrderPanel';
 import { useCart } from '~/lib/cart/CartContext';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
+import type { ProductListItem } from '~/types';
 
 // ---------------------------------------------------------------------------
 // Shared types & constants (duplicated from payment client to avoid cross-imports)
@@ -44,6 +46,23 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
   const [checkoutData, setCheckoutData] = useState<CheckoutSessionData | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
+  const [recsLoading, setRecsLoading] = useState(false);
+
+  useEffect(() => {
+    if (cart.items.length === 0) return;
+    const productIds = cart.items.map(item => item.productId).filter(Boolean);
+    if (productIds.length === 0) return;
+
+    setRecsLoading(true);
+    fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.recommendations) setRecommendations(data.recommendations);
+      })
+      .catch(() => {})
+      .finally(() => setRecsLoading(false));
+  }, [cart.items]);
 
   // ---- Read checkout data from sessionStorage ----
   useEffect(() => {
@@ -318,7 +337,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                   <ul className="mb-5 space-y-3">
                     {cart.items.map((item) => (
                       <li key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-secondary-50 ring-1 ring-black/[0.04]">
+                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
                           {item.image ? (
                             <ProductImage
                               src={getImageUrl(item.image)}
@@ -386,6 +405,18 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             </div>
           </div>
         </div>
+
+        {/* You May Also Like */}
+        {(recommendations.filter(r => r.inStock).length > 0 || recsLoading) && (
+          <section className="mt-16">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
+            </div>
+            <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">Add to Your Order</h2>
+            <RecommendationGrid products={recommendations.filter(r => r.inStock).slice(0, 5)} loading={recsLoading} />
+          </section>
+        )}
       </div>
     </div>
   );

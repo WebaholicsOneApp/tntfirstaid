@@ -44,14 +44,14 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-secondary-50 border border-secondary-100">
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-white border border-secondary-100">
         {currentImage && !imgErrors.has(selectedIndex) ? (
           <ProductImage
             src={currentImage}
             alt={productName}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
+            className="object-contain"
             priority
             onError={() => handleImageError(selectedIndex)}
           />

@@ -120,9 +120,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, isHydrated]);
 
-  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, quantity = 1) => {
+  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, quantity = 1, options?: { skipDrawer?: boolean }) => {
     dispatch({ type: 'ADD_ITEM', payload: { item, quantity } });
-    setIsOpen(true); // Open cart drawer when item is added
+    if (!options?.skipDrawer) {
+      setIsOpen(true);
+    }
   }, []);
 
   const removeItem = useCallback((variationId: number) => {

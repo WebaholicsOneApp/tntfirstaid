@@ -183,13 +183,26 @@ export default function ProductFilters({
     searchParams.has('inStock');
 
   return (
-    <aside className={cn('space-y-6', className)}>
+    <aside className={cn('space-y-7', className)}>
       {/* Categories */}
       <div>
-        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+        <h3 className="flex items-center gap-2 text-[10px] font-mono font-semibold text-secondary-400 uppercase tracking-widest pb-2 mb-3 border-b border-secondary-100">
+          <span className="w-3 h-px bg-primary-500 inline-block" />
           Categories
         </h3>
         <ul className="space-y-0.5">
+          <li>
+            <a
+              href="/shop"
+              onClick={(e) => { e.preventDefault(); handleCategoryNavigate('/shop'); }}
+              className={cn(
+                'block text-sm py-1 ml-5 transition-colors',
+                !currentCategorySlug ? 'text-primary-600 font-semibold' : 'text-secondary-500 hover:text-primary-600'
+              )}
+            >
+              All Products
+            </a>
+          </li>
           {categories.map((category) => (
             <CategoryItem
               key={category.id}
@@ -204,7 +217,8 @@ export default function ProductFilters({
 
       {/* Price Range */}
       <div>
-        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+        <h3 className="flex items-center gap-2 text-[10px] font-mono font-semibold text-secondary-400 uppercase tracking-widest pb-2 mb-3 border-b border-secondary-100">
+          <span className="w-3 h-px bg-primary-500 inline-block" />
           Price Range
         </h3>
         <div className="flex items-center gap-2">
@@ -216,10 +230,10 @@ export default function ProductFilters({
               placeholder="Min"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-full focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
-          <span className="text-secondary-300 text-sm">-</span>
+          <span className="text-secondary-300 text-sm">–</span>
           <div className="relative flex-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400 text-sm">$</span>
             <input
@@ -228,14 +242,14 @@ export default function ProductFilters({
               placeholder="Max"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-full pl-7 pr-2 py-2 text-sm border border-secondary-200 rounded-full focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
         </div>
         <button
           onClick={applyFilters}
           disabled={isPending}
-          className="mt-2 w-full text-sm py-1.5 bg-primary-500 text-secondary-900 rounded-md hover:bg-primary-400 transition-colors font-medium disabled:opacity-70 flex items-center justify-center gap-2"
+          className="mt-2 w-full text-sm py-2 bg-primary-500 text-secondary-900 hover:bg-primary-400 transition-colors font-medium font-mono tracking-wide rounded-full disabled:opacity-70 flex items-center justify-center gap-2"
         >
           {isPending && <Spinner />}
           {isPending ? 'Applying…' : 'Apply Price'}
@@ -244,10 +258,11 @@ export default function ProductFilters({
 
       {/* In Stock Toggle */}
       <div>
-        <h3 className="text-xs font-semibold text-secondary-400 uppercase tracking-wider mb-3">
+        <h3 className="flex items-center gap-2 text-[10px] font-mono font-semibold text-secondary-400 uppercase tracking-widest pb-2 mb-3 border-b border-secondary-100">
+          <span className="w-3 h-px bg-primary-500 inline-block" />
           Availability
         </h3>
-        <label className={cn('flex items-center gap-2 cursor-pointer', isPending && 'opacity-50 cursor-not-allowed')}>
+        <label className={cn('flex items-center gap-2.5 cursor-pointer', isPending && 'opacity-50 cursor-not-allowed')}>
           <input
             type="checkbox"
             checked={inStock}
@@ -264,7 +279,7 @@ export default function ProductFilters({
         <button
           onClick={resetFilters}
           disabled={isPending}
-          className="w-full text-sm py-2 border border-secondary-200 text-secondary-600 rounded-md hover:bg-secondary-50 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+          className="w-full text-sm py-2 border border-secondary-200 rounded-full text-secondary-600 hover:bg-secondary-50 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
         >
           {isPending && <Spinner />}
           Reset Filters

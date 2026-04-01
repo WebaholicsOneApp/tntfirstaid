@@ -23,6 +23,11 @@ export default async function ProfilePage() {
       <div className="container mx-auto px-4 py-12 md:py-16 max-w-3xl">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs text-secondary-400 mb-6">
+          <Link href="/account/dashboard" className="hover:text-primary-500 transition-colors mr-1" aria-label="Back to account">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
           <Link href="/account/dashboard" className="hover:text-primary-500 transition-colors">Account</Link>
           <span>/</span>
           <span className="text-secondary-600">Profile</span>

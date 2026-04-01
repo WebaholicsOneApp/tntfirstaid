@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCart } from '~/lib/cart/CartContext';
+import RecommendationGrid from '~/components/products/RecommendationGrid';
+import type { ProductListItem } from '~/types';
 
 interface OrderInfo {
   orderId: number | string;
@@ -19,8 +21,23 @@ function SuccessContent() {
   const orderNumberParam = searchParams.get('order_number');
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
 
   useEffect(() => {
+    // Save product IDs for recommendations before clearing cart
+    try {
+      const cartStr = localStorage.getItem('alpha-munitions-cart');
+      if (cartStr) {
+        const parsed = JSON.parse(cartStr);
+        const ids = (parsed?.items || [])
+          .map((i: { productId?: number }) => i.productId)
+          .filter(Boolean);
+        if (ids.length > 0) {
+          sessionStorage.setItem('alpha-checkout-product-ids', JSON.stringify(ids));
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
     // Clear the cart on successful checkout
     clearCart();
 
@@ -60,6 +77,27 @@ function SuccessContent() {
     fetchOrderInfo();
   }, [clearCart, sessionId, orderId, orderNumberParam]);
 
+  // Fetch recommendations based on recently ordered products
+  useEffect(() => {
+    try {
+      const savedIds = sessionStorage.getItem('alpha-checkout-product-ids');
+      if (!savedIds) return;
+      const productIds: number[] = JSON.parse(savedIds);
+      if (productIds.length === 0) return;
+
+      fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
+        .then(res => (res.ok ? res.json() : null))
+        .then(data => {
+          if (data?.recommendations?.length) {
+            setRecommendations(data.recommendations);
+          }
+        })
+        .catch(() => {});
+
+      sessionStorage.removeItem('alpha-checkout-product-ids');
+    } catch { /* ignore */ }
+  }, []);
+
   return (
     <div className="min-h-screen bg-secondary-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-secondary-100 p-8 text-center">
@@ -91,6 +129,22 @@ function SuccessContent() {
               Thank you for your purchase! We&apos;ve sent a confirmation email with your order details.
             </p>
           </>
+        )}
+
+        {/* You May Also Like */}
+        {recommendations.filter(r => r.inStock).length > 0 && (
+          <div className="mt-8 mb-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                Recommended
+              </span>
+            </div>
+            <h2 className="font-display text-lg font-bold text-secondary-900 mb-4">
+              Customers Also Bought
+            </h2>
+            <RecommendationGrid products={recommendations.filter(r => r.inStock).slice(0, 5)} />
+          </div>
         )}
 
         <div className="space-y-4">

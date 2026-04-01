@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getBatchedRecommendations } from '~/lib/data';
 
-const RECOMMENDATIONS_API_ENABLED = false;
+const RECOMMENDATIONS_API_ENABLED = true;
 const SLOW_RECOMMENDATIONS_REQUEST_MS = 250;
 
 /**

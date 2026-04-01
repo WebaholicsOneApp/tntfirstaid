@@ -1,16 +1,39 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import RecommendationGrid from '~/components/products/RecommendationGrid';
 import { ProductImage } from '~/components/ui/ProductImage';
 import { useCart } from '~/lib/cart/CartContext';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
+import type { ProductListItem } from '~/types';
 
 export default function CheckoutReviewPage() {
   const router = useRouter();
   const { cart, removeItem, updateQuantity } = useCart();
   const hasAnimated = useRef(false);
+  const recsFetched = useRef(false);
+  const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
+  const [recsLoading, setRecsLoading] = useState(false);
+
+  // Fetch recommendations once based on initial cart — stable across cart changes
+  useEffect(() => {
+    if (recsFetched.current) return;
+    if (cart.items.length === 0) return;
+    const productIds = cart.items.map(item => item.productId).filter(Boolean);
+    if (productIds.length === 0) return;
+
+    recsFetched.current = true;
+    setRecsLoading(true);
+    fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.recommendations) setRecommendations(data.recommendations);
+      })
+      .catch(() => {})
+      .finally(() => setRecsLoading(false));
+  }, [cart.items]);
 
   useEffect(() => {
     if (cart.items.length !== 0) {
@@ -139,7 +162,7 @@ export default function CheckoutReviewPage() {
                     >
                       <Link
                         href={`/product/${item.productSlug}`}
-                        className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-secondary-50 ring-1 ring-black/[0.04] transition-transform duration-300 hover:scale-[1.02] sm:h-24 sm:w-24"
+                        className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-white ring-1 ring-black/[0.04] transition-transform duration-300 hover:scale-[1.02] sm:h-24 sm:w-24"
                       >
                         {item.image ? (
                           <ProductImage
@@ -308,6 +331,18 @@ export default function CheckoutReviewPage() {
             </div>
           </div>
         </div>
+
+        {/* You May Also Like */}
+        {(recommendations.filter(r => r.inStock).length > 0 || recsLoading) && (
+          <section className="mt-16">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-px w-6 bg-primary-500" />
+              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
+            </div>
+            <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">Add to Your Order</h2>
+            <RecommendationGrid products={recommendations.filter(r => r.inStock).slice(0, 5)} loading={recsLoading} />
+          </section>
+        )}
       </div>
     </div>
   );
