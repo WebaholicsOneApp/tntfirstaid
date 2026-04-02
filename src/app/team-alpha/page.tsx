@@ -64,7 +64,7 @@ export default async function TeamAlphaPage() {
             {teamMembers.map((member) => (
               <div
                 key={member.name}
-                className="bg-white border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow"
+                className="bg-white border border-secondary-100 overflow-hidden rounded-2xl hover:shadow-lg transition-shadow"
               >
                 {/* Initials Avatar */}
                 <div className="aspect-[4/3] bg-secondary-50 flex items-center justify-center">
@@ -90,7 +90,7 @@ export default async function TeamAlphaPage() {
           </div>
 
           {/* Join the Team */}
-          <div className="mt-20 bg-secondary-50 p-10 md:p-16 text-center border border-secondary-100 relative">
+          <div className="mt-20 bg-secondary-50 p-10 md:p-16 text-center border border-secondary-100 rounded-2xl relative">
             <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-secondary-200" />
             <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-secondary-200" />
             <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-secondary-200" />

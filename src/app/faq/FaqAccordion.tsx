@@ -25,7 +25,7 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
         return (
           <div
             key={index}
-            className={`border transition-all ${
+            className={`border rounded-2xl transition-all ${
               isOpen
                 ? 'border-primary-500/30 bg-primary-500/5 shadow-sm'
                 : 'border-secondary-100 bg-secondary-50 hover:border-secondary-200'

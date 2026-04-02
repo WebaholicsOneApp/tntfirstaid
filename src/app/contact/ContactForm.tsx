@@ -88,7 +88,7 @@ export default function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100">
+      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 rounded-2xl">
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg
@@ -124,7 +124,7 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
+    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 rounded-2xl relative overflow-hidden">
       <h2 className="text-2xl font-display font-bold text-secondary-800 mb-8">
         Send a Message
       </h2>

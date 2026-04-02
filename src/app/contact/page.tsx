@@ -95,7 +95,7 @@ export default async function ContactPage() {
 
             <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
               {/* Map */}
-              <div className="bg-secondary-50 border border-secondary-100 overflow-hidden">
+              <div className="bg-secondary-50 border border-secondary-100 overflow-hidden rounded-2xl">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${storeConfig.mapsQuery}`}
                   target="_blank"

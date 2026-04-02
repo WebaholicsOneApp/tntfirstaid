@@ -179,7 +179,7 @@ export default async function DistributorsPage() {
                 {group.distributors.map((dist) => (
                   <div
                     key={dist.name}
-                    className="bg-white border border-secondary-100 p-5 hover:shadow-md transition-shadow flex flex-col gap-3"
+                    className="bg-white border border-secondary-100 p-5 rounded-2xl hover:shadow-md transition-shadow flex flex-col gap-3"
                   >
                     <h3 className="font-display font-bold text-secondary-900 text-sm">
                       {dist.name}
@@ -230,7 +230,7 @@ export default async function DistributorsPage() {
           ))}
 
           {/* Become a Distributor CTA */}
-          <section className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+          <section className="bg-secondary-900 p-10 md:p-16 text-center rounded-2xl relative overflow-hidden">
             <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
             <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
             <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />

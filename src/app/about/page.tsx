@@ -96,7 +96,7 @@ export default async function AboutPage() {
                   community.
                 </p>
               </div>
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/about/facility-1.jpg"
                   alt="Alpha Munitions team and facility"
@@ -112,7 +112,7 @@ export default async function AboutPage() {
         <section className="py-20 md:py-28 bg-secondary-50">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center max-w-6xl mx-auto">
-              <div className="relative aspect-[4/3] overflow-hidden md:order-first order-last">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl md:order-first order-last">
                 <Image
                   src="/images/about/facility-2.jpg"
                   alt="Alpha Munitions manufacturing facility"
@@ -166,7 +166,7 @@ export default async function AboutPage() {
                   to providing the best for the precision shooting community.
                 </p>
               </div>
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/about/shooting.jpg"
                   alt="Precision shooting with Alpha Munitions"
@@ -220,7 +220,7 @@ export default async function AboutPage() {
               {values.map((value) => (
                 <div
                   key={value.title}
-                  className="bg-secondary-50 p-8 border border-secondary-100 text-center"
+                  className="bg-secondary-50 p-8 border border-secondary-100 rounded-2xl text-center"
                 >
                   <div className="w-16 h-16 bg-primary-500/10 text-primary-600 rounded flex items-center justify-center mx-auto mb-6">
                     {value.icon}
@@ -240,7 +240,7 @@ export default async function AboutPage() {
         {/* CTA */}
         <section className="pb-20 md:pb-28">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="bg-secondary-900 p-10 md:p-16 text-center relative overflow-hidden">
+            <div className="bg-secondary-900 p-10 md:p-16 text-center rounded-2xl relative overflow-hidden">
               <div className="absolute top-6 left-6 h-8 w-8 border-t border-l border-primary-500/25" />
               <div className="absolute top-6 right-6 h-8 w-8 border-t border-r border-primary-500/25" />
               <div className="absolute bottom-6 left-6 h-8 w-8 border-b border-l border-primary-500/25" />

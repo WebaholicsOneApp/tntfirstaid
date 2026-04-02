@@ -45,7 +45,7 @@ export default function NewsGrid() {
           >
             <Link
               href={`/news/${article.slug}`}
-              className="group bg-white border border-secondary-100 overflow-hidden hover:shadow-lg transition-shadow block"
+              className="group bg-white border border-secondary-100 overflow-hidden rounded-2xl hover:shadow-lg transition-shadow block"
             >
               {/* Thumbnail */}
               <div className="aspect-[16/10] relative bg-secondary-100 overflow-hidden">

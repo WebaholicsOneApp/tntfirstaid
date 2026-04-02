@@ -100,7 +100,7 @@ export default function DealerSignUpForm() {
 
   if (status === 'success') {
     return (
-      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100">
+      <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 rounded-2xl">
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <svg
@@ -154,7 +154,7 @@ export default function DealerSignUpForm() {
     'text-[10px] font-bold text-secondary-400 uppercase tracking-widest ml-1';
 
   return (
-    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 relative overflow-hidden">
+    <div className="bg-white p-8 md:p-12 shadow-xl border border-secondary-100 rounded-2xl relative overflow-hidden">
 
       {status === 'error' && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
