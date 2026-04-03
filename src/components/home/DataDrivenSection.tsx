@@ -18,7 +18,7 @@ export default function DataDrivenSection() {
           {/* ── Left: full-bleed image ───────────────────── */}
           <AnimateIn
             animation="slide-right"
-            className="relative aspect-[4/3] sm:aspect-auto sm:min-h-[350px] lg:min-h-[540px] overflow-hidden rounded-r-[8rem]"
+            className="relative aspect-[4/3] sm:aspect-auto sm:min-h-[350px] lg:min-h-[540px] overflow-hidden rounded-3xl"
           >
             <Image
               src="/images/hero-homepage.jpg"

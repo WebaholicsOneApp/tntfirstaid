@@ -127,27 +127,30 @@ export async function checkRateLimit(
  * Get client IP from request headers
  */
 export function getClientIp(request: Request): string {
-  // Check various headers that might contain the real IP
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    return forwardedFor.split(',')[0]!.trim();
+  // Prioritize platform-set headers (cannot be spoofed by clients)
+
+  // Vercel (set by the platform, highest trust)
+  const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
+  if (vercelForwardedFor) {
+    return vercelForwardedFor.split(',')[0]!.trim();
   }
 
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) {
-    return realIp;
-  }
-
-  // Cloudflare
+  // Cloudflare (set by the platform)
   const cfConnectingIp = request.headers.get('cf-connecting-ip');
   if (cfConnectingIp) {
     return cfConnectingIp;
   }
 
-  // Vercel
-  const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
-  if (vercelForwardedFor) {
-    return vercelForwardedFor.split(',')[0]!.trim();
+  // x-real-ip (typically set by reverse proxy)
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp) {
+    return realIp;
+  }
+
+  // x-forwarded-for (can be spoofed — lowest priority fallback)
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    return forwardedFor.split(',')[0]!.trim();
   }
 
   return 'unknown';

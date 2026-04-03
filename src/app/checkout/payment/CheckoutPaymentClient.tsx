@@ -1,88 +1,162 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ProductImage } from '~/components/ui/ProductImage';
-import AuthorizeNetCheckoutForm from '~/components/checkout/AuthorizeNetCheckoutForm';
-import CheckoutAuthPrompt from '~/components/checkout/CheckoutAuthPrompt';
-import ExpressCheckout from '~/components/checkout/ExpressCheckout';
-import SavedDetailsCard from '~/components/checkout/SavedDetailsCard';
-import ShippingForm, { EMPTY_SHIPPING, type ShippingFields } from '~/components/checkout/ShippingForm';
-import StripeProvider from '~/components/checkout/StripeProvider';
-import { useAuth } from '~/lib/auth/AuthContext';
+import CheckoutStepIndicator from '~/components/checkout/CheckoutStepIndicator';
+import OrderSummary from '~/components/checkout/OrderSummary';
+import CardBrandIcon from '~/components/checkout/CardBrandIcon';
+import {
+  SESSION_KEY,
+  type CheckoutSessionData,
+  type PaymentConfig,
+  type PaymentMethod,
+} from '~/components/checkout/CheckoutTypes';
+import { Spinner } from '~/components/ui/Spinner';
 import { useCart } from '~/lib/cart/CartContext';
-import { storeConfig } from '~/lib/store-config';
-import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
+
+// Re-export PaymentConfig so page.tsx can import from here during transition
+export type { PaymentConfig };
 
 // ---------------------------------------------------------------------------
-// Shared types & constants
+// Accept.js global type
 // ---------------------------------------------------------------------------
 
-export const SESSION_KEY = 'alpha-checkout-data';
-
-export interface PaymentConfig {
-  providerType: 'stripe_connect' | 'authorize_net' | null;
-  status: 'ready' | 'needs_action' | 'not_configured';
-  stripePublishableKey: string | null;
-  stripeConnectAccountId: string | null;
-  authNetApiLoginId: string | null;
-  authNetClientKey: string | null;
-  authNetAcceptJsUrl: string | null;
-  expressCheckoutEnabled: boolean;
-  checkoutMode: string | null;
-  supportedMethods: string[];
-  devBypass?: boolean;
+declare global {
+  interface Window {
+    Accept?: {
+      dispatchData: (
+        secureData: {
+          authData: { clientKey: string; apiLoginID: string };
+          cardData: {
+            cardNumber: string;
+            month: string;
+            year: string;
+            cardCode: string;
+            zip?: string;
+            fullName?: string;
+          };
+        },
+        callback: (response: {
+          messages: {
+            resultCode: 'Ok' | 'Error';
+            message: Array<{ code: string; text: string }>;
+          };
+          opaqueData?: { dataDescriptor: string; dataValue: string };
+        }) => void,
+      ) => void;
+    };
+  }
 }
 
-export interface CheckoutSessionData {
-  shipping: {
-    name: string;
-    email: string;
-    phone?: string;
-    line1: string;
-    line2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country?: string;
+// ---------------------------------------------------------------------------
+// Card formatting helpers
+// ---------------------------------------------------------------------------
+
+function formatCardNumber(value: string): string {
+  return value
+    .replace(/\D/g, '')
+    .slice(0, 16)
+    .replace(/(.{4})/g, '$1 ')
+    .trim();
+}
+
+function formatExpiry(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 6);
+  if (digits.length <= 2) return digits;
+  const month = digits.slice(0, 2);
+  const year = digits.slice(2);
+  return `${month}/${year}`;
+}
+
+function parseExpiry(expiry: string): { month: string; year: string } | null {
+  const [monthRaw, yearRaw] = expiry.split('/');
+  const month = monthRaw?.trim() || '';
+  const year = yearRaw?.trim() || '';
+
+  if (!month || !year || month.length !== 2) return null;
+
+  const monthNumber = Number(month);
+  if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) return null;
+
+  if (year.length !== 2 && year.length !== 4) return null;
+
+  return {
+    month,
+    year: year.length === 2 ? `20${year}` : year,
   };
-  sendEmail: boolean;
 }
 
-export type { ShippingFields };
+function detectCardBrand(number: string): string {
+  const d = number.replace(/\D/g, '');
+  if (d.startsWith('4')) return 'visa';
+  if (/^5[1-5]/.test(d)) return 'mastercard';
+  if (/^3[47]/.test(d)) return 'amex';
+  if (d.startsWith('6011') || d.startsWith('65')) return 'discover';
+  return 'card';
+}
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 interface Props {
-  paymentConfig: PaymentConfig | null;
+  devBypass: boolean;
 }
 
-export default function CheckoutPaymentClient({ paymentConfig }: Props) {
+type ScriptStatus = 'idle' | 'loading' | 'ready' | 'error';
+
+export default function CheckoutPaymentClient({ devBypass }: Props) {
   const router = useRouter();
-  const { cart, clearCart } = useCart();
-  const { customer, isAuthenticated } = useAuth();
+  const { cart } = useCart();
 
-  const [isLoading, setIsLoading] = useState(false);
+  // Payment config fetched client-side for instant page load
+  const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(
+    devBypass ? { providerType: null, status: 'not_configured', stripePublishableKey: null, stripeConnectAccountId: null, authNetApiLoginId: null, authNetClientKey: null, authNetAcceptJsUrl: null, expressCheckoutEnabled: false, checkoutMode: null, supportedMethods: ['card'], devBypass: true } : null,
+  );
+
+  // Fetch payment config client-side (non-blocking)
+  useEffect(() => {
+    if (devBypass) return;
+    fetch('/api/checkout/config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) setPaymentConfig({ ...data, devBypass: false });
+      })
+      .catch(() => {});
+  }, [devBypass]);
+
+  // Session data loaded from sessionStorage
+  const [sessionData, setSessionData] = useState<CheckoutSessionData | null>(null);
+
+  // Payment method selection
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('credit_card');
+
+  // Card form state
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cardCode, setCardCode] = useState('');
+  const [cardFieldErrors, setCardFieldErrors] = useState<Set<string>>(new Set());
+
+  // Accept.js script loading
+  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('idle');
+
+  // Billing address state
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  const [billing, setBilling] = useState({
+    name: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: 'US',
+  });
+  const [billingErrors, setBillingErrors] = useState<Set<string>>(new Set());
+
+  // General state
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedDetailsApplied, setSavedDetailsApplied] = useState(false);
 
-  // Stripe-specific state
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
-  const [stripePublishableKey, setStripePublishableKey] = useState<string | null>(
-    paymentConfig?.stripePublishableKey ?? null,
-  );
-  const [stripeConnectAccountId, setStripeConnectAccountId] = useState<string | null>(
-    paymentConfig?.stripeConnectAccountId ?? null,
-  );
-  const [expressCheckoutReady, setExpressCheckoutReady] = useState(false);
-
-  // Shipping form state (single object for all fields)
-  const [shipping, setShipping] = useState<ShippingFields>(EMPTY_SHIPPING);
-  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(new Set());
+  // ---- Compute shipping cost from sessionStorage ----
+  const shippingCost = useMemo(() => {
+    if (!sessionData) return 0;
+    return sessionData.shippingMethod === 'standard' ? 0 : 0;
+  }, [sessionData]);
 
   // ---- Redirect to shop if cart is empty ----
   useEffect(() => {
@@ -93,463 +167,298 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
-  // ---- Restore shipping fields from sessionStorage (back-nav from confirm) ----
+  // ---- Read sessionStorage on mount; redirect to /checkout/shipping if no shipping data ----
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_KEY);
-      if (saved) {
-        const data = JSON.parse(saved) as CheckoutSessionData;
-        if (data.shipping) {
-          setShipping({
-            name: data.shipping.name || '',
-            email: data.shipping.email || '',
-            phone: data.shipping.phone || '',
-            line1: data.shipping.line1 || '',
-            line2: data.shipping.line2 || '',
-            city: data.shipping.city || '',
-            state: data.shipping.state || '',
-            postalCode: data.shipping.postalCode || '',
-            country: data.shipping.country || 'US',
-          });
-        }
+      if (!saved) {
+        router.push('/checkout/shipping');
+        return;
+      }
+      const data = JSON.parse(saved) as CheckoutSessionData;
+      if (!data.shipping || !data.shipping.name || !data.shipping.email) {
+        router.push('/checkout/shipping');
+        return;
+      }
+      setSessionData(data);
+
+      // Restore payment method if previously selected
+      if (data.paymentMethod) {
+        setSelectedMethod(data.paymentMethod);
+      }
+
+      // Restore billing address if previously entered
+      if (data.billing) {
+        setSameAsShipping(false);
+        setBilling({
+          name: data.billing.name,
+          line1: data.billing.line1,
+          line2: data.billing.line2 ?? '',
+          city: data.billing.city,
+          state: data.billing.state,
+          postalCode: data.billing.postalCode,
+          country: data.billing.country ?? 'US',
+        });
       }
     } catch {
-      // Ignore parse errors
+      router.push('/checkout/shipping');
     }
-  }, []);
+  }, [router]);
 
-  // ---- Derived values ----
-  const shippingCost = 0;
-  const estimatedTax = Math.round(cart.subtotal * 0.08);
-  const total = cart.subtotal + shippingCost + estimatedTax;
-
-  // ---- Create Stripe PaymentIntent (non-devBypass) ----
+  // ---- Load Accept.js when credit card is selected ----
   useEffect(() => {
-    const createPaymentIntent = async () => {
-      if (
-        cart.items.length === 0 ||
-        paymentConfig?.providerType !== 'stripe_connect' ||
-        paymentConfig.status !== 'ready'
-      ) {
-        setClientSecret(null);
-        setPaymentIntentId(null);
-        setExpressCheckoutReady(false);
+    if (selectedMethod !== 'credit_card') return undefined;
+    if (paymentConfig?.devBypass) return undefined;
+    if (!paymentConfig?.authNetAcceptJsUrl) return undefined;
+
+    const acceptJsUrl = paymentConfig.authNetAcceptJsUrl;
+
+    if (window.Accept) {
+      setScriptStatus('ready');
+      return undefined;
+    }
+
+    setScriptStatus('loading');
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      `script[data-authorize-net="${acceptJsUrl}"]`,
+    );
+
+    const handleLoad = () => setScriptStatus('ready');
+    const handleError = () => setScriptStatus('error');
+
+    if (existingScript) {
+      existingScript.addEventListener('load', handleLoad);
+      existingScript.addEventListener('error', handleError);
+      return () => {
+        existingScript.removeEventListener('load', handleLoad);
+        existingScript.removeEventListener('error', handleError);
+      };
+    }
+
+    const script = document.createElement('script');
+    script.src = acceptJsUrl;
+    script.async = true;
+    script.dataset.authorizeNet = acceptJsUrl;
+    script.onload = handleLoad;
+    script.onerror = handleError;
+    document.body.appendChild(script);
+
+    return () => {
+      script.onload = null;
+      script.onerror = null;
+    };
+  }, [selectedMethod, paymentConfig]);
+
+  const scriptMessage = useMemo(() => {
+    if (selectedMethod !== 'credit_card' || paymentConfig?.devBypass) return null;
+    if (scriptStatus === 'loading') return 'Loading secure card form...';
+    if (scriptStatus === 'error') return 'Unable to load the secure card form. Refresh the page and try again.';
+    return null;
+  }, [selectedMethod, scriptStatus, paymentConfig?.devBypass]);
+
+  // ---- Tokenize card via Accept.js ----
+  const tokenizeCard = useCallback(async (): Promise<{ dataDescriptor: string; dataValue: string }> => {
+    if (!sessionData?.shipping) throw new Error('Missing shipping data.');
+    if (!paymentConfig?.authNetApiLoginId || !paymentConfig?.authNetClientKey) {
+      throw new Error('Payment not configured.');
+    }
+
+    const parsedExpiry = parseExpiry(expiry);
+    if (!parsedExpiry) throw new Error('Enter a valid expiration date in MM/YY format.');
+    if (!window.Accept) throw new Error('Secure card form is not ready yet.');
+
+    return await new Promise<{ dataDescriptor: string; dataValue: string }>(
+      (resolve, reject) => {
+        window.Accept?.dispatchData(
+          {
+            authData: {
+              clientKey: paymentConfig.authNetClientKey!,
+              apiLoginID: paymentConfig.authNetApiLoginId!,
+            },
+            cardData: {
+              cardNumber: cardNumber.replace(/\D/g, ''),
+              month: parsedExpiry.month,
+              year: parsedExpiry.year,
+              cardCode: cardCode.replace(/\D/g, ''),
+              zip: (sameAsShipping ? sessionData.shipping.postalCode : billing.postalCode)?.trim(),
+              fullName: sessionData.shipping.name?.trim(),
+            },
+          },
+          (response) => {
+            if (response.messages.resultCode === 'Error' || !response.opaqueData) {
+              const message =
+                response.messages.message.map((item) => item.text).join(' ') ||
+                'Card verification failed.';
+              reject(new Error(message));
+              return;
+            }
+            resolve(response.opaqueData);
+          },
+        );
+      },
+    );
+  }, [cardNumber, expiry, cardCode, sessionData, paymentConfig]);
+
+  // ---- "Continue to Review" handler ----
+  const handleContinueToReview = useCallback(async () => {
+    setError(null);
+
+    if (!sessionData) {
+      setError('Session data missing. Please go back to shipping.');
+      return;
+    }
+
+    // Validate billing address if not same as shipping
+    if (!sameAsShipping) {
+      const bErrors = new Set<string>();
+      if (!billing.name.trim()) bErrors.add('billing_name');
+      if (!billing.line1.trim()) bErrors.add('billing_line1');
+      if (!billing.city.trim()) bErrors.add('billing_city');
+      if (!billing.state.trim()) bErrors.add('billing_state');
+      if (!billing.postalCode.trim()) bErrors.add('billing_postalCode');
+      if (bErrors.size > 0) {
+        setBillingErrors(bErrors);
+        setError('Please complete the billing address.');
+        return;
+      }
+      setBillingErrors(new Set());
+    }
+
+    // Helper to attach billing to session data
+    const attachBilling = (data: CheckoutSessionData) => {
+      if (sameAsShipping) {
+        delete data.billing;
+      } else {
+        data.billing = {
+          name: billing.name,
+          line1: billing.line1,
+          line2: billing.line2 || undefined,
+          city: billing.city,
+          state: billing.state,
+          postalCode: billing.postalCode,
+          country: billing.country || 'US',
+        };
+      }
+    };
+
+    if (selectedMethod === 'credit_card') {
+      // Validate card fields
+      const errors = new Set<string>();
+      if (cardNumber.replace(/\D/g, '').length < 13) errors.add('cardNumber');
+      if (cardCode.replace(/\D/g, '').length < 3) errors.add('cardCode');
+
+      const parsedExpiry = parseExpiry(expiry);
+      if (!parsedExpiry) errors.add('expiry');
+
+      if (errors.size > 0) {
+        setCardFieldErrors(errors);
+        setError('Please enter valid card details.');
+        return;
+      }
+      setCardFieldErrors(new Set());
+
+      // Detect card brand and last 4 before tokenization
+      const rawNumber = cardNumber.replace(/\D/g, '');
+      const brand = detectCardBrand(rawNumber);
+      const last4 = rawNumber.slice(-4);
+
+      // Dev bypass — skip tokenization
+      if (paymentConfig?.devBypass) {
+        const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
+        existingData.paymentMethod = 'credit_card';
+        existingData.cardBrand = brand;
+        existingData.cardLast4 = last4;
+        delete existingData.opaqueData;
+        attachBilling(existingData);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
+        router.push('/checkout/confirm');
         return;
       }
 
+      // Tokenize via Accept.js
+      setIsProcessing(true);
       try {
-        const response = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: cart.items.map((item) => ({
-              variationId: item.id,
-              productId: item.productId,
-              name: item.name,
-              variation: item.variation,
-              manufacturerNo: item.manufacturerNo,
-              price: item.price,
-              quantity: item.quantity,
-              imageUrl: item.image || undefined,
-            })),
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to initialize Stripe checkout.');
-        }
-
-        const data = (await response.json()) as {
-          clientSecret: string | null;
-          paymentIntentId: string | null;
-          publishableKey?: string | null;
-          stripeConnectAccountId?: string | null;
-        };
-
-        setClientSecret(data.clientSecret);
-        setPaymentIntentId(data.paymentIntentId);
-        setStripePublishableKey(
-          data.publishableKey || paymentConfig.stripePublishableKey,
-        );
-        setStripeConnectAccountId(
-          data.stripeConnectAccountId || paymentConfig.stripeConnectAccountId,
-        );
-        setExpressCheckoutReady(!!data.clientSecret);
+        const opaqueData = await tokenizeCard();
+        const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
+        existingData.paymentMethod = 'credit_card';
+        existingData.opaqueData = opaqueData;
+        existingData.cardBrand = brand;
+        existingData.cardLast4 = last4;
+        attachBilling(existingData);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
+        router.push('/checkout/confirm');
       } catch (err) {
-        console.error('Failed to create PaymentIntent:', err);
-        setExpressCheckoutReady(false);
+        setError(err instanceof Error ? err.message : 'Card verification failed.');
+      } finally {
+        setIsProcessing(false);
       }
-    };
+    } else {
+      // PrecisionPay — no tokenization needed
+      const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
+      existingData.paymentMethod = 'precision_pay';
+      delete existingData.opaqueData;
+      delete existingData.cardBrand;
+      delete existingData.cardLast4;
+      attachBilling(existingData);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
+      router.push('/checkout/confirm');
+    }
+  }, [selectedMethod, cardNumber, cardCode, expiry, sessionData, paymentConfig, tokenizeCard, router, sameAsShipping, billing]);
 
-    createPaymentIntent();
-  }, [cart.items, paymentConfig]);
-
-  // ---- Handlers ----
-
-  const handleShippingChange = useCallback(
-    (field: keyof ShippingFields, value: string) => {
-      setShipping((prev) => ({ ...prev, [field]: value }));
-      setShippingFieldErrors((prev) => {
-        if (!prev.size) return prev;
-        const n = new Set(prev);
-        n.delete(field);
-        return n;
-      });
-    },
-    [],
+  // ---- CTA button for sidebar ----
+  const ctaButton = (
+    <button
+      onClick={handleContinueToReview}
+      disabled={
+        isProcessing ||
+        (selectedMethod === 'credit_card' && !paymentConfig?.devBypass && scriptStatus !== 'ready')
+      }
+      className="group flex w-full items-center justify-center gap-3 rounded-full bg-secondary-900 py-4 pl-8 pr-5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-secondary-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      style={{
+        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+    >
+      {isProcessing ? (
+        <>
+          <Spinner />
+          <span>Verifying Card...</span>
+        </>
+      ) : (
+        <>
+          <span>Continue to Review</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </span>
+        </>
+      )}
+    </button>
   );
 
-  const handleExpressCheckoutSuccess = useCallback(
-    async (stripePaymentIntentId: string, paymentMethod: string) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetch('/api/express-checkout-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            stripePaymentIntentId,
-            customerEmail: shipping.email.trim() || 'express-checkout@alphamunitions.com',
-            paymentMethod,
-            items: cart.items.map((item) => ({
-              variationId: item.id,
-              productId: item.productId,
-              name: item.name,
-              variation: item.variation || null,
-              manufacturerNo: item.manufacturerNo || null,
-              imageUrl: item.image || null,
-              quantity: item.quantity,
-              price: item.price,
-              tax: Math.round(item.price * item.quantity * 0.08),
-            })),
-            subtotal: cart.subtotal,
-            shippingCost: 0,
-            tax: estimatedTax,
-            total,
-            shippingAddress: {
-              name: shipping.name.trim() || 'Express Checkout',
-              line1: shipping.line1.trim(),
-              line2: shipping.line2.trim() || undefined,
-              city: shipping.city.trim(),
-              state: shipping.state.trim(),
-              postalCode: shipping.postalCode.trim(),
-              country: shipping.country.trim() || 'US',
-            },
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to create order');
-        }
-
-        const orderData = (await response.json()) as {
-          orderId: number;
-          orderNumber?: string | null;
-        };
-
-        clearCart();
-
-        const params = new URLSearchParams({
-          payment_intent: stripePaymentIntentId,
-          order_id: String(orderData.orderId),
-        });
-
-        if (orderData.orderNumber) {
-          params.set('order_number', orderData.orderNumber);
-        }
-
-        router.push(`/checkout/success?${params.toString()}`);
-      } catch (err) {
-        console.error('Order creation error:', err);
-        setError('Payment succeeded but order creation failed. Please contact support.');
-        setIsLoading(false);
-      }
-    },
-    [cart, estimatedTax, total, clearCart, router, shipping],
-  );
-
-  const handleExpressCheckoutError = useCallback((message: string) => {
-    setError(message);
-  }, []);
-
-  const handleCheckout = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.items.map((item) => ({
-            variationId: item.id,
-            productId: item.productId,
-            name: item.name,
-            variation: item.variation,
-            manufacturerNo: item.manufacturerNo,
-            price: item.price,
-            quantity: item.quantity,
-            imageUrl: item.image || undefined,
-          })),
-          successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/checkout`,
-          ...(shipping.email.trim() ? { customerEmail: shipping.email.trim() } : {}),
-          ...(shipping.name.trim()
-            ? {
-                shippingAddress: {
-                  name: shipping.name.trim(),
-                  line1: shipping.line1.trim(),
-                  line2: shipping.line2.trim() || undefined,
-                  city: shipping.city.trim(),
-                  state: shipping.state.trim(),
-                  postalCode: shipping.postalCode.trim(),
-                  country: shipping.country.trim() || 'US',
-                },
-              }
-            : {}),
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = (await response.json()) as { message?: string };
-        throw new Error(errorData.message || 'Checkout failed');
-      }
-
-      const { url } = (await response.json()) as { url: string };
-      window.location.href = url;
-    } catch (err) {
-      console.error('Checkout error:', err);
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
-      setIsLoading(false);
-    }
-  };
-
-  const handleAuthorizeNetSuccess = useCallback(
-    ({ orderId, orderNumber }: { orderId: number; orderNumber: string | null }) => {
-      clearCart();
-      const params = new URLSearchParams({ order_id: String(orderId) });
-      if (orderNumber) params.set('order_number', orderNumber);
-      router.push(`/checkout/success?${params.toString()}`);
-    },
-    [clearCart, router],
-  );
-
-  const handleAuthorizeNetError = useCallback((message: string) => {
-    setError(message || null);
-  }, []);
-
-  // ---- "Use saved details" (opt-in prefill from account profile) ----
-  const handleUseSavedDetails = useCallback(() => {
-    if (!customer) return;
-    setShipping({
-      name: `${customer.firstName || ''}${customer.lastName ? ` ${customer.lastName}` : ''}`.trim(),
-      email: customer.email,
-      phone: customer.phone || '',
-      line1: customer.defaultAddress?.line1 || '',
-      line2: customer.defaultAddress?.line2 || '',
-      city: customer.defaultAddress?.city || '',
-      state: customer.defaultAddress?.state || '',
-      postalCode: customer.defaultAddress?.postalCode || '',
-      country: customer.defaultAddress?.country || 'US',
-    });
-    setSavedDetailsApplied(true);
-  }, [customer]);
-
-  const handleClearSavedDetails = useCallback(() => {
-    setShipping(EMPTY_SHIPPING);
-    setSavedDetailsApplied(false);
-  }, []);
-
-  // ---- "Continue to Review" (dev bypass → confirm page) ----
-  const handleContinueToReview = useCallback(() => {
-    const shipErrors = new Set<string>();
-    if (!shipping.name.trim()) shipErrors.add('name');
-    if (!shipping.email.trim()) shipErrors.add('email');
-    if (!shipping.line1.trim()) shipErrors.add('line1');
-    if (!shipping.city.trim()) shipErrors.add('city');
-    if (!shipping.state.trim()) shipErrors.add('state');
-    if (!shipping.postalCode.trim()) shipErrors.add('postalCode');
-    if (shipErrors.size > 0) {
-      setShippingFieldErrors(shipErrors);
-      setError('Please fill in all shipping fields before continuing.');
-      return;
-    }
-    setShippingFieldErrors(new Set());
-
-    const sessionData: CheckoutSessionData = {
-      shipping: {
-        name: shipping.name,
-        email: shipping.email,
-        phone: shipping.phone || undefined,
-        line1: shipping.line1,
-        line2: shipping.line2 || undefined,
-        city: shipping.city,
-        state: shipping.state,
-        postalCode: shipping.postalCode,
-        country: shipping.country || undefined,
-      },
-      sendEmail: false,
-    };
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-    router.push('/checkout/confirm');
-  }, [shipping, router]);
-
-  // ---- Render checkout panel (payment-specific content only) ----
-  const renderCheckoutPanel = () => {
-    if (paymentConfig?.devBypass) {
-      return (
-        <div className="space-y-4">
-          <button
-            onClick={handleContinueToReview}
-            className="group flex w-full items-center justify-center gap-3 rounded-full bg-secondary-900 py-4 pl-8 pr-5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-secondary-800 active:scale-[0.98]"
-            style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
-          >
-            <span>Continue to Review</span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:bg-white/20 group-hover:translate-x-0.5">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </span>
-          </button>
-
-          <div className="flex items-center justify-center gap-2 pt-1">
-            <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Test Mode
-            </span>
-          </div>
-        </div>
-      );
-    }
-
-    if (!paymentConfig || paymentConfig.status !== 'ready') {
-      return (
-        <div className="rounded-xl border border-amber-200/80 bg-amber-50 p-6 text-sm text-amber-800">
-          Checkout is not configured for this storefront yet. Please contact Alpha Munitions support.
-        </div>
-      );
-    }
-
-    if (
-      paymentConfig.providerType === 'authorize_net' &&
-      paymentConfig.authNetApiLoginId &&
-      paymentConfig.authNetClientKey &&
-      paymentConfig.authNetAcceptJsUrl
-    ) {
-      return (
-        <AuthorizeNetCheckoutForm
-          apiLoginId={paymentConfig.authNetApiLoginId}
-          clientKey={paymentConfig.authNetClientKey}
-          acceptJsUrl={paymentConfig.authNetAcceptJsUrl}
-          items={cart.items.map((item) => ({
-            variationId: item.id,
-            quantity: item.quantity,
-          }))}
-          totalLabel={formatCentsToDollars(total)}
-          shippingData={shipping}
-          onSuccess={handleAuthorizeNetSuccess}
-          onError={handleAuthorizeNetError}
-          onShippingFieldErrors={setShippingFieldErrors}
-        />
-      );
-    }
-
-    if (
-      paymentConfig.providerType === 'stripe_connect' &&
-      stripePublishableKey
-    ) {
-      const expressSlot =
-        paymentConfig.expressCheckoutEnabled &&
-        clientSecret &&
-        expressCheckoutReady &&
-        paymentIntentId ? (
-          <StripeProvider
-            clientSecret={clientSecret}
-            amount={total}
-            primaryColor={storeConfig.primaryColor}
-            publishableKey={stripePublishableKey}
-            stripeAccountId={stripeConnectAccountId}
-          >
-            <ExpressCheckout
-              items={cart.items}
-              subtotal={cart.subtotal}
-              tax={estimatedTax}
-              total={total}
-              paymentIntentId={paymentIntentId}
-              onSuccess={handleExpressCheckoutSuccess}
-              onError={handleExpressCheckoutError}
-            />
-          </StripeProvider>
-        ) : undefined;
-
-      return (
-        <CheckoutAuthPrompt
-          onGuestCheckout={handleCheckout}
-          onAuthCheckout={handleCheckout}
-          isLoading={isLoading}
-          expressCheckoutSlot={expressSlot}
-        />
-      );
-    }
-
-    return (
-      <div className="rounded-xl border border-red-200/80 bg-red-50 p-6 text-sm text-red-700">
-        This storefront payment configuration is incomplete.
-      </div>
-    );
-  };
-
-  // ---- Empty cart state ----
-  if (cart.items.length === 0) {
+  // ---- Empty cart / loading state (includes waiting for config fetch) ----
+  if (cart.items.length === 0 || !sessionData || (!devBypass && !paymentConfig)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAF8]">
         <div className="text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
-          <p className="text-secondary-600">Loading your cart...</p>
+          <p className="text-secondary-600">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // ---- Main render ----
+  // ---- Payment not configured ----
+  const isPaymentReady =
+    paymentConfig?.devBypass ||
+    (paymentConfig && paymentConfig.status === 'ready');
+
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
-        {/* Step indicator — 3 steps, step 2 active */}
-        <div className="mb-12 flex items-center justify-center gap-3">
-          <Link
-            href="/checkout"
-            className="flex items-center gap-2 transition-opacity hover:opacity-70"
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 font-mono text-[0.6rem] text-white">
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </span>
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-secondary-400">
-              Review
-            </span>
-          </Link>
-          <div className="h-px w-12 bg-secondary-900" />
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary-900 font-mono text-[0.6rem] text-white">
-              2
-            </span>
-            <span className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.2em] text-secondary-900">
-              Shipping
-            </span>
-          </div>
-          <div className="h-px w-12 bg-secondary-200" />
-          <div className="flex items-center gap-2 opacity-40">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary-200 font-mono text-[0.6rem] text-secondary-500">
-              3
-            </span>
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-secondary-400">
-              Confirm
-            </span>
-          </div>
-        </div>
+        {/* Step indicator */}
+        <CheckoutStepIndicator currentStep={2} />
 
         {/* Header */}
         <div className="mb-10 flex items-end justify-between">
@@ -561,17 +470,17 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
               </span>
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-secondary-900 sm:text-5xl">
-              Shipping & Payment
+              Payment Method
             </h1>
           </div>
           <Link
-            href="/checkout"
+            href="/checkout/shipping"
             className="hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase text-secondary-400 transition-colors hover:text-primary-600 sm:flex"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Review
+            Back to Shipping
           </Link>
         </div>
 
@@ -580,144 +489,385 @@ export default function CheckoutPaymentClient({ paymentConfig }: Props) {
           <div className="space-y-6 lg:col-span-2">
             {/* Back link mobile */}
             <Link
-              href="/checkout"
+              href="/checkout/shipping"
               className="flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase text-secondary-400 transition-colors hover:text-primary-600 sm:hidden"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Review
+              Back to Shipping
             </Link>
 
-            {/* Shipping form — ALWAYS visible for all providers */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="h-px w-6 bg-primary-500" />
-                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                    Shipping Information
-                  </span>
-                </div>
-
-                {/* Saved address card — shown for ALL providers when authenticated */}
-                {isAuthenticated && customer && (
-                  <div className="mb-6">
-                    <SavedDetailsCard
-                      customer={customer}
-                      isApplied={savedDetailsApplied}
-                      onApply={handleUseSavedDetails}
-                      onClear={handleClearSavedDetails}
-                    />
-                  </div>
-                )}
-
-                <ShippingForm data={shipping} onChange={handleShippingChange} fieldErrors={shippingFieldErrors} />
-              </div>
-            </div>
-
-            {/* Payment / Continue card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="h-px w-6 bg-primary-500" />
-                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                    Payment Method
-                  </span>
-                </div>
-
-                {error && (
-                  <div className="mb-6 rounded-xl border border-red-200/80 bg-red-50 p-4">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-
-                {renderCheckoutPanel()}
-              </div>
-            </div>
-          </div>
-
-          {/* Right column — Compact order summary */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-8">
+            {!isPaymentReady ? (
               <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                 <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                  <div className="mb-5 flex items-center gap-3">
-                    <div className="h-px w-6 bg-primary-500" />
-                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                      Your Order
-                    </span>
+                  <div className="rounded-xl border border-amber-200/80 bg-amber-50 p-6 text-sm text-amber-800">
+                    Checkout is not configured for this storefront yet. Please contact Alpha Munitions support.
                   </div>
-
-                  {/* Compact item list */}
-                  <ul className="mb-5 space-y-3">
-                    {cart.items.map((item) => (
-                      <li key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
-                          {item.image ? (
-                            <ProductImage
-                              src={getImageUrl(item.image)}
-                              alt={item.name}
-                              fill
-                              className="object-contain p-1"
-                              sizes="48px"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-secondary-200">
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[0.8rem] font-medium leading-tight text-secondary-900">
-                            {item.name}
-                          </p>
-                          <p className="font-mono text-[0.6rem] text-secondary-400">
-                            Qty {item.quantity}
-                          </p>
-                        </div>
-                        <span className="flex-shrink-0 text-[0.8rem] font-medium tabular-nums text-secondary-700">
-                          {formatCentsToDollars(item.price * item.quantity)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="border-t border-secondary-100 pt-4">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Subtotal</span>
-                        <span className="tabular-nums text-secondary-900">
-                          {formatCentsToDollars(cart.subtotal)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Shipping</span>
-                        <span className="text-green-600">FREE</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Est. Tax</span>
-                        <span className="font-mono tabular-nums text-secondary-900">
-                          {formatCentsToDollars(estimatedTax)}
-                        </span>
-                      </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Payment Method Selector Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                    <div className="mb-6 flex items-center gap-3">
+                      <div className="h-px w-6 bg-primary-500" />
+                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                        Select Payment Method
+                      </span>
                     </div>
 
-                    <div className="mt-4 border-t border-secondary-100 pt-4">
-                      <div className="flex items-baseline justify-between">
-                        <span className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
-                          Total
-                        </span>
-                        <span className="font-display text-2xl font-bold tracking-tight text-secondary-900">
-                          {formatCentsToDollars(total)}
-                        </span>
+                    {error && (
+                      <div className="mb-4 rounded-xl border border-red-200/80 bg-red-50 p-4">
+                        <p className="text-sm text-red-600">{error}</p>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      {/* Credit Card option */}
+                      <label
+                        className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                          selectedMethod === 'credit_card'
+                            ? 'border-primary-500 bg-primary-50/30'
+                            : 'border-secondary-200 hover:border-secondary-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="credit_card"
+                          checked={selectedMethod === 'credit_card'}
+                          onChange={() => setSelectedMethod('credit_card')}
+                          className="h-4 w-4 border-secondary-300 text-primary-500 focus:ring-primary-500"
+                        />
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <svg className="h-5 w-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                            <p className="text-sm font-medium text-secondary-900">Credit Card</p>
+                          </div>
+                          <div className="mt-2 ml-8 flex items-center gap-2">
+                            <CardBrandIcon brand="visa" />
+                            <CardBrandIcon brand="mastercard" />
+                            <CardBrandIcon brand="amex" />
+                            <CardBrandIcon brand="discover" />
+                            <CardBrandIcon brand="diners" />
+                            <CardBrandIcon brand="jcb" />
+                          </div>
+                        </div>
+                      </label>
+
+                      {/* Credit Card Form (animated expand) */}
+                      <div
+                        className={`grid transition-all duration-300 ease-out ${
+                          selectedMethod === 'credit_card' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="pt-0.5">
+                            {scriptMessage && (
+                              <div
+                                className={`mb-3 rounded-xl border p-3 text-sm ${
+                                  scriptStatus === 'error'
+                                    ? 'border-red-200 bg-red-50 text-red-700'
+                                    : 'border-secondary-200 bg-secondary-50 text-secondary-500'
+                                }`}
+                              >
+                                {scriptMessage}
+                              </div>
+                            )}
+
+                            <div className="rounded-2xl border border-secondary-100 bg-secondary-50/80 p-4">
+                              <div className="mb-4">
+                                <p className="font-display text-lg font-semibold text-secondary-900">
+                                  Card Details
+                                </p>
+                                <p className="text-xs text-secondary-500">
+                                  Card details are tokenized by Authorize.net before anything is sent to the server.
+                                </p>
+                              </div>
+
+                              <div className="space-y-4">
+                                <label className="block">
+                                  <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                    Card Number
+                                  </span>
+                                  <input
+                                    inputMode="numeric"
+                                    autoComplete="cc-number"
+                                    value={cardNumber}
+                                    onChange={(event) => {
+                                      setCardNumber(formatCardNumber(event.target.value));
+                                      if (cardFieldErrors.size) {
+                                        setCardFieldErrors((prev) => {
+                                          const n = new Set(prev);
+                                          n.delete('cardNumber');
+                                          return n;
+                                        });
+                                      }
+                                    }}
+                                    className={`w-full rounded-xl border ${cardFieldErrors.has('cardNumber') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                    placeholder="4111 1111 1111 1111"
+                                  />
+                                </label>
+
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <label className="block">
+                                    <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                      Expiration
+                                    </span>
+                                    <input
+                                      inputMode="numeric"
+                                      autoComplete="cc-exp"
+                                      value={expiry}
+                                      onChange={(event) => {
+                                        setExpiry(formatExpiry(event.target.value));
+                                        if (cardFieldErrors.size) {
+                                          setCardFieldErrors((prev) => {
+                                            const n = new Set(prev);
+                                            n.delete('expiry');
+                                            return n;
+                                          });
+                                        }
+                                      }}
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has('expiry') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                      placeholder="MM/YY"
+                                    />
+                                  </label>
+                                  <label className="block">
+                                    <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                      Security Code
+                                    </span>
+                                    <input
+                                      inputMode="numeric"
+                                      autoComplete="cc-csc"
+                                      value={cardCode}
+                                      onChange={(event) => {
+                                        setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4));
+                                        if (cardFieldErrors.size) {
+                                          setCardFieldErrors((prev) => {
+                                            const n = new Set(prev);
+                                            n.delete('cardCode');
+                                            return n;
+                                          });
+                                        }
+                                      }}
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has('cardCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                      placeholder="CVV"
+                                    />
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* PrecisionPay option */}
+                      <label
+                        className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                          selectedMethod === 'precision_pay'
+                            ? 'border-primary-500 bg-primary-50/30'
+                            : 'border-secondary-200 hover:border-secondary-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="precision_pay"
+                          checked={selectedMethod === 'precision_pay'}
+                          onChange={() => setSelectedMethod('precision_pay')}
+                          className="h-4 w-4 border-secondary-300 text-primary-500 focus:ring-primary-500"
+                        />
+                        <img
+                          src="/images/payment/precisionpay.png"
+                          alt="PrecisionPay"
+                          className="h-7"
+                        />
+                      </label>
+
+                      {/* PrecisionPay description (animated expand) */}
+                      <div
+                        className={`grid transition-all duration-300 ease-out ${
+                          selectedMethod === 'precision_pay' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="pt-0.5">
+                            <div className="rounded-2xl border border-secondary-100 bg-secondary-50/80 p-4">
+                              <div className="flex items-start gap-3">
+                                <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                  <p className="text-sm font-medium text-secondary-900">About PrecisionPay</p>
+                                  <p className="mt-1 text-sm text-secondary-600">
+                                    Pay directly from your bank account with PrecisionPay. Lower fees, no credit card needed.
+                                    You&apos;ll complete the bank transfer on the next step.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+
+                {/* Billing Address Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="h-px w-6 bg-primary-500" />
+                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                        Billing Address
+                      </span>
+                    </div>
+
+                    {/* Same as shipping toggle */}
+                    <label className="flex cursor-pointer items-center gap-3">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={sameAsShipping}
+                          onChange={(e) => {
+                            setSameAsShipping(e.target.checked);
+                            if (e.target.checked) setBillingErrors(new Set());
+                          }}
+                          className="peer sr-only"
+                        />
+                        <div className="h-5 w-5 rounded border-2 border-secondary-300 bg-white transition-colors peer-checked:border-primary-500 peer-checked:bg-primary-500 flex items-center justify-center">
+                          {sameAsShipping && (
+                            <svg className="h-3 w-3 text-secondary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm text-secondary-700">Same as shipping address</span>
+                    </label>
+
+                    {/* Billing form — animated expand */}
+                    <div className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                      <div className="overflow-hidden">
+                        <div className="pt-5 space-y-4">
+                          {/* Name */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Full Name</span>
+                            <input
+                              type="text"
+                              autoComplete="billing name"
+                              value={billing.name}
+                              onChange={(e) => {
+                                setBilling((p) => ({ ...p, name: e.target.value }));
+                                setBillingErrors((p) => { const n = new Set(p); n.delete('billing_name'); return n; });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has('billing_name') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              placeholder="Jane Smith"
+                            />
+                          </label>
+
+                          {/* Address line 1 */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Address</span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line1"
+                              value={billing.line1}
+                              onChange={(e) => {
+                                setBilling((p) => ({ ...p, line1: e.target.value }));
+                                setBillingErrors((p) => { const n = new Set(p); n.delete('billing_line1'); return n; });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has('billing_line1') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              placeholder="123 Main St"
+                            />
+                          </label>
+
+                          {/* Address line 2 */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Apt, Suite, etc. <span className="normal-case tracking-normal text-secondary-400">(optional)</span></span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line2"
+                              value={billing.line2}
+                              onChange={(e) => setBilling((p) => ({ ...p, line2: e.target.value }))}
+                              className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                              placeholder="Apt 4B"
+                            />
+                          </label>
+
+                          {/* City / State / ZIP */}
+                          <div className="grid grid-cols-3 gap-3">
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">City</span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level2"
+                                value={billing.city}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, city: e.target.value }));
+                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_city'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_city') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="Salt Lake City"
+                              />
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">State</span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level1"
+                                value={billing.state}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, state: e.target.value.toUpperCase().slice(0, 2) }));
+                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_state'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_state') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="UT"
+                                maxLength={2}
+                              />
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">ZIP</span>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="billing postal-code"
+                                value={billing.postalCode}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, postalCode: e.target.value.replace(/\D/g, '').slice(0, 10) }));
+                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_postalCode'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_postalCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="84101"
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dev bypass badge */}
+                {paymentConfig?.devBypass && (
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Test Mode
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Right column — Order Summary */}
+          <div className="lg:col-span-1">
+            <OrderSummary cart={cart} showItemDetails={false} shippingCost={shippingCost} ctaButton={isPaymentReady ? ctaButton : undefined} />
           </div>
         </div>
       </div>

@@ -1,43 +1,33 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import RecommendationGrid from '~/components/products/RecommendationGrid';
+import CheckoutStepIndicator from '~/components/checkout/CheckoutStepIndicator';
+import OrderSummary from '~/components/checkout/OrderSummary';
+import CardBrandIcon from '~/components/checkout/CardBrandIcon';
 import { ProductImage } from '~/components/ui/ProductImage';
-import PlaceOrderPanel from '~/components/checkout/PlaceOrderPanel';
-import { useCart } from '~/lib/cart/CartContext';
 import { formatCentsToDollars, getImageUrl } from '~/lib/utils';
-import type { ProductListItem } from '~/types';
+import PlaceOrderPanel from '~/components/checkout/PlaceOrderPanel';
+import { openPrecisionPayPortal } from '~/components/checkout/PrecisionPayPopup';
+import { useCart } from '~/lib/cart/CartContext';
+import {
+  SESSION_KEY,
+  type CheckoutSessionData,
+  type PaymentConfig,
+} from '~/components/checkout/CheckoutTypes';
 
 // ---------------------------------------------------------------------------
-// Shared types & constants (duplicated from payment client to avoid cross-imports)
-// ---------------------------------------------------------------------------
-
-const SESSION_KEY = 'alpha-checkout-data';
-
-interface CheckoutSessionData {
-  shipping: {
-    name: string;
-    email: string;
-    phone?: string;
-    line1: string;
-    line2?: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    country?: string;
-  };
-  sendEmail: boolean;
-}
-
-// ---------------------------------------------------------------------------
-// Component
+// Props
 // ---------------------------------------------------------------------------
 
 interface Props {
   devBypass: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 export default function CheckoutConfirmClient({ devBypass }: Props) {
   const router = useRouter();
@@ -45,24 +35,8 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
   const [checkoutData, setCheckoutData] = useState<CheckoutSessionData | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
-  const [recsLoading, setRecsLoading] = useState(false);
-
-  useEffect(() => {
-    if (cart.items.length === 0) return;
-    const productIds = cart.items.map(item => item.productId).filter(Boolean);
-    if (productIds.length === 0) return;
-
-    setRecsLoading(true);
-    fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.recommendations) setRecommendations(data.recommendations);
-      })
-      .catch(() => {})
-      .finally(() => setRecsLoading(false));
-  }, [cart.items]);
 
   // ---- Read checkout data from sessionStorage ----
   useEffect(() => {
@@ -70,16 +44,27 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
         const data = JSON.parse(saved) as CheckoutSessionData;
-        if (data.shipping?.name && data.shipping?.email) {
-          setCheckoutData(data);
-          setIsReady(true);
+
+        // Must have shipping data
+        if (!data.shipping?.name || !data.shipping?.email) {
+          router.replace('/checkout/shipping');
           return;
         }
+
+        // Must have a payment method selected
+        if (!data.paymentMethod) {
+          router.replace('/checkout/payment');
+          return;
+        }
+
+        setCheckoutData(data);
+        setIsReady(true);
+        return;
       }
     } catch {
       // fall through to redirect
     }
-    router.replace('/checkout/payment');
+    router.replace('/checkout/shipping');
   }, [router]);
 
   // ---- Redirect to shop if cart is empty ----
@@ -91,15 +76,64 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
-  // ---- Derived values ----
-  const shippingCost = 0;
-  const estimatedTax = Math.round(cart.subtotal * 0.08);
-  const total = cart.subtotal + shippingCost + estimatedTax;
+  // ---- Compute shipping cost from session ----
+  const shippingCost = useMemo(() => {
+    if (!checkoutData) return 0;
+    return checkoutData.shippingMethod === 'standard' ? 0 : 0;
+  }, [checkoutData]);
 
-  // ---- Handlers ----
-  const handlePlaceOrderSuccess = useCallback(
-    ({ orderId, orderNumber }: { orderId: number; orderNumber: string | null }) => {
-      // Clear sessionStorage first
+  // ---- Place Order: Credit Card (Authorize.net) ----
+  const handlePlaceOrderCC = useCallback(async () => {
+    if (!checkoutData) return;
+
+    // Ensure opaqueData exists for credit card payments
+    if (!checkoutData.opaqueData) {
+      setError('Payment information is missing. Please go back and re-enter your card details.');
+      router.replace('/checkout/payment');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/authorize-net/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: checkoutData.shipping.email,
+          phoneNumber: checkoutData.shipping.phone,
+          items: cart.items.map((item) => ({
+            variationId: item.id,
+            quantity: item.quantity,
+          })),
+          opaqueData: checkoutData.opaqueData,
+          shippingAddress: {
+            name: checkoutData.shipping.name,
+            line1: checkoutData.shipping.line1,
+            line2: checkoutData.shipping.line2,
+            city: checkoutData.shipping.city,
+            state: checkoutData.shipping.state,
+            postalCode: checkoutData.shipping.postalCode,
+            country: checkoutData.shipping.country,
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setError(data.error || 'Payment failed. Please try again.');
+        try {
+          const existing = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+          delete existing.opaqueData;
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(existing));
+        } catch {}
+        setIsLoading(false);
+        return;
+      }
+
+      // Success — clear session + cart, navigate to success page
       try {
         sessionStorage.removeItem(SESSION_KEY);
       } catch {
@@ -108,16 +142,133 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
       clearCart();
 
-      const params = new URLSearchParams({ order_id: String(orderId) });
-      if (orderNumber) params.set('order_number', orderNumber);
+      const params = new URLSearchParams({ order_id: String(data.orderId) });
+      if (data.orderNumber) params.set('order_number', data.orderNumber);
       router.push(`/checkout/success?${params.toString()}`);
-    },
-    [clearCart, router],
-  );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      try {
+        const existing = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+        delete existing.opaqueData;
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(existing));
+      } catch {}
+      setIsLoading(false);
+    }
+  }, [checkoutData, cart.items, clearCart, router]);
 
-  const handlePlaceOrderError = useCallback((message: string) => {
-    setError(message);
-  }, []);
+  // ---- Place Order: PrecisionPay ----
+  const handlePlaceOrderPP = useCallback(async () => {
+    if (!checkoutData) return;
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const displayAmount = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      // Dev bypass: skip PP portal, go straight to order creation
+      if (devBypass) {
+        const res = await fetch('/api/checkout/precision-pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            devBypass: true,
+            amount: displayAmount,
+            customerEmail: checkoutData.shipping.email,
+            phoneNumber: checkoutData.shipping.phone || undefined,
+            items: cart.items.map((item) => ({
+              variationId: item.id,
+              quantity: item.quantity,
+            })),
+            shippingAddress: {
+              name: checkoutData.shipping.name,
+              line1: checkoutData.shipping.line1,
+              line2: checkoutData.shipping.line2 || undefined,
+              city: checkoutData.shipping.city,
+              state: checkoutData.shipping.state,
+              postalCode: checkoutData.shipping.postalCode,
+              country: checkoutData.shipping.country || 'US',
+            },
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.orderId) {
+          throw new Error(data.error || 'Failed to create order');
+        }
+
+        try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+        clearCart();
+        const params = new URLSearchParams({ order_id: String(data.orderId) });
+        if (data.orderNumber) params.set('order_number', data.orderNumber);
+        router.push(`/checkout/success?${params.toString()}`);
+        return;
+      }
+
+      // Step 1: Get merchant nonce from server
+      const nonceRes = await fetch('/api/checkout/precision-pay/nonce');
+      if (!nonceRes.ok) {
+        throw new Error('Failed to initialize PrecisionPay checkout');
+      }
+      const nonceData = await nonceRes.json();
+
+      // Step 2: Open PP portal iframe
+      const amountDollars = (displayAmount / 100).toFixed(2);
+
+      const result = await openPrecisionPayPortal({
+        merchantNonce: nonceData.merchantNonce,
+        amountDollars,
+        env: nonceData.env,
+        checkoutPortalUrl: nonceData.checkoutPortalUrl,
+      });
+
+      if (!result.success) {
+        setError(result.error || 'Payment was not completed.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 3: Complete payment + create order via API route
+      const res = await fetch('/api/checkout/precision-pay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          precisionPayToken: result.precisionPayToken || undefined,
+          plaidData: result.plaidData || undefined,
+          amount: displayAmount,
+          customerEmail: checkoutData.shipping.email,
+          phoneNumber: checkoutData.shipping.phone || undefined,
+          items: cart.items.map((item) => ({
+            variationId: item.id,
+            quantity: item.quantity,
+          })),
+          shippingAddress: {
+            name: checkoutData.shipping.name,
+            line1: checkoutData.shipping.line1,
+            line2: checkoutData.shipping.line2 || undefined,
+            city: checkoutData.shipping.city,
+            state: checkoutData.shipping.state,
+            postalCode: checkoutData.shipping.postalCode,
+            country: checkoutData.shipping.country || 'US',
+          },
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.orderId) {
+        throw new Error(data.error || 'Failed to create order');
+      }
+
+      try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+      clearCart();
+      const params = new URLSearchParams({ order_id: String(data.orderId) });
+      if (data.orderNumber) params.set('order_number', data.orderNumber);
+      router.push(`/checkout/success?${params.toString()}`);
+    } catch (err) {
+      console.error('[PrecisionPay] Error:', err);
+      setError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
+      setIsLoading(false);
+    }
+  }, [devBypass, checkoutData, cart.items, clearCart, router]);
 
   // ---- Loading / redirect states ----
   if (!isReady || !checkoutData) {
@@ -142,49 +293,229 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     );
   }
 
-  // ---- Main render ----
+  // ---- Derived values ----
+  const paymentMethod = checkoutData.paymentMethod;
+  const cardBrand = checkoutData.cardBrand || 'card';
+  const cardLast4 = checkoutData.cardLast4 || '****';
+
+  // ---- Branded Pay button ----
+  const payButton = paymentMethod === 'credit_card' ? (
+    <button
+      type="button"
+      disabled={isLoading}
+      onClick={devBypass ? undefined : handlePlaceOrderCC}
+      className="group flex w-full items-center justify-center gap-3 rounded-full bg-secondary-900 py-4 pl-8 pr-5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-secondary-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {isLoading ? (
+        <>
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <span>Processing...</span>
+        </>
+      ) : (
+        <>
+          <span className="flex items-center gap-2">
+            <CardBrandIcon brand={cardBrand} className="h-5" />
+            <span>Pay with &bull;&bull;&bull;{cardLast4}</span>
+          </span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </span>
+        </>
+      )}
+    </button>
+  ) : (
+    <button
+      type="button"
+      disabled={isLoading}
+      onClick={handlePlaceOrderPP}
+      className="group flex w-full items-center justify-center gap-3 rounded-full bg-[#E5521A] py-4 pl-8 pr-5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-[#cc4a17] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {isLoading ? (
+        <>
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <span>Processing...</span>
+        </>
+      ) : (
+        <>
+          <span className="flex items-center gap-2">
+            <img src="/images/payment/precisionpay.png" alt="PrecisionPay" className="h-4 brightness-0 invert" />
+            <span>Checkout</span>
+          </span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </span>
+        </>
+      )}
+    </button>
+  );
+
+  // ---- devBypass: fall back to the legacy PlaceOrderPanel ----
+  if (devBypass) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF8]">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
+          <CheckoutStepIndicator currentStep={3} />
+
+          {/* Header */}
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <div className="mb-3 flex items-center gap-3">
+                <div className="h-px w-8 bg-primary-500" />
+                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                  Checkout
+                </span>
+              </div>
+              <h1 className="font-display text-4xl font-bold tracking-tight text-secondary-900 sm:text-5xl">
+                Review Order
+              </h1>
+            </div>
+            <Link
+              href="/checkout/payment"
+              className="hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase text-secondary-400 transition-colors hover:text-primary-600 sm:flex"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Payment
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-6 lg:col-span-2">
+              {/* Dev bypass: legacy PlaceOrderPanel */}
+              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="h-px w-6 bg-primary-500" />
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      Place Order (Dev Bypass)
+                    </span>
+                  </div>
+
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      Test Mode
+                    </span>
+                    <span className="text-sm text-secondary-500">
+                      No payment will be processed
+                    </span>
+                  </div>
+
+                  {error && (
+                    <div className="mb-6 rounded-xl border border-red-200/80 bg-red-50 p-4">
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
+
+                  <PlaceOrderPanel
+                    items={cart.items}
+                    email={checkoutData.shipping.email}
+                    phone={checkoutData.shipping.phone}
+                    shippingAddress={{
+                      name: checkoutData.shipping.name,
+                      line1: checkoutData.shipping.line1,
+                      line2: checkoutData.shipping.line2,
+                      city: checkoutData.shipping.city,
+                      state: checkoutData.shipping.state,
+                      postalCode: checkoutData.shipping.postalCode,
+                      country: checkoutData.shipping.country,
+                    }}
+                    onSuccess={({ orderId, orderNumber }) => {
+                      try {
+                        sessionStorage.removeItem(SESSION_KEY);
+                      } catch {
+                        // Ignore
+                      }
+                      clearCart();
+                      const params = new URLSearchParams({ order_id: String(orderId) });
+                      if (orderNumber) params.set('order_number', orderNumber);
+                      router.push(`/checkout/success?${params.toString()}`);
+                    }}
+                    onError={(message) => setError(message)}
+                  />
+                </div>
+              </div>
+
+              {/* Order Items card */}
+              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="h-px w-6 bg-primary-500" />
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      Order Items
+                    </span>
+                  </div>
+                  <ul className="space-y-3">
+                    {cart.items.map((item) => (
+                      <li key={item.id} className="flex items-center gap-3">
+                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
+                          {item.image ? (
+                            <ProductImage
+                              src={getImageUrl(item.image)}
+                              alt={item.name}
+                              fill
+                              className="object-contain p-1"
+                              sizes="48px"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-secondary-200">
+                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[0.8rem] font-medium leading-tight text-secondary-900">
+                            {item.name}
+                          </p>
+                          {item.packCount && (
+                            <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                              Quantity: {item.packCount}
+                            </p>
+                          )}
+                          {item.variation && !item.packCount && (
+                            <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                              {item.variantType ? `${item.variantType}: ` : ''}{item.variation}
+                            </p>
+                          )}
+                          {item.variationTwo && (
+                            <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                              {item.variantTypeTwo ? `${item.variantTypeTwo}: ` : ''}{item.variationTwo}
+                            </p>
+                          )}
+                          <p className="font-mono text-[0.6rem] text-secondary-400">Qty {item.quantity}</p>
+                        </div>
+                        <span className="flex-shrink-0 text-[0.8rem] font-medium tabular-nums text-secondary-700">
+                          {formatCentsToDollars(item.price * item.quantity)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column — Order summary */}
+            <div className="lg:col-span-1">
+              <OrderSummary cart={cart} showItemDetails={false} shippingCost={shippingCost} ctaButton={payButton} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Main render (production / non-bypass) ----
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
-        {/* Step indicator — 3 steps, step 3 active */}
-        <div className="mb-12 flex items-center justify-center gap-3">
-          <Link
-            href="/checkout"
-            className="flex items-center gap-2 transition-opacity hover:opacity-70"
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 font-mono text-[0.6rem] text-white">
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </span>
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-secondary-400">
-              Review
-            </span>
-          </Link>
-          <div className="h-px w-12 bg-green-600" />
-          <Link
-            href="/checkout/payment"
-            className="flex items-center gap-2 transition-opacity hover:opacity-70"
-          >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 font-mono text-[0.6rem] text-white">
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </span>
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-secondary-400">
-              Shipping
-            </span>
-          </Link>
-          <div className="h-px w-12 bg-secondary-900" />
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary-900 font-mono text-[0.6rem] text-white">
-              3
-            </span>
-            <span className="font-mono text-[0.65rem] font-medium uppercase tracking-[0.2em] text-secondary-900">
-              Confirm
-            </span>
-          </div>
-        </div>
+        <CheckoutStepIndicator currentStep={3} />
 
         {/* Header */}
         <div className="mb-10 flex items-end justify-between">
@@ -196,7 +527,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               </span>
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-secondary-900 sm:text-5xl">
-              Confirm Order
+              Review Order
             </h1>
           </div>
           <Link
@@ -206,7 +537,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Shipping
+            Back to Payment
           </Link>
         </div>
 
@@ -221,10 +552,17 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Shipping
+              Back to Payment
             </Link>
 
-            {/* Shipping address card (read-only) */}
+            {/* Error */}
+            {error && (
+              <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
+
+            {/* Shipping Address card (read-only) */}
             <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
               <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
                 <div className="mb-4 flex items-center justify-between">
@@ -235,7 +573,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                     </span>
                   </div>
                   <Link
-                    href="/checkout/payment"
+                    href="/checkout/shipping"
                     className="font-mono text-[0.6rem] tracking-[0.1em] uppercase text-primary-600 transition-colors hover:text-primary-700"
                   >
                     Edit
@@ -262,161 +600,134 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               </div>
             </div>
 
-            {/* Payment method card */}
+            {/* Shipping Method card (read-only) */}
+            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-px w-6 bg-primary-500" />
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      Shipping Method
+                    </span>
+                  </div>
+                  <Link
+                    href="/checkout/shipping"
+                    className="font-mono text-[0.6rem] tracking-[0.1em] uppercase text-primary-600 transition-colors hover:text-primary-700"
+                  >
+                    Edit
+                  </Link>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-secondary-700">
+                  <svg className="h-5 w-5 flex-shrink-0 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  <div>
+                    <p className="font-medium text-secondary-900">Standard</p>
+                    <p className="text-green-600">FREE</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Method card (read-only) */}
+            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-px w-6 bg-primary-500" />
+                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      Payment Method
+                    </span>
+                  </div>
+                  <Link
+                    href="/checkout/payment"
+                    className="font-mono text-[0.6rem] tracking-[0.1em] uppercase text-primary-600 transition-colors hover:text-primary-700"
+                  >
+                    Edit
+                  </Link>
+                </div>
+
+                {paymentMethod === 'credit_card' && (
+                  <div className="flex items-center gap-3 text-sm text-secondary-700">
+                    <CardBrandIcon brand={cardBrand} className="h-6" />
+                    <p className="font-medium text-secondary-900">
+                      Card ending in {cardLast4}
+                    </p>
+                  </div>
+                )}
+
+                {paymentMethod === 'precision_pay' && (
+                  <img src="/images/payment/precisionpay.png" alt="PrecisionPay" className="h-6" />
+                )}
+              </div>
+            </div>
+
+            {/* Order Items card */}
             <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
               <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="h-px w-6 bg-primary-500" />
                   <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                    Payment Method
+                    Order Items
                   </span>
                 </div>
-                {devBypass && (
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Test Mode
-                    </span>
-                    <span className="text-sm text-secondary-500">
-                      No payment will be processed
-                    </span>
-                  </div>
-                )}
+                <ul className="space-y-3">
+                  {cart.items.map((item) => (
+                    <li key={item.id} className="flex items-center gap-3">
+                      <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
+                        {item.image ? (
+                          <ProductImage
+                            src={getImageUrl(item.image)}
+                            alt={item.name}
+                            fill
+                            className="object-contain p-1"
+                            sizes="48px"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-secondary-200">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[0.8rem] font-medium leading-tight text-secondary-900">
+                          {item.name}
+                        </p>
+                        {item.packCount && (
+                          <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                            Quantity: {item.packCount}
+                          </p>
+                        )}
+                        {item.variation && !item.packCount && (
+                          <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                            {item.variantType ? `${item.variantType}: ` : ''}{item.variation}
+                          </p>
+                        )}
+                        {item.variationTwo && (
+                          <p className="mt-0.5 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
+                            {item.variantTypeTwo ? `${item.variantTypeTwo}: ` : ''}{item.variationTwo}
+                          </p>
+                        )}
+                        <p className="font-mono text-[0.6rem] text-secondary-400">Qty {item.quantity}</p>
+                      </div>
+                      <span className="flex-shrink-0 text-[0.8rem] font-medium tabular-nums text-secondary-700">
+                        {formatCentsToDollars(item.price * item.quantity)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
-            {/* Place Order card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="h-px w-6 bg-primary-500" />
-                  <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                    Place Order
-                  </span>
-                </div>
-
-                {error && (
-                  <div className="mb-6 rounded-xl border border-red-200/80 bg-red-50 p-4">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-
-                <PlaceOrderPanel
-                  items={cart.items}
-                  email={checkoutData.shipping.email}
-                  phone={checkoutData.shipping.phone}
-                  shippingAddress={{
-                    name: checkoutData.shipping.name,
-                    line1: checkoutData.shipping.line1,
-                    line2: checkoutData.shipping.line2,
-                    city: checkoutData.shipping.city,
-                    state: checkoutData.shipping.state,
-                    postalCode: checkoutData.shipping.postalCode,
-                    country: checkoutData.shipping.country,
-                  }}
-                  onSuccess={handlePlaceOrderSuccess}
-                  onError={handlePlaceOrderError}
-                />
-              </div>
-            </div>
           </div>
 
           {/* Right column — Order summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-8">
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                  <div className="mb-5 flex items-center gap-3">
-                    <div className="h-px w-6 bg-primary-500" />
-                    <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                      Your Order
-                    </span>
-                  </div>
-
-                  {/* Compact item list */}
-                  <ul className="mb-5 space-y-3">
-                    {cart.items.map((item) => (
-                      <li key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
-                          {item.image ? (
-                            <ProductImage
-                              src={getImageUrl(item.image)}
-                              alt={item.name}
-                              fill
-                              className="object-contain p-1"
-                              sizes="48px"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-secondary-200">
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[0.8rem] font-medium leading-tight text-secondary-900">
-                            {item.name}
-                          </p>
-                          <p className="font-mono text-[0.6rem] text-secondary-400">
-                            Qty {item.quantity}
-                          </p>
-                        </div>
-                        <span className="flex-shrink-0 text-[0.8rem] font-medium tabular-nums text-secondary-700">
-                          {formatCentsToDollars(item.price * item.quantity)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="border-t border-secondary-100 pt-4">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Subtotal</span>
-                        <span className="tabular-nums text-secondary-900">
-                          {formatCentsToDollars(cart.subtotal)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Shipping</span>
-                        <span className="text-green-600">FREE</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Est. Tax</span>
-                        <span className="font-mono tabular-nums text-secondary-900">
-                          {formatCentsToDollars(estimatedTax)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 border-t border-secondary-100 pt-4">
-                      <div className="flex items-baseline justify-between">
-                        <span className="font-mono text-[0.6rem] uppercase tracking-[0.3em] text-secondary-400">
-                          Total
-                        </span>
-                        <span className="font-display text-2xl font-bold tracking-tight text-secondary-900">
-                          {formatCentsToDollars(total)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <OrderSummary cart={cart} showItemDetails={false} shippingCost={shippingCost} ctaButton={payButton} />
           </div>
         </div>
-
-        {/* You May Also Like */}
-        {(recommendations.filter(r => r.inStock).length > 0 || recsLoading) && (
-          <section className="mt-16">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="h-px w-6 bg-primary-500" />
-              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
-            </div>
-            <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">Add to Your Order</h2>
-            <RecommendationGrid products={recommendations.filter(r => r.inStock).slice(0, 5)} loading={recsLoading} />
-          </section>
-        )}
       </div>
     </div>
   );

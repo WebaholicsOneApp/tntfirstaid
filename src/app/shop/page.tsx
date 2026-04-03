@@ -180,8 +180,8 @@ function PaginationLink({
       aria-current={isActive ? 'page' : undefined}
       className={
         isActive
-          ? 'w-10 h-11 flex items-center justify-center bg-primary-500 text-secondary-900 text-sm font-mono font-semibold tracking-tight'
-          : 'w-10 h-11 flex items-center justify-center border border-secondary-200 text-secondary-500 text-sm hover:border-secondary-300 hover:text-secondary-800 hover:bg-secondary-50 transition-colors'
+          ? 'w-10 h-11 flex items-center justify-center bg-primary-500 text-secondary-900 text-sm font-mono font-semibold tracking-tight rounded-lg'
+          : 'w-10 h-11 flex items-center justify-center border border-secondary-200 text-secondary-500 text-sm hover:border-secondary-300 hover:text-secondary-800 hover:bg-secondary-50 transition-colors rounded-lg'
       }
     >
       {children}

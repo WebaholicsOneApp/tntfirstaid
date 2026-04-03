@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ProductListItem } from '~/types';
 import ProductCard from '~/components/products/ProductCard';
+import QuickAddModal from '~/components/products/QuickAddModal';
 import AnimateIn from '~/components/ui/AnimateIn';
 
 interface ReamersSectionProps {
@@ -47,6 +48,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [, setScrollState] = useState({ left: false, right: true });
+  const [quickAddProduct, setQuickAddProduct] = useState<ProductListItem | null>(null);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
@@ -70,6 +72,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
   const items = hasDbProducts ? products.slice(0, 8) : placeholderReamers;
 
   return (
+    <>
     <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 
@@ -108,7 +111,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
             {hasDbProducts ? (
               (items as ProductListItem[]).map((product) => (
                 <div key={product.id} className="flex-shrink-0 w-[220px] sm:w-[260px] snap-start">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} onQuickAdd={() => setQuickAddProduct(product)} />
                 </div>
               ))
             ) : (
@@ -163,5 +166,10 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
 
       </div>
     </section>
+
+    {quickAddProduct && (
+      <QuickAddModal product={quickAddProduct} onClose={() => setQuickAddProduct(null)} />
+    )}
+  </>
   );
 }

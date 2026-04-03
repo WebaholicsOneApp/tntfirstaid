@@ -8,6 +8,10 @@ export interface CartItem {
   productSlug: string;
   name: string;
   variation?: string | null;
+  variantType?: string | null;
+  variationTwo?: string | null;
+  variantTypeTwo?: string | null;
+  packCount?: number | null;
   manufacturerNo?: string | null;
   price: number; // in cents
   quantity: number;

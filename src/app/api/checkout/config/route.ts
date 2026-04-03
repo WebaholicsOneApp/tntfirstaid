@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp, rateLimitResponse } from '~/lib/ratelimit';
 import { getApiClient } from '~/lib/api-client';
 
 interface StorefrontCheckoutConfigResponse {
@@ -17,7 +18,11 @@ interface StorefrontCheckoutConfigResponse {
   };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const clientIp = getClientIp(request);
+  const rateLimit = await checkRateLimit(clientIp, 'api');
+  if (!rateLimit.success) return rateLimitResponse(rateLimit);
+
   try {
     const config = await getApiClient().getConfig<StorefrontCheckoutConfigResponse>();
 

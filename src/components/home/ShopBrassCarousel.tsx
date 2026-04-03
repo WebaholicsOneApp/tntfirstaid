@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ProductListItem } from '~/types';
 import ProductCard from '~/components/products/ProductCard';
+import QuickAddModal from '~/components/products/QuickAddModal';
 import AnimateIn from '~/components/ui/AnimateIn';
 
 interface ShopBrassGridProps {
