@@ -48,6 +48,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [, setScrollState] = useState({ left: false, right: true });
+  const [quickAddProduct, setQuickAddProduct] = useState<ProductListItem | null>(null);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
@@ -71,6 +72,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
   const items = hasDbProducts ? products.slice(0, 12) : placeholderBrass;
 
   return (
+    <>
     <section className="relative overflow-hidden bg-white py-20 sm:py-28">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 
@@ -109,7 +111,7 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
             {hasDbProducts ? (
               (items as ProductListItem[]).map((product) => (
                 <div key={product.id} className="flex-shrink-0 w-[200px] sm:w-[220px] snap-start">
-                  <ProductCard product={product} />
+                  <ProductCard product={product} onQuickAdd={() => setQuickAddProduct(product)} />
                 </div>
               ))
             ) : (
@@ -164,5 +166,10 @@ export default function ShopBrassCarousel({ products }: ShopBrassGridProps) {
 
       </div>
     </section>
+
+    {quickAddProduct && (
+      <QuickAddModal product={quickAddProduct} onClose={() => setQuickAddProduct(null)} />
+    )}
+    </>
   );
 }
