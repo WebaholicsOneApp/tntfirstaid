@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.PRECISIONPAY_API_KEY;
     const apiSecret = process.env.PRECISIONPAY_API_SECRET;
-    const ppEnv = process.env.PRECISIONPAY_ENV || 'sandbox';
+    const ppEnv = process.env.PRECISIONPAY_ENV || 'production';
 
     if (!apiKey || !apiSecret) {
       return NextResponse.json({ error: 'Payment provider not configured' }, { status: 500 });

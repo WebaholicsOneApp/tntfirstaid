@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const ppEnv = process.env.PRECISIONPAY_ENV || 'sandbox';
+    const ppEnv = process.env.PRECISIONPAY_ENV || 'production';
     const PP_API_URL = ppEnv === 'production'
       ? 'https://api.myprecisionpay.com/api'
       : 'https://sandbox.myprecisionpay.com/api';
