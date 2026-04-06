@@ -151,8 +151,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('[DEV_CHECKOUT] Order created:', data.orderId, data.orderNumber);
-
     return NextResponse.json({
       orderId: data.orderId,
       orderNumber: data.orderNumber,

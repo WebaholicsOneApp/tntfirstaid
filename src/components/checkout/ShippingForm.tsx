@@ -25,10 +25,10 @@ export const EMPTY_SHIPPING: ShippingFields = {
 interface ShippingFormProps {
   data: ShippingFields;
   onChange: (field: keyof ShippingFields, value: string) => void;
-  fieldErrors?: Set<string>;
+  fieldErrors?: Map<string, string>;
 }
 
-const inputClass = (field: string, fieldErrors?: Set<string>) =>
+const inputClass = (field: string, fieldErrors?: Map<string, string>) =>
   `w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ${fieldErrors?.has(field) ? 'ring-1 ring-red-400' : 'ring-1 ring-black/[0.06]'} placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40`;
 
 export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFormProps) {
@@ -47,6 +47,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
           autoComplete="name"
           className={inputClass('name', fieldErrors)}
         />
+        {fieldErrors?.has('name') && (
+          <p className="mt-1 text-sm text-red-500">{fieldErrors.get('name')}</p>
+        )}
       </div>
 
       <div>
@@ -62,6 +65,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
           autoComplete="email"
           className={inputClass('email', fieldErrors)}
         />
+        {fieldErrors?.has('email') && (
+          <p className="mt-1 text-sm text-red-500">{fieldErrors.get('email')}</p>
+        )}
       </div>
 
       <div>
@@ -92,6 +98,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
           autoComplete="address-line1"
           className={inputClass('line1', fieldErrors)}
         />
+        {fieldErrors?.has('line1') && (
+          <p className="mt-1 text-sm text-red-500">{fieldErrors.get('line1')}</p>
+        )}
       </div>
 
       <div>
@@ -123,6 +132,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
             autoComplete="address-level2"
             className={inputClass('city', fieldErrors)}
           />
+          {fieldErrors?.has('city') && (
+            <p className="mt-1 text-sm text-red-500">{fieldErrors.get('city')}</p>
+          )}
         </div>
         <div>
           <label htmlFor="shipping-state" className="mb-1.5 block text-sm font-medium text-secondary-700">
@@ -137,6 +149,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
             autoComplete="address-level1"
             className={inputClass('state', fieldErrors)}
           />
+          {fieldErrors?.has('state') && (
+            <p className="mt-1 text-sm text-red-500">{fieldErrors.get('state')}</p>
+          )}
         </div>
         <div>
           <label htmlFor="shipping-zip" className="mb-1.5 block text-sm font-medium text-secondary-700">
@@ -151,6 +166,9 @@ export default function ShippingForm({ data, onChange, fieldErrors }: ShippingFo
             autoComplete="postal-code"
             className={inputClass('postalCode', fieldErrors)}
           />
+          {fieldErrors?.has('postalCode') && (
+            <p className="mt-1 text-sm text-red-500">{fieldErrors.get('postalCode')}</p>
+          )}
         </div>
       </div>
 

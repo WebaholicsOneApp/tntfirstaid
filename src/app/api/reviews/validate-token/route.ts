@@ -37,9 +37,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Call OneApp API to validate the token
     const oneAppUrl = getOneAppApiUrl();
-    console.log(`[Validate Token] Calling OneApp: ${oneAppUrl}/api/v1/reviews/validate-token?token=${token.substring(0, 8)}...`);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);

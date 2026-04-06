@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import RecommendationGrid from '~/components/products/RecommendationGrid';
@@ -12,6 +12,7 @@ import type { ProductListItem } from '~/types';
 export default function CheckoutProductReviewPage() {
   const router = useRouter();
   const { cart, removeItem, updateQuantity } = useCart();
+  const recsFetched = useRef(false);
   const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
   const [recsLoading, setRecsLoading] = useState(false);
 
@@ -24,12 +25,14 @@ export default function CheckoutProductReviewPage() {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
-  // Load recommendations
+  // Fetch recommendations once based on initial cart — stable across cart changes
   useEffect(() => {
+    if (recsFetched.current) return;
     if (cart.items.length === 0) return;
     const productIds = cart.items.map((item) => item.productId).filter(Boolean);
     if (productIds.length === 0) return;
 
+    recsFetched.current = true;
     setRecsLoading(true);
     fetch(`/api/recommendations?productIds=${productIds.join(',')}`)
       .then((res) => (res.ok ? res.json() : null))

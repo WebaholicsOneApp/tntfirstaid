@@ -30,7 +30,6 @@ export async function POST(request: Request) {
       }
 
       const transactionId = `dev-pp-${Date.now()}`;
-      console.log(`[PrecisionPay] DEV BYPASS: Creating order with mock transaction ${transactionId}`);
 
       const orderResult = await getApiClient().post<{
         success: boolean;
@@ -71,8 +70,6 @@ export async function POST(request: Request) {
     const authHeader = JSON.stringify({ apiKey, apiSecret });
     const envValue = ppEnv === 'production' ? 'live' : 'sandbox';
     const siteUrl = process.env.CORS_ALLOWED_ORIGINS || process.env.NEXT_PUBLIC_SITE_URL || 'https://alphamunitions.com';
-
-    console.log(`[PrecisionPay] Processing payment via ${PP_API_URL} (env: ${envValue})`);
 
     const amount = body.amount;
     if (!amount || amount <= 0) {

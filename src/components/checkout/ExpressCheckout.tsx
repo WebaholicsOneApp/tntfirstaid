@@ -81,16 +81,9 @@ export default function ExpressCheckout({
   };
 
   const handleReady = ({ availablePaymentMethods }: { availablePaymentMethods?: Record<string, boolean> }) => {
-    // Debug: log available payment methods
-    console.log('[ExpressCheckout] Available payment methods:', availablePaymentMethods);
-
-    // Check if any express payment method is available
     if (availablePaymentMethods) {
       const hasMethod = Object.values(availablePaymentMethods).some(Boolean);
-      console.log('[ExpressCheckout] Has available method:', hasMethod);
       setIsReady(hasMethod);
-    } else {
-      console.log('[ExpressCheckout] No payment methods available (HTTPS required for Apple Pay/Google Pay)');
     }
   };
 

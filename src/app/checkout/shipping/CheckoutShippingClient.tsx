@@ -17,7 +17,7 @@ export default function CheckoutShippingClient() {
   const { customer, isAuthenticated } = useAuth();
 
   const [shipping, setShipping] = useState<ShippingFields>(EMPTY_SHIPPING);
-  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(new Set());
+  const [shippingFieldErrors, setShippingFieldErrors] = useState<Map<string, string>>(new Map());
   const [shippingMethod, setShippingMethod] = useState<'standard'>('standard');
   const [savedDetailsApplied, setSavedDetailsApplied] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ export default function CheckoutShippingClient() {
       setShipping((prev) => ({ ...prev, [field]: value }));
       setShippingFieldErrors((prev) => {
         if (!prev.size) return prev;
-        const n = new Set(prev);
+        const n = new Map(prev);
         n.delete(field);
         return n;
       });
@@ -89,7 +89,7 @@ export default function CheckoutShippingClient() {
       country: customer.defaultAddress?.country || 'US',
     });
     setSavedDetailsApplied(true);
-    setShippingFieldErrors(new Set());
+    setShippingFieldErrors(new Map<string, string>());
     setError(null);
   }, [customer]);
 
@@ -99,20 +99,19 @@ export default function CheckoutShippingClient() {
   }, []);
 
   const handleContinueToPayment = useCallback(() => {
-    const shipErrors = new Set<string>();
-    if (!shipping.name.trim()) shipErrors.add('name');
-    if (!shipping.email.trim()) shipErrors.add('email');
-    if (!shipping.line1.trim()) shipErrors.add('line1');
-    if (!shipping.city.trim()) shipErrors.add('city');
-    if (!shipping.state.trim()) shipErrors.add('state');
-    if (!shipping.postalCode.trim()) shipErrors.add('postalCode');
+    const shipErrors = new Map<string, string>();
+    if (!shipping.name.trim()) shipErrors.set('name', 'Full name is required');
+    if (!shipping.email.trim()) shipErrors.set('email', 'Email address is required');
+    if (!shipping.line1.trim()) shipErrors.set('line1', 'Street address is required');
+    if (!shipping.city.trim()) shipErrors.set('city', 'City is required');
+    if (!shipping.state.trim()) shipErrors.set('state', 'State is required');
+    if (!shipping.postalCode.trim()) shipErrors.set('postalCode', 'ZIP code is required');
 
     if (shipErrors.size > 0) {
       setShippingFieldErrors(shipErrors);
-      setError('Please fill in all required shipping fields.');
       return;
     }
-    setShippingFieldErrors(new Set());
+    setShippingFieldErrors(new Map<string, string>());
     setError(null);
 
     const sessionData: CheckoutSessionData = {

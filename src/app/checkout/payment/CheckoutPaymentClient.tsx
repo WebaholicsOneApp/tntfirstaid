@@ -136,7 +136,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cardCode, setCardCode] = useState('');
-  const [cardFieldErrors, setCardFieldErrors] = useState<Set<string>>(new Set());
+  const [cardFieldErrors, setCardFieldErrors] = useState<Map<string, string>>(new Map());
 
   // Accept.js script loading
   const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('idle');
@@ -146,7 +146,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   const [billing, setBilling] = useState({
     name: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: 'US',
   });
-  const [billingErrors, setBillingErrors] = useState<Set<string>>(new Set());
+  const [billingErrors, setBillingErrors] = useState<Map<string, string>>(new Map());
 
   // General state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -311,18 +311,17 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
     // Validate billing address if not same as shipping
     if (!sameAsShipping) {
-      const bErrors = new Set<string>();
-      if (!billing.name.trim()) bErrors.add('billing_name');
-      if (!billing.line1.trim()) bErrors.add('billing_line1');
-      if (!billing.city.trim()) bErrors.add('billing_city');
-      if (!billing.state.trim()) bErrors.add('billing_state');
-      if (!billing.postalCode.trim()) bErrors.add('billing_postalCode');
+      const bErrors = new Map<string, string>();
+      if (!billing.name.trim()) bErrors.set('billing_name', 'Full name is required');
+      if (!billing.line1.trim()) bErrors.set('billing_line1', 'Street address is required');
+      if (!billing.city.trim()) bErrors.set('billing_city', 'City is required');
+      if (!billing.state.trim()) bErrors.set('billing_state', 'State is required');
+      if (!billing.postalCode.trim()) bErrors.set('billing_postalCode', 'ZIP code is required');
       if (bErrors.size > 0) {
         setBillingErrors(bErrors);
-        setError('Please complete the billing address.');
         return;
       }
-      setBillingErrors(new Set());
+      setBillingErrors(new Map<string, string>());
     }
 
     // Helper to attach billing to session data
@@ -344,19 +343,18 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
     if (selectedMethod === 'credit_card') {
       // Validate card fields
-      const errors = new Set<string>();
-      if (cardNumber.replace(/\D/g, '').length < 13) errors.add('cardNumber');
-      if (cardCode.replace(/\D/g, '').length < 3) errors.add('cardCode');
+      const errors = new Map<string, string>();
+      if (cardNumber.replace(/\D/g, '').length < 13) errors.set('cardNumber', 'Card number must be at least 13 digits');
+      if (cardCode.replace(/\D/g, '').length < 3) errors.set('cardCode', 'Security code must be at least 3 digits');
 
       const parsedExpiry = parseExpiry(expiry);
-      if (!parsedExpiry) errors.add('expiry');
+      if (!parsedExpiry) errors.set('expiry', 'Enter a valid expiration date (MM/YY)');
 
       if (errors.size > 0) {
         setCardFieldErrors(errors);
-        setError('Please enter valid card details.');
         return;
       }
-      setCardFieldErrors(new Set());
+      setCardFieldErrors(new Map<string, string>());
 
       // Detect card brand and last 4 before tokenization
       const rawNumber = cardNumber.replace(/\D/g, '');
@@ -508,6 +506,156 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               </div>
             ) : (
               <>
+                {/* Billing Address Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="h-px w-6 bg-primary-500" />
+                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                        Billing Address
+                      </span>
+                    </div>
+
+                    {/* Same as shipping toggle */}
+                    <label className="flex cursor-pointer items-center gap-3">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={sameAsShipping}
+                          onChange={(e) => {
+                            setSameAsShipping(e.target.checked);
+                            if (e.target.checked) setBillingErrors(new Map<string, string>());
+                          }}
+                          className="peer sr-only"
+                        />
+                        <div className="h-5 w-5 rounded border-2 border-secondary-300 bg-white transition-colors peer-checked:border-primary-500 peer-checked:bg-primary-500 flex items-center justify-center">
+                          {sameAsShipping && (
+                            <svg className="h-3 w-3 text-secondary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm text-secondary-700">Same as shipping address</span>
+                    </label>
+
+                    {/* Billing form — animated expand */}
+                    <div className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                      <div className="overflow-hidden">
+                        <div className="pt-5 space-y-4">
+                          {/* Name */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Full Name</span>
+                            <input
+                              type="text"
+                              autoComplete="billing name"
+                              value={billing.name}
+                              onChange={(e) => {
+                                setBilling((p) => ({ ...p, name: e.target.value }));
+                                setBillingErrors((p) => { const n = new Map(p); n.delete('billing_name'); return n; });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has('billing_name') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              placeholder="Jane Smith"
+                            />
+                            {billingErrors.has('billing_name') && (
+                              <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_name')}</p>
+                            )}
+                          </label>
+
+                          {/* Address line 1 */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Address</span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line1"
+                              value={billing.line1}
+                              onChange={(e) => {
+                                setBilling((p) => ({ ...p, line1: e.target.value }));
+                                setBillingErrors((p) => { const n = new Map(p); n.delete('billing_line1'); return n; });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has('billing_line1') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              placeholder="123 Main St"
+                            />
+                            {billingErrors.has('billing_line1') && (
+                              <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_line1')}</p>
+                            )}
+                          </label>
+
+                          {/* Address line 2 */}
+                          <label className="block">
+                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Apt, Suite, etc. <span className="normal-case tracking-normal text-secondary-400">(optional)</span></span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line2"
+                              value={billing.line2}
+                              onChange={(e) => setBilling((p) => ({ ...p, line2: e.target.value }))}
+                              className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                              placeholder="Apt 4B"
+                            />
+                          </label>
+
+                          {/* City / State / ZIP */}
+                          <div className="grid grid-cols-3 gap-3">
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">City</span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level2"
+                                value={billing.city}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, city: e.target.value }));
+                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_city'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_city') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="Salt Lake City"
+                              />
+                              {billingErrors.has('billing_city') && (
+                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_city')}</p>
+                              )}
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">State</span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level1"
+                                value={billing.state}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, state: e.target.value.toUpperCase().slice(0, 2) }));
+                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_state'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_state') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="UT"
+                                maxLength={2}
+                              />
+                              {billingErrors.has('billing_state') && (
+                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_state')}</p>
+                              )}
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">ZIP</span>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="billing postal-code"
+                                value={billing.postalCode}
+                                onChange={(e) => {
+                                  setBilling((p) => ({ ...p, postalCode: e.target.value.replace(/\D/g, '').slice(0, 10) }));
+                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_postalCode'); return n; });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has('billing_postalCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                placeholder="84101"
+                              />
+                              {billingErrors.has('billing_postalCode') && (
+                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_postalCode')}</p>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Payment Method Selector Card */}
                 <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                   <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
@@ -602,7 +750,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                       setCardNumber(formatCardNumber(event.target.value));
                                       if (cardFieldErrors.size) {
                                         setCardFieldErrors((prev) => {
-                                          const n = new Set(prev);
+                                          const n = new Map(prev);
                                           n.delete('cardNumber');
                                           return n;
                                         });
@@ -611,6 +759,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                     className={`w-full rounded-xl border ${cardFieldErrors.has('cardNumber') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
                                     placeholder="4111 1111 1111 1111"
                                   />
+                                  {cardFieldErrors.has('cardNumber') && (
+                                    <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('cardNumber')}</p>
+                                  )}
                                 </label>
 
                                 <div className="grid gap-4 md:grid-cols-2">
@@ -626,7 +777,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                         setExpiry(formatExpiry(event.target.value));
                                         if (cardFieldErrors.size) {
                                           setCardFieldErrors((prev) => {
-                                            const n = new Set(prev);
+                                            const n = new Map(prev);
                                             n.delete('expiry');
                                             return n;
                                           });
@@ -635,6 +786,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                       className={`w-full rounded-xl border ${cardFieldErrors.has('expiry') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
                                       placeholder="MM/YY"
                                     />
+                                    {cardFieldErrors.has('expiry') && (
+                                      <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('expiry')}</p>
+                                    )}
                                   </label>
                                   <label className="block">
                                     <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
@@ -648,7 +802,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                         setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4));
                                         if (cardFieldErrors.size) {
                                           setCardFieldErrors((prev) => {
-                                            const n = new Set(prev);
+                                            const n = new Map(prev);
                                             n.delete('cardCode');
                                             return n;
                                           });
@@ -657,6 +811,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                       className={`w-full rounded-xl border ${cardFieldErrors.has('cardCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
                                       placeholder="CVV"
                                     />
+                                    {cardFieldErrors.has('cardCode') && (
+                                      <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('cardCode')}</p>
+                                    )}
                                   </label>
                                 </div>
                               </div>
@@ -710,141 +867,6 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Billing Address Card */}
-                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="h-px w-6 bg-primary-500" />
-                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                        Billing Address
-                      </span>
-                    </div>
-
-                    {/* Same as shipping toggle */}
-                    <label className="flex cursor-pointer items-center gap-3">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={sameAsShipping}
-                          onChange={(e) => {
-                            setSameAsShipping(e.target.checked);
-                            if (e.target.checked) setBillingErrors(new Set());
-                          }}
-                          className="peer sr-only"
-                        />
-                        <div className="h-5 w-5 rounded border-2 border-secondary-300 bg-white transition-colors peer-checked:border-primary-500 peer-checked:bg-primary-500 flex items-center justify-center">
-                          {sameAsShipping && (
-                            <svg className="h-3 w-3 text-secondary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-sm text-secondary-700">Same as shipping address</span>
-                    </label>
-
-                    {/* Billing form — animated expand */}
-                    <div className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
-                      <div className="overflow-hidden">
-                        <div className="pt-5 space-y-4">
-                          {/* Name */}
-                          <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Full Name</span>
-                            <input
-                              type="text"
-                              autoComplete="billing name"
-                              value={billing.name}
-                              onChange={(e) => {
-                                setBilling((p) => ({ ...p, name: e.target.value }));
-                                setBillingErrors((p) => { const n = new Set(p); n.delete('billing_name'); return n; });
-                              }}
-                              className={`w-full rounded-xl border ${billingErrors.has('billing_name') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
-                              placeholder="Jane Smith"
-                            />
-                          </label>
-
-                          {/* Address line 1 */}
-                          <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Address</span>
-                            <input
-                              type="text"
-                              autoComplete="billing address-line1"
-                              value={billing.line1}
-                              onChange={(e) => {
-                                setBilling((p) => ({ ...p, line1: e.target.value }));
-                                setBillingErrors((p) => { const n = new Set(p); n.delete('billing_line1'); return n; });
-                              }}
-                              className={`w-full rounded-xl border ${billingErrors.has('billing_line1') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
-                              placeholder="123 Main St"
-                            />
-                          </label>
-
-                          {/* Address line 2 */}
-                          <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Apt, Suite, etc. <span className="normal-case tracking-normal text-secondary-400">(optional)</span></span>
-                            <input
-                              type="text"
-                              autoComplete="billing address-line2"
-                              value={billing.line2}
-                              onChange={(e) => setBilling((p) => ({ ...p, line2: e.target.value }))}
-                              className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
-                              placeholder="Apt 4B"
-                            />
-                          </label>
-
-                          {/* City / State / ZIP */}
-                          <div className="grid grid-cols-3 gap-3">
-                            <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">City</span>
-                              <input
-                                type="text"
-                                autoComplete="billing address-level2"
-                                value={billing.city}
-                                onChange={(e) => {
-                                  setBilling((p) => ({ ...p, city: e.target.value }));
-                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_city'); return n; });
-                                }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_city') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
-                                placeholder="Salt Lake City"
-                              />
-                            </label>
-                            <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">State</span>
-                              <input
-                                type="text"
-                                autoComplete="billing address-level1"
-                                value={billing.state}
-                                onChange={(e) => {
-                                  setBilling((p) => ({ ...p, state: e.target.value.toUpperCase().slice(0, 2) }));
-                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_state'); return n; });
-                                }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_state') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
-                                placeholder="UT"
-                                maxLength={2}
-                              />
-                            </label>
-                            <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">ZIP</span>
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                autoComplete="billing postal-code"
-                                value={billing.postalCode}
-                                onChange={(e) => {
-                                  setBilling((p) => ({ ...p, postalCode: e.target.value.replace(/\D/g, '').slice(0, 10) }));
-                                  setBillingErrors((p) => { const n = new Set(p); n.delete('billing_postalCode'); return n; });
-                                }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_postalCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
-                                placeholder="84101"
-                              />
-                            </label>
                           </div>
                         </div>
                       </div>
