@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp, rateLimitResponse } from '~/lib/ratelimit';
 
-const PP_API_URL = 'https://api.myprecisionpay.com/api';
-
 export async function GET(request: Request) {
   const clientIp = getClientIp(request);
   const rateLimit = await checkRateLimit(clientIp, 'checkout');
@@ -17,6 +15,9 @@ export async function GET(request: Request) {
 
   try {
     const ppEnv = process.env.PRECISIONPAY_ENV || 'sandbox';
+    const PP_API_URL = ppEnv === 'production'
+      ? 'https://api.myprecisionpay.com/api'
+      : 'https://sandbox.myprecisionpay.com/api';
     const siteUrl = process.env.CORS_ALLOWED_ORIGINS || process.env.NEXT_PUBLIC_SITE_URL || 'https://alphamunitions.com';
 
     const response = await fetch(`${PP_API_URL}/merchant-nonce`, {
