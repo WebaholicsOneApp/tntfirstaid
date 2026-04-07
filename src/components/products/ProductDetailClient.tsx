@@ -1,25 +1,30 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import type { ProductDetail } from '~/types';
-import type { ReviewAggregate } from '~/types/review';
-import { formatCentsToDollars, cn } from '~/lib/utils';
-import { sanitizeProductDescription } from '~/lib/sanitize';
-import ProductGallery from './ProductGallery';
-import VariantSelector from './VariantSelector';
-import AddToCartButton from './AddToCartButton';
-import StockBadge from './StockBadge';
-import ReviewsSection from './ReviewsSection';
-import RecommendationGrid from './RecommendationGrid';
-import StarRating from './StarRating';
+import { useState, useMemo } from "react";
+import type { ProductDetail } from "~/types";
+import type { ReviewAggregate } from "~/types/review";
+import { formatCentsToDollars, cn } from "~/lib/utils";
+import { sanitizeProductDescription } from "~/lib/sanitize";
+import ProductGallery from "./ProductGallery";
+import VariantSelector from "./VariantSelector";
+import AddToCartButton from "./AddToCartButton";
+import StockBadge from "./StockBadge";
+import ReviewsSection from "./ReviewsSection";
+import RecommendationGrid from "./RecommendationGrid";
+import StarRating from "./StarRating";
 
 interface ProductDetailClientProps {
   product: ProductDetail;
   reviewAggregate?: ReviewAggregate | null;
 }
 
-export default function ProductDetailClient({ product, reviewAggregate }: ProductDetailClientProps) {
-  const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
+export default function ProductDetailClient({
+  product,
+  reviewAggregate,
+}: ProductDetailClientProps) {
+  const [activeTab, setActiveTab] = useState<"description" | "specifications">(
+    "description",
+  );
 
   // Find the default variation — first in-stock variation, or just the first
   const defaultVariation = useMemo(() => {
@@ -31,7 +36,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
 
   // Multi-variation products start with no selection so the price range is shown
   const [selectedVariation, setSelectedVariation] = useState(
-    product.variations.length > 1 ? null : defaultVariation
+    product.variations.length > 1 ? null : defaultVariation,
   );
 
   // Compute price range across all variations
@@ -48,7 +53,8 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
   // Get current price to display
   const displayPrice = selectedVariation?.price ?? product.price;
   const displayMsrp = selectedVariation?.msrp ?? product.msrp;
-  const isOnSale = displayMsrp != null && displayPrice != null && displayMsrp > displayPrice;
+  const isOnSale =
+    displayMsrp != null && displayPrice != null && displayMsrp > displayPrice;
   const showRange = !selectedVariation && priceRange != null;
 
   // Get images — prefer selected variation images, fall back to product images
@@ -62,7 +68,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
   // Sanitize description for rendering
   const sanitizedDescription = useMemo(
     () => sanitizeProductDescription(product.description),
-    [product.description]
+    [product.description],
   );
 
   // Split bulletPoints: items with "Label: value" pattern → specs, rest → features
@@ -70,9 +76,12 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
     const specs: { label: string; value: string }[] = [];
     const features: string[] = [];
     for (const point of product.bulletPoints) {
-      const colonIdx = point.indexOf(':');
+      const colonIdx = point.indexOf(":");
       if (colonIdx > 0 && colonIdx < 30) {
-        specs.push({ label: point.slice(0, colonIdx).trim(), value: point.slice(colonIdx + 1).trim() });
+        specs.push({
+          label: point.slice(0, colonIdx).trim(),
+          value: point.slice(colonIdx + 1).trim(),
+        });
       } else {
         features.push(point);
       }
@@ -81,7 +90,7 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
   }, [product.bulletPoints]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
       {/* Left: Image Gallery */}
       <ProductGallery images={images} productName={product.name} />
 
@@ -89,21 +98,25 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
       <div className="space-y-6">
         {/* Category */}
         {product.categoryName && (
-          <p className="text-xs font-semibold text-primary-600 uppercase tracking-wider">
+          <p className="text-primary-600 text-xs font-semibold tracking-wider uppercase">
             {product.categoryName}
           </p>
         )}
 
         {/* Product name + SKU */}
         <div className="space-y-1">
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-secondary-900 leading-tight">
+          <h1 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl">
             {product.name}
           </h1>
           {selectedVariation?.manufacturerNo && (
             <p className="inline-flex items-center gap-1.5 text-xs">
-              <span className="text-secondary-400 uppercase tracking-wider">SKU</span>
+              <span className="text-secondary-400 tracking-wider uppercase">
+                SKU
+              </span>
               <span className="text-secondary-300">|</span>
-              <span className="font-mono text-secondary-500">{selectedVariation.manufacturerNo}</span>
+              <span className="text-secondary-500 font-mono">
+                {selectedVariation.manufacturerNo}
+              </span>
             </p>
           )}
         </div>
@@ -111,25 +124,31 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
         {/* Star rating summary */}
         {reviewAggregate && reviewAggregate.totalReviews > 0 && (
           <button
-            onClick={() => document.getElementById('reviews-section')?.scrollIntoView({ behavior: 'smooth' })}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            onClick={() =>
+              document
+                .getElementById("reviews-section")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="flex items-center gap-2 transition-opacity hover:opacity-80"
           >
             <StarRating rating={reviewAggregate.averageRating} />
-            <span className="text-sm text-secondary-500">
-              {reviewAggregate.averageRating.toFixed(1)} ({reviewAggregate.totalReviews} review{reviewAggregate.totalReviews !== 1 ? 's' : ''})
+            <span className="text-secondary-500 text-sm">
+              {reviewAggregate.averageRating.toFixed(1)} (
+              {reviewAggregate.totalReviews} review
+              {reviewAggregate.totalReviews !== 1 ? "s" : ""})
             </span>
           </button>
         )}
 
         {/* Price */}
         <div className="flex items-baseline gap-3">
-          <span className="text-2xl font-bold text-secondary-900">
+          <span className="text-secondary-900 text-2xl font-bold">
             {showRange
               ? `${formatCentsToDollars(priceRange.min)} – ${formatCentsToDollars(priceRange.max)}`
               : formatCentsToDollars(displayPrice)}
           </span>
           {!showRange && isOnSale && (
-            <span className="text-lg text-secondary-400 line-through">
+            <span className="text-secondary-400 text-lg line-through">
               {formatCentsToDollars(displayMsrp)}
             </span>
           )}
@@ -162,14 +181,14 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
 
         {/* Tags */}
         {product.keywords && (
-          <div className="text-sm text-secondary-500">
+          <div className="text-secondary-500 text-sm">
             <p>
-              <span className="font-medium text-secondary-700">Tags:</span>{' '}
+              <span className="text-secondary-700 font-medium">Tags:</span>{" "}
               {product.keywords
                 .split(/[|,]/)
                 .map((tag) => tag.trim())
                 .filter(Boolean)
-                .join(', ')}
+                .join(", ")}
             </p>
           </div>
         )}
@@ -178,9 +197,20 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
         {features.length > 0 && (
           <ul className="space-y-2">
             {features.map((point, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-secondary-600">
-                <svg className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <li
+                key={i}
+                className="text-secondary-600 flex items-start gap-2 text-sm"
+              >
+                <svg
+                  className="text-primary-500 mt-0.5 h-4 w-4 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {point}
               </li>
@@ -189,26 +219,26 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
         )}
 
         {/* Tabs: Description / Specifications */}
-        <div className="pt-4 border-t border-secondary-100">
-          <div className="flex border-b border-secondary-200">
+        <div className="border-secondary-100 border-t pt-4">
+          <div className="border-secondary-200 flex border-b">
             <button
-              onClick={() => setActiveTab('description')}
+              onClick={() => setActiveTab("description")}
               className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
-                activeTab === 'description'
-                  ? 'border-primary-500 text-primary-700'
-                  : 'border-transparent text-secondary-500 hover:text-secondary-700'
+                "-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors duration-75 active:scale-95",
+                activeTab === "description"
+                  ? "border-primary-500 text-primary-700"
+                  : "text-secondary-500 hover:text-secondary-700 border-transparent",
               )}
             >
               Description
             </button>
             <button
-              onClick={() => setActiveTab('specifications')}
+              onClick={() => setActiveTab("specifications")}
               className={cn(
-                'px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px active:scale-95 duration-75',
-                activeTab === 'specifications'
-                  ? 'border-primary-500 text-primary-700'
-                  : 'border-transparent text-secondary-500 hover:text-secondary-700'
+                "-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors duration-75 active:scale-95",
+                activeTab === "specifications"
+                  ? "border-primary-500 text-primary-700"
+                  : "text-secondary-500 hover:text-secondary-700 border-transparent",
               )}
             >
               Specifications
@@ -216,80 +246,109 @@ export default function ProductDetailClient({ product, reviewAggregate }: Produc
           </div>
 
           <div className="pt-4">
-            {activeTab === 'description' && (
-              sanitizedDescription ? (
+            {activeTab === "description" &&
+              (sanitizedDescription ? (
                 <div
                   className="product-description prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                 />
               ) : (
-                <p className="text-sm text-secondary-400 italic">
+                <p className="text-secondary-400 text-sm italic">
                   No description available.
                 </p>
-              )
-            )}
-            {activeTab === 'specifications' && (
+              ))}
+            {activeTab === "specifications" && (
               <div className="space-y-3">
                 {product.categoryName && (
                   <SpecRow label="Category" value={product.categoryName} />
                 )}
                 {selectedVariation?.manufacturerNo && (
-                  <SpecRow label="Manufacturer #" value={selectedVariation.manufacturerNo} />
+                  <SpecRow
+                    label="Manufacturer #"
+                    value={selectedVariation.manufacturerNo}
+                  />
                 )}
-                {selectedVariation?.weight != null && selectedVariation.weight > 0 && (
-                  <SpecRow label="Weight" value={`${selectedVariation.weight} lbs`} />
-                )}
+                {selectedVariation?.weight != null &&
+                  selectedVariation.weight > 0 && (
+                    <SpecRow
+                      label="Weight"
+                      value={`${selectedVariation.weight} lbs`}
+                    />
+                  )}
                 {specs.map((spec) => (
-                  <SpecRow key={spec.label} label={spec.label} value={spec.value} />
+                  <SpecRow
+                    key={spec.label}
+                    label={spec.label}
+                    value={spec.value}
+                  />
                 ))}
                 {selectedVariation?.variation && (
-                  <SpecRow label={selectedVariation.variantType ?? 'Variant'} value={selectedVariation.variation} />
+                  <SpecRow
+                    label={selectedVariation.variantType ?? "Variant"}
+                    value={selectedVariation.variation}
+                  />
                 )}
                 {selectedVariation?.variationTwo && (
                   <SpecRow
-                    label={selectedVariation.variantTypeTwo ?? 'Variant 2'}
+                    label={selectedVariation.variantTypeTwo ?? "Variant 2"}
                     value={selectedVariation.variationTwo}
                   />
                 )}
-                {product.brandName && product.brandName !== '#N/A' && (
+                {product.brandName && product.brandName !== "#N/A" && (
                   <SpecRow label="Brand" value={product.brandName} />
                 )}
-                {specs.length === 0 && !product.categoryName && !selectedVariation && (
-                  <p className="text-sm text-secondary-400 italic">
-                    No specifications available.
-                  </p>
-                )}
+                {specs.length === 0 &&
+                  !product.categoryName &&
+                  !selectedVariation && (
+                    <p className="text-secondary-400 text-sm italic">
+                      No specifications available.
+                    </p>
+                  )}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Related products — above reviews */}
-      {product.relatedProducts.filter(r => r.inStock).length > 0 && (
-        <div className="col-span-full mt-8 mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-px w-6 bg-primary-500" />
-            <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Recommended</span>
-          </div>
-          <h2 className="font-display text-2xl font-bold text-secondary-900 mb-6">You May Also Like</h2>
-          <RecommendationGrid products={product.relatedProducts.filter(r => r.inStock).slice(0, 5)} />
-        </div>
-      )}
-
       {/* Reviews — standalone section below product detail */}
       <div className="col-span-full">
-        <ReviewsSection productId={product.id} productName={product.name} aggregate={reviewAggregate ?? null} />
+        <ReviewsSection
+          productId={product.id}
+          productName={product.name}
+          aggregate={reviewAggregate ?? null}
+        />
       </div>
+
+      {/* Related products — below reviews */}
+      {product.relatedProducts.filter((r) => r.inStock).length > 0 && (
+        <div className="col-span-full mt-8 mb-4">
+          <div className="mb-2 flex items-center gap-3">
+            <div className="bg-primary-500 h-px w-6" />
+            <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              Recommended
+            </span>
+          </div>
+          <h2 className="font-display text-secondary-900 mb-6 text-2xl font-bold">
+            You May Also Like
+          </h2>
+          <RecommendationGrid
+            products={product.relatedProducts
+              .filter((r) => r.inStock)
+              .slice(0, 5)}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex border-b border-secondary-50 pb-2">
-      <span className="text-sm font-medium text-secondary-500 w-36 flex-shrink-0">{label}</span>
-      <span className="text-sm text-secondary-800">{value}</span>
+    <div className="border-secondary-50 flex border-b pb-2">
+      <span className="text-secondary-500 w-36 flex-shrink-0 text-sm font-medium">
+        {label}
+      </span>
+      <span className="text-secondary-800 text-sm">{value}</span>
     </div>
   );
 }

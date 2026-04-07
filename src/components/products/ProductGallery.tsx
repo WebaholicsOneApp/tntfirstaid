@@ -1,15 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ProductImage } from '~/components/ui/ProductImage';
-import { cn } from '~/lib/utils';
+import { useState } from "react";
+import { ProductImage } from "~/components/ui/ProductImage";
+import { cn } from "~/lib/utils";
 
 interface ProductGalleryProps {
   images: string[];
   productName: string;
 }
 
-export default function ProductGallery({ images, productName }: ProductGalleryProps) {
+export default function ProductGallery({
+  images,
+  productName,
+}: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [imgErrors, setImgErrors] = useState<Set<number>>(new Set());
 
@@ -25,8 +28,13 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
 
   if (validImages.length === 0) {
     return (
-      <div className="aspect-square bg-secondary-50 rounded-lg flex items-center justify-center">
-        <svg className="w-24 h-24 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="bg-secondary-50 flex aspect-square items-center justify-center rounded-lg">
+        <svg
+          className="text-secondary-200 h-24 w-24"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -44,7 +52,7 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-white border border-secondary-100">
+      <div className="border-secondary-100 relative aspect-square overflow-hidden rounded-lg border bg-white">
         {currentImage && !imgErrors.has(selectedIndex) ? (
           <ProductImage
             src={currentImage}
@@ -56,8 +64,13 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
             onError={() => handleImageError(selectedIndex)}
           />
         ) : (
-          <div className="flex items-center justify-center w-full h-full text-secondary-200">
-            <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-secondary-200 flex h-full w-full items-center justify-center">
+            <svg
+              className="h-24 w-24"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -79,10 +92,10 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                 key={index}
                 onClick={() => setSelectedIndex(index)}
                 className={cn(
-                  'relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all',
+                  "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border-2 transition-all sm:h-20 sm:w-20",
                   selectedIndex === index
-                    ? 'border-primary-500 ring-1 ring-primary-300'
-                    : 'border-secondary-200 hover:border-primary-300'
+                    ? "border-primary-500 ring-primary-300 ring-1"
+                    : "border-secondary-200 hover:border-primary-300",
                 )}
               >
                 <ProductImage

@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
-import { clearBrandingCache, clearPolicyCache } from '~/lib/db';
-import { clearProductCaches } from '~/lib/data';
+import { type NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
+import { clearBrandingCache, clearPolicyCache } from "~/lib/db";
+import { clearProductCaches } from "~/lib/data";
 
 const REVALIDATE_SECRET = process.env.ONEAPP_WEBHOOK_SECRET;
 
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const { secret } = body;
 
   if (!REVALIDATE_SECRET || secret !== REVALIDATE_SECRET) {
-    return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
+    return NextResponse.json({ error: "Invalid secret" }, { status: 401 });
   }
 
   // Clear in-memory caches
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   clearProductCaches();
 
   // Revalidate the entire site (layout + all pages)
-  revalidatePath('/', 'layout');
+  revalidatePath("/", "layout");
 
   return NextResponse.json({ revalidated: true });
 }

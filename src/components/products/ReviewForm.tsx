@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import Image from 'next/image';
-import StarRating from './StarRating';
+import { useState, useRef } from "react";
+import Image from "next/image";
+import StarRating from "./StarRating";
 
 interface ReviewFormProps {
   productId: number;
@@ -31,10 +31,10 @@ export default function ReviewForm({
   onSuccess,
 }: ReviewFormProps) {
   const [rating, setRating] = useState(0);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [customerName, setCustomerName] = useState(prefillName || '');
-  const [customerEmail, setCustomerEmail] = useState(prefillEmail || '');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [customerName, setCustomerName] = useState(prefillName || "");
+  const [customerEmail, setCustomerEmail] = useState(prefillEmail || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
@@ -57,13 +57,17 @@ export default function ReviewForm({
     const newImages: ImagePreview[] = [];
     for (const file of files) {
       // Check file type
-      if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
-        setError('Only JPEG, PNG, WebP, and GIF images are allowed');
+      if (
+        !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(
+          file.type,
+        )
+      ) {
+        setError("Only JPEG, PNG, WebP, and GIF images are allowed");
         return;
       }
       // Check file size (5MB max)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Each image must be under 5MB');
+        setError("Each image must be under 5MB");
         return;
       }
       newImages.push({
@@ -77,7 +81,7 @@ export default function ReviewForm({
 
     // Reset file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -95,13 +99,14 @@ export default function ReviewForm({
 
     // Client-side validation
     const errors = new Set<string>();
-    if (rating === 0) errors.add('rating');
-    if (content.trim().length < 10) errors.add('content');
-    if (customerName.trim().length < 2) errors.add('customerName');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) errors.add('customerEmail');
+    if (rating === 0) errors.add("rating");
+    if (content.trim().length < 10) errors.add("content");
+    if (customerName.trim().length < 2) errors.add("customerName");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))
+      errors.add("customerEmail");
     if (errors.size > 0) {
       setFieldErrors(errors);
-      setError('Please fix the highlighted fields.');
+      setError("Please fix the highlighted fields.");
       return;
     }
     setFieldErrors(new Set());
@@ -112,31 +117,31 @@ export default function ReviewForm({
       // Upload images first if any
       let imageUrls: string[] = [];
       if (images.length > 0) {
-        setUploadProgress('Uploading...');
+        setUploadProgress("Uploading...");
         const formData = new FormData();
         images.forEach((img) => {
-          formData.append('images', img.file);
+          formData.append("images", img.file);
         });
 
-        const uploadResponse = await fetch('/api/reviews/upload', {
-          method: 'POST',
+        const uploadResponse = await fetch("/api/reviews/upload", {
+          method: "POST",
           body: formData,
         });
 
         const uploadData = await uploadResponse.json();
 
         if (!uploadResponse.ok) {
-          throw new Error(uploadData.error || 'Failed to upload images');
+          throw new Error(uploadData.error || "Failed to upload images");
         }
 
         imageUrls = uploadData.images.map((img: { url: string }) => img.url);
       }
 
-      setUploadProgress('Submitting review...');
+      setUploadProgress("Submitting review...");
 
-      const response = await fetch('/api/reviews/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/reviews/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId,
           rating,
@@ -152,7 +157,7 @@ export default function ReviewForm({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit review');
+        throw new Error(data.error || "Failed to submit review");
       }
 
       // Clean up image previews
@@ -163,7 +168,7 @@ export default function ReviewForm({
         onSuccess();
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit review');
+      setError(err instanceof Error ? err.message : "Failed to submit review");
     } finally {
       setIsSubmitting(false);
       setUploadProgress(null);
@@ -171,34 +176,46 @@ export default function ReviewForm({
   };
 
   // Prevent body scroll when modal is open
-  if (typeof window !== 'undefined') {
-    document.body.style.overflow = 'hidden';
+  if (typeof window !== "undefined") {
+    document.body.style.overflow = "hidden";
   }
 
   const handleClose = () => {
-    if (typeof window !== 'undefined') {
-      document.body.style.overflow = '';
+    if (typeof window !== "undefined") {
+      document.body.style.overflow = "";
     }
     onClose();
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white shadow-xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-white border-b border-secondary-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-lg font-bold text-secondary-900">Write a Review</h2>
+        <div className="border-secondary-100 sticky top-0 z-10 flex items-center justify-between rounded-t-2xl border-b bg-white px-6 py-4">
+          <h2 className="text-secondary-900 text-lg font-bold">
+            Write a Review
+          </h2>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-secondary-100 rounded-lg transition-colors"
+            className="hover:bg-secondary-100 rounded-lg p-2 transition-colors"
           >
-            <svg className="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="text-secondary-500 h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -206,55 +223,86 @@ export default function ReviewForm({
         {success ? (
           /* Success State */
           <div className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <svg
+                className="h-8 w-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-secondary-900 mb-2">Thank You!</h3>
+            <h3 className="text-secondary-900 mb-2 text-xl font-bold">
+              Thank You!
+            </h3>
             <p className="text-secondary-600">
-              Your review has been submitted and will be visible after moderation.
+              Your review has been submitted and will be visible after
+              moderation.
             </p>
           </div>
         ) : (
           /* Form */
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 p-6">
             {/* Product name */}
-            <div className="text-sm text-secondary-600">
-              Reviewing: <span className="font-medium text-secondary-900">{productName}</span>
+            <div className="text-secondary-600 text-sm">
+              Reviewing:{" "}
+              <span className="text-secondary-900 font-medium">
+                {productName}
+              </span>
             </div>
 
             {/* Star Rating */}
             <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
+              <label className="text-secondary-700 mb-2 block text-sm font-medium">
                 Your Rating <span className="text-red-500">*</span>
               </label>
-              <div className={fieldErrors.has('rating') ? 'inline-block ring-1 ring-red-400 rounded-lg p-1' : 'inline-block'}>
+              <div
+                className={
+                  fieldErrors.has("rating")
+                    ? "inline-block rounded-lg p-1 ring-1 ring-red-400"
+                    : "inline-block"
+                }
+              >
                 <StarRating
                   rating={rating}
                   size="lg"
                   interactive
                   onChange={(val) => {
                     setRating(val);
-                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('rating'); return n; });
+                    if (fieldErrors.size)
+                      setFieldErrors((prev) => {
+                        const n = new Set(prev);
+                        n.delete("rating");
+                        return n;
+                      });
                   }}
                 />
               </div>
               {rating > 0 && (
-                <span className="text-sm text-secondary-500 mt-1 block">
-                  {rating === 1 && 'Poor'}
-                  {rating === 2 && 'Fair'}
-                  {rating === 3 && 'Good'}
-                  {rating === 4 && 'Very Good'}
-                  {rating === 5 && 'Excellent'}
+                <span className="text-secondary-500 mt-1 block text-sm">
+                  {rating === 1 && "Poor"}
+                  {rating === 2 && "Fair"}
+                  {rating === 3 && "Good"}
+                  {rating === 4 && "Very Good"}
+                  {rating === 5 && "Excellent"}
                 </span>
               )}
             </div>
 
             {/* Review Title */}
             <div>
-              <label htmlFor="review-title" className="block text-sm font-medium text-secondary-700 mb-2">
-                Review Title <span className="text-secondary-400">(optional)</span>
+              <label
+                htmlFor="review-title"
+                className="text-secondary-700 mb-2 block text-sm font-medium"
+              >
+                Review Title{" "}
+                <span className="text-secondary-400">(optional)</span>
               </label>
               <input
                 id="review-title"
@@ -263,15 +311,16 @@ export default function ReviewForm({
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Summarize your experience"
                 maxLength={255}
-                className="w-full px-4 py-3 border border-secondary-200 rounded-xl text-secondary-700
-                  placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors"
+                className="border-secondary-200 text-secondary-700 placeholder:text-secondary-400 focus:ring-primary-500 focus:border-primary-500 w-full rounded-xl border px-4 py-3 transition-colors focus:ring-2 focus:outline-none"
               />
             </div>
 
             {/* Review Content */}
             <div>
-              <label htmlFor="review-content" className="block text-sm font-medium text-secondary-700 mb-2">
+              <label
+                htmlFor="review-content"
+                className="text-secondary-700 mb-2 block text-sm font-medium"
+              >
                 Your Review <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -279,48 +328,61 @@ export default function ReviewForm({
                 value={content}
                 onChange={(e) => {
                   setContent(e.target.value);
-                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('content'); return n; });
+                  if (fieldErrors.size)
+                    setFieldErrors((prev) => {
+                      const n = new Set(prev);
+                      n.delete("content");
+                      return n;
+                    });
                 }}
                 placeholder="Share your experience with this product..."
                 rows={4}
                 maxLength={5000}
-                className={`w-full px-4 py-3 border ${fieldErrors.has('content') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
-                  placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors resize-none`}
+                className={`w-full border px-4 py-3 ${fieldErrors.has("content") ? "border-red-400" : "border-secondary-200"} text-secondary-700 placeholder:text-secondary-400 focus:ring-primary-500 focus:border-primary-500 resize-none rounded-xl transition-colors focus:ring-2 focus:outline-none`}
               />
-              <span className="text-xs text-secondary-400 mt-1 block">
+              <span className="text-secondary-400 mt-1 block text-xs">
                 {content.length}/5000 characters (minimum 10)
               </span>
             </div>
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-secondary-700 mb-2">
-                Add Photos <span className="text-secondary-400">(optional)</span>
+              <label className="text-secondary-700 mb-2 block text-sm font-medium">
+                Add Photos{" "}
+                <span className="text-secondary-400">(optional)</span>
               </label>
 
               {/* Image Previews */}
               {images.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="mb-3 flex flex-wrap gap-2">
                   {images.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <div className="w-20 h-20 rounded-lg overflow-hidden border border-secondary-200">
+                    <div key={index} className="group relative">
+                      <div className="border-secondary-200 h-20 w-20 overflow-hidden rounded-lg border">
                         <Image
                           src={img.preview}
                           alt={`Preview ${index + 1}`}
                           width={80}
                           height={80}
-                          className="w-full h-full object-cover"
+                          className="h-full w-full object-cover"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full
-                          flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="h-3 w-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -342,16 +404,24 @@ export default function ReviewForm({
                   />
                   <label
                     htmlFor="image-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg
-                      text-sm text-secondary-600 hover:bg-secondary-50 cursor-pointer transition-colors"
+                    className="border-secondary-200 text-secondary-600 hover:bg-secondary-50 inline-flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                     Add Photos
                   </label>
-                  <span className="text-xs text-secondary-400 ml-2">
+                  <span className="text-secondary-400 ml-2 text-xs">
                     {images.length}/{MAX_IMAGES} (max 5MB each)
                   </span>
                 </div>
@@ -360,7 +430,10 @@ export default function ReviewForm({
 
             {/* Name */}
             <div>
-              <label htmlFor="review-name" className="block text-sm font-medium text-secondary-700 mb-2">
+              <label
+                htmlFor="review-name"
+                className="text-secondary-700 mb-2 block text-sm font-medium"
+              >
                 Your Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -369,19 +442,25 @@ export default function ReviewForm({
                 value={customerName}
                 onChange={(e) => {
                   setCustomerName(e.target.value);
-                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('customerName'); return n; });
+                  if (fieldErrors.size)
+                    setFieldErrors((prev) => {
+                      const n = new Set(prev);
+                      n.delete("customerName");
+                      return n;
+                    });
                 }}
                 placeholder="John D."
                 maxLength={100}
-                className={`w-full px-4 py-3 border ${fieldErrors.has('customerName') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
-                  placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors`}
+                className={`w-full border px-4 py-3 ${fieldErrors.has("customerName") ? "border-red-400" : "border-secondary-200"} text-secondary-700 placeholder:text-secondary-400 focus:ring-primary-500 focus:border-primary-500 rounded-xl transition-colors focus:ring-2 focus:outline-none`}
               />
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="review-email" className="block text-sm font-medium text-secondary-700 mb-2">
+              <label
+                htmlFor="review-email"
+                className="text-secondary-700 mb-2 block text-sm font-medium"
+              >
                 Your Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -390,21 +469,24 @@ export default function ReviewForm({
                 value={customerEmail}
                 onChange={(e) => {
                   setCustomerEmail(e.target.value);
-                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('customerEmail'); return n; });
+                  if (fieldErrors.size)
+                    setFieldErrors((prev) => {
+                      const n = new Set(prev);
+                      n.delete("customerEmail");
+                      return n;
+                    });
                 }}
                 placeholder="john@example.com"
-                className={`w-full px-4 py-3 border ${fieldErrors.has('customerEmail') ? 'border-red-400' : 'border-secondary-200'} rounded-xl text-secondary-700
-                  placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500
-                  focus:border-primary-500 transition-colors`}
+                className={`w-full border px-4 py-3 ${fieldErrors.has("customerEmail") ? "border-red-400" : "border-secondary-200"} text-secondary-700 placeholder:text-secondary-400 focus:ring-primary-500 focus:border-primary-500 rounded-xl transition-colors focus:ring-2 focus:outline-none`}
               />
-              <span className="text-xs text-secondary-400 mt-1 block">
+              <span className="text-secondary-400 mt-1 block text-xs">
                 Your email will not be published
               </span>
             </div>
 
             {/* Error message */}
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
@@ -413,20 +495,30 @@ export default function ReviewForm({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-primary-600 text-white font-semibold rounded-xl
-                hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
-                disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 w-full rounded-xl px-4 py-3 font-semibold text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
-                  {uploadProgress || 'Submitting...'}
+                  {uploadProgress || "Submitting..."}
                 </span>
               ) : (
-                'Submit Review'
+                "Submit Review"
               )}
             </button>
           </form>

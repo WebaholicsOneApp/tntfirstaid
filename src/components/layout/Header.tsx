@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useCart } from '~/lib/cart';
-import { useAuth } from '~/lib/auth';
-import type { CategoryWithChildren } from '~/types';
-import MobileMenu from './MobileMenu';
-import MegaMenu from '~/components/navigation/MegaMenu';
-import { SearchOverlay } from '~/components/search/SearchOverlay';
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCart } from "~/lib/cart";
+import { useAuth } from "~/lib/auth";
+import type { CategoryWithChildren } from "~/types";
+import MobileMenu from "./MobileMenu";
+import MegaMenu from "~/components/navigation/MegaMenu";
+import { SearchOverlay } from "~/components/search/SearchOverlay";
 
 interface HeaderProps {
   siteName?: string;
@@ -17,23 +17,27 @@ interface HeaderProps {
 }
 
 const navLinks = [
-  { href: '/shop', label: 'Shop' },
-  { href: '/team-alpha', label: 'Team Alpha' },
-  { href: '/about', label: 'About Us' },
-  { href: '/distributors', label: 'Distributors' },
-  { href: '/news', label: 'News and Data' },
-  { href: '/calculator', label: "Kauber's Wind Constant Calculator" },
+  { href: "/shop", label: "Shop" },
+  { href: "/team-alpha", label: "Team Alpha" },
+  { href: "/about", label: "About Us" },
+  { href: "/distributors", label: "Distributors" },
+  { href: "/news", label: "News and Data" },
+  { href: "/calculator", label: "Kauber's Wind Constant Calculator" },
   {
-    href: '/contact',
-    label: 'Contact',
+    href: "/contact",
+    label: "Contact",
     children: [
-      { href: '/contact', label: 'Contact Us' },
-      { href: '/dealer-sign-up', label: 'Dealer Sign Up' },
+      { href: "/contact", label: "Contact Us" },
+      { href: "/dealer-sign-up", label: "Dealer Sign Up" },
     ],
   },
 ];
 
-export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/images/alpha-logo-wide.png', categories }: HeaderProps) {
+export default function Header({
+  siteName = "Alpha Munitions",
+  logoUrl = "/images/alpha-logo-wide.png",
+  categories,
+}: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOverlayOpen, setSearchOverlayOpen] = useState(false);
   const [megaMenuOpen, setMegaMenuOpen] = useState(false);
@@ -41,25 +45,31 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const megaMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const contactDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const accountDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const contactDropdownTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
+  const accountDropdownTimeoutRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const { cart, openCart } = useCart();
   const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen]);
 
   const handleShopEnter = () => {
@@ -78,18 +88,30 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
   };
 
   return (
-    <header className={`transition-all duration-500 ${scrolled ? 'bg-secondary-800/95 backdrop-blur-sm shadow-lg border-b border-primary-500/[0.08]' : 'bg-secondary-800 border-b border-secondary-800'}`}>
-      <div className="w-full px-4 lg:px-6 py-5">
+    <header
+      className={`transition-all duration-500 ${scrolled ? "bg-secondary-800/95 border-primary-500/[0.08] border-b shadow-lg backdrop-blur-sm" : "bg-secondary-800 border-secondary-800 border-b"}`}
+    >
+      <div className="w-full px-4 py-5 lg:px-6">
         <div className="flex items-center justify-between">
           {/* Left: Hamburger (mobile) + Logo */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-primary-400 hover:text-white transition-colors"
+              className="text-primary-400 p-2 transition-colors hover:text-white lg:hidden"
               aria-label="Open navigation menu"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
 
@@ -99,16 +121,16 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
                 alt={siteName}
                 width={300}
                 height={50}
-                className="w-[160px] sm:w-[220px] lg:w-[240px] xl:w-[280px] h-auto"
+                className="h-auto w-[160px] sm:w-[220px] lg:w-[240px] xl:w-[280px]"
                 priority
               />
             </Link>
           </div>
 
           {/* Center: Desktop navigation */}
-          <nav className="hidden lg:flex items-center gap-0">
+          <nav className="hidden items-center gap-0 lg:flex">
             {navLinks.map((link) => {
-              if (link.href === '/shop') {
+              if (link.href === "/shop") {
                 return (
                   <div
                     key={link.href}
@@ -118,16 +140,18 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
                   >
                     <Link
                       href={link.href}
-                      className={`relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
+                      className={`relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em] ${
                         megaMenuOpen
-                          ? 'text-white'
-                          : 'text-primary-400 hover:text-white'
+                          ? "text-white"
+                          : "text-primary-400 hover:text-white"
                       }`}
                     >
                       {link.label}
-                      <span className={`absolute bottom-0 left-0 h-[2px] bg-primary-500 transition-[width] duration-300 ${
-                        megaMenuOpen ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`} />
+                      <span
+                        className={`bg-primary-500 absolute bottom-0 left-0 h-[2px] transition-[width] duration-300 ${
+                          megaMenuOpen ? "w-full" : "w-0 group-hover:w-full"
+                        }`}
+                      />
                     </Link>
                   </div>
                 );
@@ -138,31 +162,41 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
                     key={link.href}
                     className="group relative"
                     onMouseEnter={() => {
-                      if (contactDropdownTimeoutRef.current) clearTimeout(contactDropdownTimeoutRef.current);
+                      if (contactDropdownTimeoutRef.current)
+                        clearTimeout(contactDropdownTimeoutRef.current);
                       setContactDropdownOpen(true);
                     }}
                     onMouseLeave={() => {
-                      contactDropdownTimeoutRef.current = setTimeout(() => setContactDropdownOpen(false), 150);
+                      contactDropdownTimeoutRef.current = setTimeout(
+                        () => setContactDropdownOpen(false),
+                        150,
+                      );
                     }}
                   >
                     <Link
                       href={link.href}
-                      className={`relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] transition-colors whitespace-nowrap ${
-                        contactDropdownOpen ? 'text-white' : 'text-primary-400 hover:text-white'
+                      className={`relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em] ${
+                        contactDropdownOpen
+                          ? "text-white"
+                          : "text-primary-400 hover:text-white"
                       }`}
                     >
                       {link.label}
-                      <span className={`absolute bottom-0 left-0 h-[2px] bg-primary-500 transition-[width] duration-300 ${
-                        contactDropdownOpen ? 'w-full' : 'w-0 group-hover:w-full'
-                      }`} />
+                      <span
+                        className={`bg-primary-500 absolute bottom-0 left-0 h-[2px] transition-[width] duration-300 ${
+                          contactDropdownOpen
+                            ? "w-full"
+                            : "w-0 group-hover:w-full"
+                        }`}
+                      />
                     </Link>
                     {contactDropdownOpen && (
-                      <div className="absolute top-full right-0 mt-1 min-w-[160px] bg-secondary-800 border border-secondary-700 rounded-md shadow-xl py-1 z-50">
+                      <div className="bg-secondary-800 border-secondary-700 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border py-1 shadow-xl">
                         {link.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
-                            className="block px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-primary-400 hover:text-white hover:bg-secondary-700 transition-colors whitespace-nowrap"
+                            className="text-primary-400 hover:bg-secondary-700 block px-4 py-2.5 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors hover:text-white"
                             onClick={() => setContactDropdownOpen(false)}
                           >
                             {child.label}
@@ -177,10 +211,10 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
                 <div key={link.href} className="group relative">
                   <Link
                     href={link.href}
-                    className="relative px-1.5 xl:px-2.5 py-2 text-[9px] xl:text-[11px] font-medium uppercase tracking-[0.08em] xl:tracking-[0.12em] text-primary-400 hover:text-white transition-colors whitespace-nowrap"
+                    className="text-primary-400 relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors hover:text-white xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em]"
                   >
                     {link.label}
-                    <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-primary-500 transition-[width] duration-300 group-hover:w-full" />
+                    <span className="bg-primary-500 absolute bottom-0 left-0 h-[2px] w-0 transition-[width] duration-300 group-hover:w-full" />
                   </Link>
                 </div>
               );
@@ -192,11 +226,21 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
             {/* Search icon */}
             <button
               onClick={() => setSearchOverlayOpen(!searchOverlayOpen)}
-              className="p-2 text-primary-400 hover:text-white transition-colors"
+              className="text-primary-400 p-2 transition-colors hover:text-white"
               aria-label="Open search"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </button>
 
@@ -204,11 +248,21 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
             {customerAuthEnabled && !isAuthenticated && (
               <Link
                 href="/account"
-                className="p-2 text-primary-400 hover:text-white transition-colors"
+                className="text-primary-400 p-2 transition-colors hover:text-white"
                 aria-label="Sign in"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
               </Link>
             )}
@@ -216,59 +270,67 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
               <div
                 className="relative"
                 onMouseEnter={() => {
-                  if (accountDropdownTimeoutRef.current) clearTimeout(accountDropdownTimeoutRef.current);
+                  if (accountDropdownTimeoutRef.current)
+                    clearTimeout(accountDropdownTimeoutRef.current);
                   setAccountDropdownOpen(true);
                 }}
                 onMouseLeave={() => {
-                  accountDropdownTimeoutRef.current = setTimeout(() => setAccountDropdownOpen(false), 200);
+                  accountDropdownTimeoutRef.current = setTimeout(
+                    () => setAccountDropdownOpen(false),
+                    200,
+                  );
                 }}
               >
                 <Link
                   href="/account/dashboard"
-                  className="p-2 text-primary-400 hover:text-white transition-colors block"
+                  className="text-primary-400 block p-2 transition-colors hover:text-white"
                   aria-label="My account"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
                   </svg>
                 </Link>
                 {accountDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-1 min-w-[160px] bg-secondary-800 border border-secondary-700 rounded-md shadow-xl py-1 z-50">
+                  <div className="bg-secondary-800 border-secondary-700 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border py-1 shadow-xl">
                     <Link
                       href="/account/dashboard"
-                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       My Account
                     </Link>
                     <Link
                       href="/account/profile"
-                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
                       href="/account/orders"
-                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Orders
                     </Link>
                     <Link
                       href="/account/security"
-                      className="text-sm text-primary-400 hover:text-white hover:bg-secondary-700 px-4 py-2 block transition-colors"
+                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Security
                     </Link>
-                    <div className="border-t border-secondary-700 my-1" />
+                    <div className="border-secondary-700 my-1 border-t" />
                     <button
                       onClick={() => {
                         setAccountDropdownOpen(false);
                         logout();
                       }}
-                      className="text-sm text-red-400 hover:text-red-300 hover:bg-secondary-700 px-4 py-2 w-full text-left transition-colors"
+                      className="hover:bg-secondary-700 w-full px-4 py-2 text-left text-sm text-red-400 transition-colors hover:text-red-300"
                     >
                       Sign Out
                     </button>
@@ -280,19 +342,29 @@ export default function Header({ siteName = 'Alpha Munitions', logoUrl = '/image
             {/* Cart icon */}
             <button
               onClick={openCart}
-              className="relative p-2 text-primary-400 hover:text-white transition-colors"
+              className="text-primary-400 relative p-2 transition-colors hover:text-white"
               aria-label="Open cart"
               suppressHydrationWarning
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
               </svg>
               {cart.itemCount > 0 && (
                 <span
-                  className="absolute -top-1 -right-1 bg-primary-500 text-secondary-800 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                  className="bg-primary-500 text-secondary-800 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
                   suppressHydrationWarning
                 >
-                  {cart.itemCount > 99 ? '99+' : cart.itemCount}
+                  {cart.itemCount > 99 ? "99+" : cart.itemCount}
                 </span>
               )}
             </button>

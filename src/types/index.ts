@@ -2,4 +2,4 @@
  * Type exports for Storefront
  */
 
-export * from './product';
+export * from "./product";

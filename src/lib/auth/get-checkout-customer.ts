@@ -3,9 +3,9 @@
  * the customer profile or null. Never throws — checkout must always
  * work for guests.
  */
-import { getCustomerToken } from '~/lib/auth/cookies';
-import { getMe } from '~/lib/auth/auth-api';
-import type { Customer } from '~/types/auth';
+import { getCustomerToken } from "~/lib/auth/cookies";
+import { getMe } from "~/lib/auth/auth-api";
+import type { Customer } from "~/types/auth";
 
 export async function getCheckoutCustomer(): Promise<Customer | null> {
   try {

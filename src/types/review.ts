@@ -52,4 +52,9 @@ export interface ReviewSubmission {
   content: string;
 }
 
-export type ReviewSortOption = 'newest' | 'oldest' | 'highest' | 'lowest' | 'helpful';
+export type ReviewSortOption =
+  | "newest"
+  | "oldest"
+  | "highest"
+  | "lowest"
+  | "helpful";

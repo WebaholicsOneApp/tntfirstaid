@@ -3,7 +3,7 @@
  */
 
 export interface ParsedSearch {
-  type: 'sku' | 'keyword';
+  type: "sku" | "keyword";
   keywords: string;
   original: string;
 }
@@ -16,7 +16,7 @@ export function parseSearchQuery(query: string): ParsedSearch {
 
   // Default result
   const result: ParsedSearch = {
-    type: 'keyword',
+    type: "keyword",
     keywords: trimmed,
     original: trimmed,
   };
@@ -27,7 +27,7 @@ export function parseSearchQuery(query: string): ParsedSearch {
 
   // SKU check (first priority)
   if (/^\d{5,}$/.test(trimmed) || /^[A-Z]{1,4}[-]?\d{5,}$/i.test(trimmed)) {
-    result.type = 'sku';
+    result.type = "sku";
     return result;
   }
 

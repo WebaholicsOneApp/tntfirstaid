@@ -1,6 +1,6 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { getApiClient, ApiClientError } from '~/lib/api-client';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { getApiClient, ApiClientError } from "~/lib/api-client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,10 +8,13 @@ export async function POST(request: NextRequest) {
     const { token } = body;
 
     if (!token) {
-      return NextResponse.json({
-        success: false,
-        error: 'No token provided',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "No token provided",
+        },
+        { status: 400 },
+      );
     }
 
     // Unsubscribe via API (handles token lookup and update server-side)
@@ -21,30 +24,35 @@ export async function POST(request: NextRequest) {
     }>({ token });
 
     return NextResponse.json(result);
-
   } catch (error) {
     if (error instanceof ApiClientError) {
-      return NextResponse.json({
-        success: false,
-        error: error.message,
-      }, { status: error.status });
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: error.status },
+      );
     }
-    console.error('Unsubscribe error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to process unsubscribe request. Please try again.',
-    }, { status: 500 });
+    console.error("Unsubscribe error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to process unsubscribe request. Please try again.",
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   if (!token) {
     return NextResponse.json({
       valid: false,
-      error: 'No token provided',
+      error: "No token provided",
     });
   }
 
@@ -61,7 +69,7 @@ export async function GET(request: NextRequest) {
   } catch {
     return NextResponse.json({
       valid: false,
-      error: 'Invalid or expired unsubscribe link.',
+      error: "Invalid or expired unsubscribe link.",
     });
   }
 }

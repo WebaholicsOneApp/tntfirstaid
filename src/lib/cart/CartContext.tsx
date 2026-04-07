@@ -1,9 +1,17 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useReducer, useEffect, useCallback, useState, type ReactNode } from 'react';
-import type { Cart, CartItem, CartContextType } from '~/types/cart';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Cart, CartItem, CartContextType } from "~/types/cart";
 
-const CART_STORAGE_KEY = 'alpha-munitions-cart';
+const CART_STORAGE_KEY = "alpha-munitions-cart";
 
 // Initial empty cart state
 const initialCart: Cart = {
@@ -14,27 +22,35 @@ const initialCart: Cart = {
 
 // Cart actions
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: { item: Omit<CartItem, 'quantity'>; quantity: number } }
-  | { type: 'REMOVE_ITEM'; payload: { variationId: number } }
-  | { type: 'UPDATE_QUANTITY'; payload: { variationId: number; quantity: number } }
-  | { type: 'CLEAR_CART' }
-  | { type: 'LOAD_CART'; payload: Cart };
+  | {
+      type: "ADD_ITEM";
+      payload: { item: Omit<CartItem, "quantity">; quantity: number };
+    }
+  | { type: "REMOVE_ITEM"; payload: { variationId: number } }
+  | {
+      type: "UPDATE_QUANTITY";
+      payload: { variationId: number; quantity: number };
+    }
+  | { type: "CLEAR_CART" }
+  | { type: "LOAD_CART"; payload: Cart };
 
 // Calculate cart totals
-function calculateTotals(items: CartItem[]): Pick<Cart, 'subtotal' | 'itemCount'> {
+function calculateTotals(
+  items: CartItem[],
+): Pick<Cart, "subtotal" | "itemCount"> {
   return items.reduce(
     (acc, item) => ({
       subtotal: acc.subtotal + item.price * item.quantity,
       itemCount: acc.itemCount + item.quantity,
     }),
-    { subtotal: 0, itemCount: 0 }
+    { subtotal: 0, itemCount: 0 },
   );
 }
 
 // Cart reducer
 function cartReducer(state: Cart, action: CartAction): Cart {
   switch (action.type) {
-    case 'ADD_ITEM': {
+    case "ADD_ITEM": {
       const { item, quantity } = action.payload;
       const existingIndex = state.items.findIndex((i) => i.id === item.id);
 
@@ -43,8 +59,11 @@ function cartReducer(state: Cart, action: CartAction): Cart {
         // Update existing item quantity
         newItems = state.items.map((i, index) =>
           index === existingIndex
-            ? { ...i, quantity: Math.min(i.quantity + quantity, i.maxQuantity || 99) }
-            : i
+            ? {
+                ...i,
+                quantity: Math.min(i.quantity + quantity, i.maxQuantity || 99),
+              }
+            : i,
         );
       } else {
         // Add new item
@@ -54,12 +73,14 @@ function cartReducer(state: Cart, action: CartAction): Cart {
       return { items: newItems, ...calculateTotals(newItems) };
     }
 
-    case 'REMOVE_ITEM': {
-      const newItems = state.items.filter((i) => i.id !== action.payload.variationId);
+    case "REMOVE_ITEM": {
+      const newItems = state.items.filter(
+        (i) => i.id !== action.payload.variationId,
+      );
       return { items: newItems, ...calculateTotals(newItems) };
     }
 
-    case 'UPDATE_QUANTITY': {
+    case "UPDATE_QUANTITY": {
       const { variationId, quantity } = action.payload;
       if (quantity <= 0) {
         const newItems = state.items.filter((i) => i.id !== variationId);
@@ -68,15 +89,15 @@ function cartReducer(state: Cart, action: CartAction): Cart {
       const newItems = state.items.map((i) =>
         i.id === variationId
           ? { ...i, quantity: Math.min(quantity, i.maxQuantity || 99) }
-          : i
+          : i,
       );
       return { items: newItems, ...calculateTotals(newItems) };
     }
 
-    case 'CLEAR_CART':
+    case "CLEAR_CART":
       return initialCart;
 
-    case 'LOAD_CART':
+    case "LOAD_CART":
       return action.payload;
 
     default:
@@ -100,11 +121,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (parsed && Array.isArray(parsed.items)) {
-          dispatch({ type: 'LOAD_CART', payload: parsed });
+          dispatch({ type: "LOAD_CART", payload: parsed });
         }
       }
     } catch (error) {
-      console.error('Failed to load cart from localStorage:', error);
+      console.error("Failed to load cart from localStorage:", error);
     }
     setIsHydrated(true);
   }, []);
@@ -115,28 +136,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
       } catch (error) {
-        console.error('Failed to save cart to localStorage:', error);
+        console.error("Failed to save cart to localStorage:", error);
       }
     }
   }, [cart, isHydrated]);
 
-  const addItem = useCallback((item: Omit<CartItem, 'quantity'>, quantity = 1, options?: { skipDrawer?: boolean }) => {
-    dispatch({ type: 'ADD_ITEM', payload: { item, quantity } });
-    if (!options?.skipDrawer) {
-      setIsOpen(true);
-    }
-  }, []);
+  const addItem = useCallback(
+    (
+      item: Omit<CartItem, "quantity">,
+      quantity = 1,
+      options?: { skipDrawer?: boolean },
+    ) => {
+      dispatch({ type: "ADD_ITEM", payload: { item, quantity } });
+      if (!options?.skipDrawer) {
+        setIsOpen(true);
+      }
+    },
+    [],
+  );
 
   const removeItem = useCallback((variationId: number) => {
-    dispatch({ type: 'REMOVE_ITEM', payload: { variationId } });
+    dispatch({ type: "REMOVE_ITEM", payload: { variationId } });
   }, []);
 
-  const updateQuantity = useCallback((variationId: number, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', payload: { variationId, quantity } });
-  }, []);
+  const updateQuantity = useCallback(
+    (variationId: number, quantity: number) => {
+      dispatch({ type: "UPDATE_QUANTITY", payload: { variationId, quantity } });
+    },
+    [],
+  );
 
   const clearCart = useCallback(() => {
-    dispatch({ type: 'CLEAR_CART' });
+    dispatch({ type: "CLEAR_CART" });
   }, []);
 
   const openCart = useCallback(() => setIsOpen(true), []);
@@ -164,7 +195,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 export function useCart(): CartContextType {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 }

@@ -2,11 +2,11 @@
  * Email Service using Resend
  * Sends order notification emails to customers
  */
-import { Resend } from 'resend';
-import { orderShippedTemplate } from './templates/order-shipped';
-import { orderDeliveredTemplate } from './templates/order-delivered';
-import { orderConfirmedTemplate } from './templates/order-confirmed';
-import type { FulfillmentStatus } from '~/types/fulfillment';
+import { Resend } from "resend";
+import { orderShippedTemplate } from "./templates/order-shipped";
+import { orderDeliveredTemplate } from "./templates/order-delivered";
+import { orderConfirmedTemplate } from "./templates/order-confirmed";
+import type { FulfillmentStatus } from "~/types/fulfillment";
 
 // Lazy initialize Resend to avoid build-time errors
 let resend: Resend | null = null;
@@ -15,7 +15,7 @@ function getResend(): Resend {
   if (!resend) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      throw new Error('RESEND_API_KEY is not configured');
+      throw new Error("RESEND_API_KEY is not configured");
     }
     resend = new Resend(apiKey);
   }
@@ -54,54 +54,64 @@ export interface OrderEmailData {
  */
 function getTrackingUrl(carrier: string, trackingNumber: string): string {
   const carrierUrls: Record<string, string> = {
-    'UPS': `https://www.ups.com/track?tracknum=${trackingNumber}`,
-    'FEDEX': `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
-    'USPS': `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
-    'DHL': `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNumber}`,
+    UPS: `https://www.ups.com/track?tracknum=${trackingNumber}`,
+    FEDEX: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    USPS: `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
+    DHL: `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNumber}`,
   };
 
   const normalizedCarrier = carrier.toUpperCase();
-  return carrierUrls[normalizedCarrier] || `https://www.google.com/search?q=${trackingNumber}+tracking`;
+  return (
+    carrierUrls[normalizedCarrier] ||
+    `https://www.google.com/search?q=${trackingNumber}+tracking`
+  );
 }
 
 /**
  * Send order notification email
  */
-export async function sendOrderEmail(data: OrderEmailData): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-  const storeName = process.env.STORE_NAME || 'Alpha Munitions';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alphamunitions.com';
+export async function sendOrderEmail(
+  data: OrderEmailData,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
+  const storeName = process.env.STORE_NAME || "Alpha Munitions";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
 
   try {
     // Generate tracking URL if available
-    const trackingUrl = data.trackingNumber && data.carrier
-      ? getTrackingUrl(data.carrier, data.trackingNumber)
-      : undefined;
+    const trackingUrl =
+      data.trackingNumber && data.carrier
+        ? getTrackingUrl(data.carrier, data.trackingNumber)
+        : undefined;
 
     // Select template based on status
-    const { subject, html } = data.status === 'SHIPPED'
-      ? orderShippedTemplate({
-          customerName: data.customerName,
-          orderId: data.orderId,
-          trackingNumber: data.trackingNumber,
-          carrier: data.carrier,
-          trackingUrl,
-          estimatedDelivery: data.estimatedDelivery,
-          shippingAddress: data.shippingAddress,
-          items: data.items,
-          storeName,
-          siteUrl,
-        })
-      : orderDeliveredTemplate({
-          customerName: data.customerName,
-          orderId: data.orderId,
-          shippingAddress: data.shippingAddress,
-          items: data.items,
-          storeName,
-          siteUrl,
-        });
+    const { subject, html } =
+      data.status === "SHIPPED"
+        ? orderShippedTemplate({
+            customerName: data.customerName,
+            orderId: data.orderId,
+            trackingNumber: data.trackingNumber,
+            carrier: data.carrier,
+            trackingUrl,
+            estimatedDelivery: data.estimatedDelivery,
+            shippingAddress: data.shippingAddress,
+            items: data.items,
+            storeName,
+            siteUrl,
+          })
+        : orderDeliveredTemplate({
+            customerName: data.customerName,
+            orderId: data.orderId,
+            shippingAddress: data.shippingAddress,
+            items: data.items,
+            storeName,
+            siteUrl,
+          });
 
-    console.log(`[EMAIL] Sending ${data.status} email to ${data.customerEmail}`);
+    console.log(
+      `[EMAIL] Sending ${data.status} email to ${data.customerEmail}`,
+    );
 
     const result = await getResend().emails.send({
       from: `${storeName} <${fromEmail}>`,
@@ -111,16 +121,15 @@ export async function sendOrderEmail(data: OrderEmailData): Promise<{ success: b
     });
 
     if (result.error) {
-      console.error('[EMAIL] Resend error:', result.error);
+      console.error("[EMAIL] Resend error:", result.error);
       return { success: false, error: result.error.message };
     }
 
     console.log(`[EMAIL] Email sent successfully. ID: ${result.data?.id}`);
     return { success: true, messageId: result.data?.id };
-
   } catch (error: any) {
-    console.error('[EMAIL] Error sending email:', error);
-    return { success: false, error: error.message || 'Unknown error' };
+    console.error("[EMAIL] Error sending email:", error);
+    return { success: false, error: error.message || "Unknown error" };
   }
 }
 
@@ -157,10 +166,13 @@ export interface OrderConfirmationEmailData {
 /**
  * Send order confirmation email
  */
-export async function sendOrderConfirmationEmail(data: OrderConfirmationEmailData): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-  const storeName = process.env.STORE_NAME || 'Alpha Munitions';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alphamunitions.com';
+export async function sendOrderConfirmationEmail(
+  data: OrderConfirmationEmailData,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
+  const storeName = process.env.STORE_NAME || "Alpha Munitions";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
 
   try {
     const { subject, html } = orderConfirmedTemplate({
@@ -185,7 +197,9 @@ export async function sendOrderConfirmationEmail(data: OrderConfirmationEmailDat
       siteUrl,
     });
 
-    console.log(`[EMAIL] Sending order confirmation email to ${data.customerEmail}`);
+    console.log(
+      `[EMAIL] Sending order confirmation email to ${data.customerEmail}`,
+    );
 
     const result = await getResend().emails.send({
       from: `${storeName} <${fromEmail}>`,
@@ -195,15 +209,16 @@ export async function sendOrderConfirmationEmail(data: OrderConfirmationEmailDat
     });
 
     if (result.error) {
-      console.error('[EMAIL] Resend error:', result.error);
+      console.error("[EMAIL] Resend error:", result.error);
       return { success: false, error: result.error.message };
     }
 
-    console.log(`[EMAIL] Order confirmation email sent successfully. ID: ${result.data?.id}`);
+    console.log(
+      `[EMAIL] Order confirmation email sent successfully. ID: ${result.data?.id}`,
+    );
     return { success: true, messageId: result.data?.id };
-
   } catch (error: any) {
-    console.error('[EMAIL] Error sending order confirmation email:', error);
-    return { success: false, error: error.message || 'Unknown error' };
+    console.error("[EMAIL] Error sending order confirmation email:", error);
+    return { success: false, error: error.message || "Unknown error" };
   }
 }

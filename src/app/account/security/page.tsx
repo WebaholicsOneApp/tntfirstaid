@@ -1,44 +1,67 @@
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { getCustomerToken } from '~/lib/auth/cookies';
-import { getMe } from '~/lib/auth/auth-api';
-import SecurityClient from './SecurityClient';
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { getCustomerToken } from "~/lib/auth/cookies";
+import { getMe } from "~/lib/auth/auth-api";
+import SecurityClient from "./SecurityClient";
 
-export const metadata = { title: 'Security' };
+export const metadata = { title: "Security" };
 
 export default async function SecurityPage() {
   const token = await getCustomerToken();
-  if (!token) redirect('/account');
+  if (!token) redirect("/account");
 
   let customer;
   try {
     const data = await getMe(token);
     customer = data.customer;
   } catch {
-    redirect('/account?expired=1');
+    redirect("/account?expired=1");
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-12 md:py-16 max-w-3xl">
+      <div className="container mx-auto max-w-3xl px-4 py-12 md:py-16">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-secondary-400 mb-6">
-          <Link href="/account/dashboard" className="hover:text-primary-500 transition-colors mr-1" aria-label="Back to account">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <div className="text-secondary-400 mb-6 flex items-center gap-2 text-xs">
+          <Link
+            href="/account/dashboard"
+            className="hover:text-primary-500 mr-1 transition-colors"
+            aria-label="Back to account"
+          >
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </Link>
-          <Link href="/account/dashboard" className="hover:text-primary-500 transition-colors">Account</Link>
+          <Link
+            href="/account/dashboard"
+            className="hover:text-primary-500 transition-colors"
+          >
+            Account
+          </Link>
           <span>/</span>
           <span className="text-secondary-600">Security</span>
         </div>
 
         {/* Header */}
-        <div className="flex items-center gap-3 mb-2">
-          <div className="h-px w-6 bg-primary-500" />
-          <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">Account</span>
+        <div className="mb-2 flex items-center gap-3">
+          <div className="bg-primary-500 h-px w-6" />
+          <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+            Account
+          </span>
         </div>
-        <h1 className="font-display text-3xl font-bold text-secondary-900 mb-8">Security</h1>
+        <h1 className="font-display text-secondary-900 mb-8 text-3xl font-bold">
+          Security
+        </h1>
 
         <SecurityClient customer={customer} />
       </div>

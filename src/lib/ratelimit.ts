@@ -42,15 +42,18 @@ interface RateLimitEntry {
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
 // Clean up old entries every 5 minutes
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [key, entry] of rateLimitStore.entries()) {
-      if (entry.resetTime < now) {
-        rateLimitStore.delete(key);
+if (typeof setInterval !== "undefined") {
+  setInterval(
+    () => {
+      const now = Date.now();
+      for (const [key, entry] of rateLimitStore.entries()) {
+        if (entry.resetTime < now) {
+          rateLimitStore.delete(key);
+        }
       }
-    }
-  }, 5 * 60 * 1000);
+    },
+    5 * 60 * 1000,
+  );
 }
 
 // ============================================
@@ -73,7 +76,7 @@ export interface RateLimitResult {
  */
 export async function checkRateLimit(
   identifier: string,
-  type: RateLimitType = 'api'
+  type: RateLimitType = "api",
 ): Promise<RateLimitResult> {
   const config = RATE_LIMITS[type];
   const windowMs = config.windowSeconds * 1000;
@@ -130,30 +133,30 @@ export function getClientIp(request: Request): string {
   // Prioritize platform-set headers (cannot be spoofed by clients)
 
   // Vercel (set by the platform, highest trust)
-  const vercelForwardedFor = request.headers.get('x-vercel-forwarded-for');
+  const vercelForwardedFor = request.headers.get("x-vercel-forwarded-for");
   if (vercelForwardedFor) {
-    return vercelForwardedFor.split(',')[0]!.trim();
+    return vercelForwardedFor.split(",")[0]!.trim();
   }
 
   // Cloudflare (set by the platform)
-  const cfConnectingIp = request.headers.get('cf-connecting-ip');
+  const cfConnectingIp = request.headers.get("cf-connecting-ip");
   if (cfConnectingIp) {
     return cfConnectingIp;
   }
 
   // x-real-ip (typically set by reverse proxy)
-  const realIp = request.headers.get('x-real-ip');
+  const realIp = request.headers.get("x-real-ip");
   if (realIp) {
     return realIp;
   }
 
   // x-forwarded-for (can be spoofed — lowest priority fallback)
-  const forwardedFor = request.headers.get('x-forwarded-for');
+  const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) {
-    return forwardedFor.split(',')[0]!.trim();
+    return forwardedFor.split(",")[0]!.trim();
   }
 
-  return 'unknown';
+  return "unknown";
 }
 
 /**
@@ -162,19 +165,19 @@ export function getClientIp(request: Request): string {
 export function rateLimitResponse(result: RateLimitResult): Response {
   return new Response(
     JSON.stringify({
-      error: 'Too many requests',
+      error: "Too many requests",
       message: `Rate limit exceeded. Please try again in ${result.resetIn} seconds.`,
       retryAfter: result.resetIn,
     }),
     {
       status: 429,
       headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': String(result.resetIn),
-        'X-RateLimit-Limit': String(result.limit),
-        'X-RateLimit-Remaining': String(result.remaining),
-        'X-RateLimit-Reset': String(result.resetIn),
+        "Content-Type": "application/json",
+        "Retry-After": String(result.resetIn),
+        "X-RateLimit-Limit": String(result.limit),
+        "X-RateLimit-Remaining": String(result.remaining),
+        "X-RateLimit-Reset": String(result.resetIn),
       },
-    }
+    },
   );
 }

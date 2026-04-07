@@ -1,49 +1,49 @@
 export default function CheckoutSuccessLoading() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center px-4">
-      <div className="max-w-lg w-full text-center">
+    <div className="flex min-h-screen items-center justify-center bg-[#FAFAF8] px-4">
+      <div className="w-full max-w-lg text-center">
         {/* Checkmark placeholder */}
         <div
-          className="skeleton w-20 h-20 !rounded-full mx-auto mb-8"
-          style={{ animationDelay: '0ms' }}
+          className="skeleton mx-auto mb-8 h-20 w-20 !rounded-full"
+          style={{ animationDelay: "0ms" }}
         />
 
         {/* Thank you heading */}
         <div
-          className="skeleton h-9 w-64 mx-auto mb-3"
-          style={{ animationDelay: '100ms' }}
+          className="skeleton mx-auto mb-3 h-9 w-64"
+          style={{ animationDelay: "100ms" }}
         />
 
         {/* Subtext */}
         <div
-          className="skeleton h-4 w-80 max-w-full mx-auto mb-2"
-          style={{ animationDelay: '180ms' }}
+          className="skeleton mx-auto mb-2 h-4 w-80 max-w-full"
+          style={{ animationDelay: "180ms" }}
         />
         <div
-          className="skeleton h-4 w-56 mx-auto mb-8"
-          style={{ animationDelay: '240ms' }}
+          className="skeleton mx-auto mb-8 h-4 w-56"
+          style={{ animationDelay: "240ms" }}
         />
 
         {/* Order number card */}
-        <div className="bg-white rounded-2xl p-6 border border-secondary-100 shadow-[0_4px_24px_rgba(0,0,0,0.06)] mb-8">
+        <div className="border-secondary-100 mb-8 rounded-2xl border bg-white p-6 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
           <div
-            className="skeleton h-3 w-28 mx-auto mb-3"
-            style={{ animationDelay: '300ms' }}
+            className="skeleton mx-auto mb-3 h-3 w-28"
+            style={{ animationDelay: "300ms" }}
           />
           <div
-            className="skeleton h-8 w-36 mx-auto mb-4"
-            style={{ animationDelay: '360ms' }}
+            className="skeleton mx-auto mb-4 h-8 w-36"
+            style={{ animationDelay: "360ms" }}
           />
           <div
-            className="skeleton h-3 w-52 mx-auto"
-            style={{ animationDelay: '420ms' }}
+            className="skeleton mx-auto h-3 w-52"
+            style={{ animationDelay: "420ms" }}
           />
         </div>
 
         {/* Continue shopping button */}
         <div
-          className="skeleton h-12 w-56 !rounded-full mx-auto"
-          style={{ animationDelay: '480ms' }}
+          className="skeleton mx-auto h-12 w-56 !rounded-full"
+          style={{ animationDelay: "480ms" }}
         />
       </div>
     </div>

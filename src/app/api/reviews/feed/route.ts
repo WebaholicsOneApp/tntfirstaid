@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { getApiClient } from '~/lib/api-client';
-import { escapeXml, slugify } from '~/lib/xml-helpers';
+import { NextResponse } from "next/server";
+import { getApiClient } from "~/lib/api-client";
+import { escapeXml, slugify } from "~/lib/xml-helpers";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://alphamunition.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunition.com";
 
 export async function GET() {
   try {
@@ -31,7 +31,7 @@ export async function GET() {
       <reviewer>
         <name>${escapeXml(review.customerName)}</name>
       </reviewer>
-      <review_timestamp>${timestamp}</review_timestamp>${review.title ? `\n      <title>${escapeXml(review.title)}</title>` : ''}
+      <review_timestamp>${timestamp}</review_timestamp>${review.title ? `\n      <title>${escapeXml(review.title)}</title>` : ""}
       <content>${escapeXml(review.content)}</content>
       <review_url type="singleton">${escapeXml(productUrl)}#reviews</review_url>
       <ratings>
@@ -53,29 +53,29 @@ export async function GET() {
       xsi:noNamespaceSchemaLocation="http://www.google.com/shopping/reviews/schema/product/2.3/product_reviews.xsd">
   <version>2.3</version>
   <publisher>
-    <name>${escapeXml(process.env.STORE_NAME || 'Alpha Munitions')}</name>
+    <name>${escapeXml(process.env.STORE_NAME || "Alpha Munitions")}</name>
     <link>${escapeXml(siteUrl)}</link>
   </publisher>
   <reviews>
-${reviewXmlEntries.join('\n')}
+${reviewXmlEntries.join("\n")}
   </reviews>
 </feed>`;
 
     return new NextResponse(xml, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600',
+        "Content-Type": "application/xml",
+        "Cache-Control": "public, max-age=3600",
       },
     });
   } catch (error) {
-    console.error('Error generating reviews feed:', error);
+    console.error("Error generating reviews feed:", error);
     return new NextResponse(
       '<?xml version="1.0" encoding="UTF-8"?><error>Internal Server Error</error>',
       {
         status: 500,
-        headers: { 'Content-Type': 'application/xml' },
-      }
+        headers: { "Content-Type": "application/xml" },
+      },
     );
   }
 }

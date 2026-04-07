@@ -2,9 +2,9 @@
  * Server-side utility to get CSP nonce from request headers
  * Use this in Server Components to get the nonce for inline scripts
  */
-import { headers } from 'next/headers';
+import { headers } from "next/headers";
 
-const CSP_NONCE_HEADER = 'x-csp-nonce';
+const CSP_NONCE_HEADER = "x-csp-nonce";
 
 /**
  * Gets the CSP nonce from the request headers

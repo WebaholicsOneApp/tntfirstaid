@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface FaqItem {
   q: string;
@@ -25,30 +25,30 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
         return (
           <div
             key={index}
-            className={`border rounded-2xl transition-all ${
+            className={`rounded-2xl border transition-all ${
               isOpen
-                ? 'border-primary-500/30 bg-primary-500/5 shadow-sm'
-                : 'border-secondary-100 bg-secondary-50 hover:border-secondary-200'
+                ? "border-primary-500/30 bg-primary-500/5 shadow-sm"
+                : "border-secondary-100 bg-secondary-50 hover:border-secondary-200"
             }`}
           >
             <button
               onClick={() => toggle(index)}
-              className="w-full text-left p-6 md:p-8 flex items-start gap-4"
+              className="flex w-full items-start gap-4 p-6 text-left md:p-8"
               aria-expanded={isOpen}
             >
               <span
-                className={`text-sm font-bold mt-0.5 flex-shrink-0 transition-colors ${
-                  isOpen ? 'text-primary-600' : 'text-secondary-400'
+                className={`mt-0.5 flex-shrink-0 text-sm font-bold transition-colors ${
+                  isOpen ? "text-primary-600" : "text-secondary-400"
                 }`}
               >
                 Q:
               </span>
-              <span className="text-lg font-bold text-secondary-800 flex-1">
+              <span className="text-secondary-800 flex-1 text-lg font-bold">
                 {faq.q}
               </span>
               <svg
-                className={`w-5 h-5 text-secondary-400 flex-shrink-0 mt-1 transition-transform duration-200 ${
-                  isOpen ? 'rotate-180' : ''
+                className={`text-secondary-400 mt-1 h-5 w-5 flex-shrink-0 transition-transform duration-200 ${
+                  isOpen ? "rotate-180" : ""
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -63,7 +63,7 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
               </svg>
             </button>
             {isOpen && (
-              <div className="px-6 pb-6 md:px-8 md:pb-8 pl-14 md:pl-16 animate-fade-in">
+              <div className="animate-fade-in px-6 pb-6 pl-14 md:px-8 md:pb-8 md:pl-16">
                 <p className="text-secondary-600 leading-relaxed">{faq.a}</p>
               </div>
             )}

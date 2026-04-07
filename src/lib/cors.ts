@@ -15,31 +15,31 @@
  * In production, this should be restricted to your actual domains
  */
 export function getAllowedOrigins(): string[] {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3005';
-  const additionalOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(',').map(o => o.trim()).filter(Boolean) || [];
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3005";
+  const additionalOrigins =
+    process.env.CORS_ALLOWED_ORIGINS?.split(",")
+      .map((o) => o.trim())
+      .filter(Boolean) || [];
 
-  const origins = [
-    siteUrl,
-    ...additionalOrigins,
-  ];
+  const origins = [siteUrl, ...additionalOrigins];
 
   // In development, allow localhost variants
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     origins.push(
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:3005',
-      'https://localhost:3000',
-      'https://localhost:3001',
-      'https://localhost:3005',
-      'https://localhost:3443',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      'http://127.0.0.1:3005',
-      'https://127.0.0.1:3000',
-      'https://127.0.0.1:3001',
-      'https://127.0.0.1:3005',
-      'https://127.0.0.1:3443',
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3005",
+      "https://localhost:3000",
+      "https://localhost:3001",
+      "https://localhost:3005",
+      "https://localhost:3443",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "http://127.0.0.1:3005",
+      "https://127.0.0.1:3000",
+      "https://127.0.0.1:3001",
+      "https://127.0.0.1:3005",
+      "https://127.0.0.1:3443",
     );
   }
 
@@ -49,28 +49,31 @@ export function getAllowedOrigins(): string[] {
 /**
  * Allowed HTTP methods for CORS
  */
-export const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const;
-export type AllowedMethod = typeof ALLOWED_METHODS[number];
+export const ALLOWED_METHODS = [
+  "GET",
+  "POST",
+  "PUT",
+  "DELETE",
+  "OPTIONS",
+] as const;
+export type AllowedMethod = (typeof ALLOWED_METHODS)[number];
 
 /**
  * Allowed headers for CORS requests
  */
 export const ALLOWED_HEADERS = [
-  'Content-Type',
-  'Authorization',
-  'X-Requested-With',
-  'Accept',
-  'Origin',
-  'Cache-Control',
+  "Content-Type",
+  "Authorization",
+  "X-Requested-With",
+  "Accept",
+  "Origin",
+  "Cache-Control",
 ] as const;
 
 /**
  * Headers exposed to the client
  */
-export const EXPOSED_HEADERS = [
-  'Content-Length',
-  'X-Request-Id',
-] as const;
+export const EXPOSED_HEADERS = ["Content-Length", "X-Request-Id"] as const;
 
 /**
  * Preflight cache duration in seconds (24 hours)
@@ -101,10 +104,8 @@ export function isOriginAllowed(origin: string | null): boolean {
 
   // Check wildcard patterns (e.g., https://*.example.com)
   for (const allowed of allowedOrigins) {
-    if (allowed.includes('*')) {
-      const pattern = allowed
-        .replace(/\./g, '\\.')
-        .replace(/\*/g, '[^.]+');
+    if (allowed.includes("*")) {
+      const pattern = allowed.replace(/\./g, "\\.").replace(/\*/g, "[^.]+");
       const regex = new RegExp(`^${pattern}$`);
       if (regex.test(origin)) {
         return true;
@@ -131,7 +132,7 @@ export function isMethodAllowed(method: string): boolean {
  */
 export function isHeaderAllowed(header: string): boolean {
   const normalizedHeader = header.toLowerCase();
-  return ALLOWED_HEADERS.some(h => h.toLowerCase() === normalizedHeader);
+  return ALLOWED_HEADERS.some((h) => h.toLowerCase() === normalizedHeader);
 }
 
 /**
@@ -144,7 +145,7 @@ export function areHeadersAllowed(requestedHeaders: string | null): boolean {
     return true;
   }
 
-  const headers = requestedHeaders.split(',').map(h => h.trim());
+  const headers = requestedHeaders.split(",").map((h) => h.trim());
   return headers.every(isHeaderAllowed);
 }
 
@@ -153,13 +154,13 @@ export function areHeadersAllowed(requestedHeaders: string | null): boolean {
 // ============================================
 
 export interface CorsHeaders {
-  'Access-Control-Allow-Origin': string;
-  'Access-Control-Allow-Methods': string;
-  'Access-Control-Allow-Headers': string;
-  'Access-Control-Expose-Headers': string;
-  'Access-Control-Max-Age': string;
-  'Access-Control-Allow-Credentials': string;
-  'Vary': string;
+  "Access-Control-Allow-Origin": string;
+  "Access-Control-Allow-Methods": string;
+  "Access-Control-Allow-Headers": string;
+  "Access-Control-Expose-Headers": string;
+  "Access-Control-Max-Age": string;
+  "Access-Control-Allow-Credentials": string;
+  Vary: string;
 }
 
 /**
@@ -173,16 +174,16 @@ export function getCorsHeaders(origin: string | null): CorsHeaders | null {
   }
 
   // Use the actual origin or '*' if no origin (same-origin request)
-  const allowOrigin = origin || '*';
+  const allowOrigin = origin || "*";
 
   return {
-    'Access-Control-Allow-Origin': allowOrigin,
-    'Access-Control-Allow-Methods': ALLOWED_METHODS.join(', '),
-    'Access-Control-Allow-Headers': ALLOWED_HEADERS.join(', '),
-    'Access-Control-Expose-Headers': EXPOSED_HEADERS.join(', '),
-    'Access-Control-Max-Age': PREFLIGHT_MAX_AGE.toString(),
-    'Access-Control-Allow-Credentials': 'true',
-    'Vary': 'Origin',
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Methods": ALLOWED_METHODS.join(", "),
+    "Access-Control-Allow-Headers": ALLOWED_HEADERS.join(", "),
+    "Access-Control-Expose-Headers": EXPOSED_HEADERS.join(", "),
+    "Access-Control-Max-Age": PREFLIGHT_MAX_AGE.toString(),
+    "Access-Control-Allow-Credentials": "true",
+    Vary: "Origin",
   };
 }
 
@@ -196,7 +197,7 @@ export function getCorsHeaders(origin: string | null): CorsHeaders | null {
 export function handlePreflight(
   origin: string | null,
   requestMethod: string | null,
-  requestHeaders: string | null
+  requestHeaders: string | null,
 ): { headers: CorsHeaders | null; allowed: boolean; reason?: string } {
   // Validate origin
   if (!isOriginAllowed(origin)) {
@@ -240,27 +241,30 @@ export function handlePreflight(
  * Generates CORS headers configuration for next.config.js
  * Use this in the headers() function of next.config.js
  */
-export function getNextConfigCorsHeaders(): Array<{ key: string; value: string }> {
+export function getNextConfigCorsHeaders(): Array<{
+  key: string;
+  value: string;
+}> {
   return [
     {
-      key: 'Access-Control-Allow-Methods',
-      value: ALLOWED_METHODS.join(', '),
+      key: "Access-Control-Allow-Methods",
+      value: ALLOWED_METHODS.join(", "),
     },
     {
-      key: 'Access-Control-Allow-Headers',
-      value: ALLOWED_HEADERS.join(', '),
+      key: "Access-Control-Allow-Headers",
+      value: ALLOWED_HEADERS.join(", "),
     },
     {
-      key: 'Access-Control-Expose-Headers',
-      value: EXPOSED_HEADERS.join(', '),
+      key: "Access-Control-Expose-Headers",
+      value: EXPOSED_HEADERS.join(", "),
     },
     {
-      key: 'Access-Control-Max-Age',
+      key: "Access-Control-Max-Age",
       value: PREFLIGHT_MAX_AGE.toString(),
     },
     {
-      key: 'Vary',
-      value: 'Origin',
+      key: "Vary",
+      value: "Origin",
     },
   ];
 }
@@ -271,7 +275,7 @@ export function getNextConfigCorsHeaders(): Array<{ key: string; value: string }
 
 export interface CorsError {
   error: string;
-  code: 'CORS_ORIGIN_DENIED' | 'CORS_METHOD_DENIED' | 'CORS_HEADERS_DENIED';
+  code: "CORS_ORIGIN_DENIED" | "CORS_METHOD_DENIED" | "CORS_HEADERS_DENIED";
   allowed?: string[];
 }
 
@@ -279,19 +283,19 @@ export interface CorsError {
  * Creates a CORS error response
  */
 export function createCorsError(
-  code: CorsError['code'],
-  details?: string
+  code: CorsError["code"],
+  details?: string,
 ): CorsError {
-  const errors: Record<CorsError['code'], string> = {
-    CORS_ORIGIN_DENIED: 'Cross-origin request blocked: origin not allowed',
-    CORS_METHOD_DENIED: 'Cross-origin request blocked: method not allowed',
-    CORS_HEADERS_DENIED: 'Cross-origin request blocked: headers not allowed',
+  const errors: Record<CorsError["code"], string> = {
+    CORS_ORIGIN_DENIED: "Cross-origin request blocked: origin not allowed",
+    CORS_METHOD_DENIED: "Cross-origin request blocked: method not allowed",
+    CORS_HEADERS_DENIED: "Cross-origin request blocked: headers not allowed",
   };
 
   return {
     error: details || errors[code],
     code,
-    allowed: code === 'CORS_METHOD_DENIED' ? [...ALLOWED_METHODS] : undefined,
+    allowed: code === "CORS_METHOD_DENIED" ? [...ALLOWED_METHODS] : undefined,
   };
 }
 
@@ -306,7 +310,10 @@ let corsStats = {
   preflightBlocked: 0,
 };
 
-export function recordCorsRequest(allowed: boolean, isPreflight: boolean = false): void {
+export function recordCorsRequest(
+  allowed: boolean,
+  isPreflight: boolean = false,
+): void {
   if (isPreflight) {
     if (allowed) {
       corsStats.preflightAllowed++;

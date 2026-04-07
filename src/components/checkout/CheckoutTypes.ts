@@ -1,6 +1,6 @@
-export const SESSION_KEY = 'alpha-checkout-data';
+export const SESSION_KEY = "alpha-checkout-data";
 
-export type PaymentMethod = 'credit_card' | 'precision_pay';
+export type PaymentMethod = "credit_card" | "precision_pay";
 
 export interface CheckoutSessionData {
   shipping: {
@@ -14,7 +14,7 @@ export interface CheckoutSessionData {
     postalCode: string;
     country?: string;
   };
-  shippingMethod: 'standard' | 'express';
+  shippingMethod: "standard" | "express";
   billing?: {
     name: string;
     line1: string;
@@ -26,14 +26,14 @@ export interface CheckoutSessionData {
   };
   paymentMethod: PaymentMethod;
   opaqueData?: { dataDescriptor: string; dataValue: string };
-  cardLast4?: string;   // last 4 digits of card
-  cardBrand?: string;   // "visa" | "mastercard" | "amex" | "discover"
+  cardLast4?: string; // last 4 digits of card
+  cardBrand?: string; // "visa" | "mastercard" | "amex" | "discover"
   sendEmail: boolean;
 }
 
 export interface PaymentConfig {
-  providerType: 'stripe_connect' | 'authorize_net' | null;
-  status: 'ready' | 'needs_action' | 'not_configured';
+  providerType: "stripe_connect" | "authorize_net" | null;
+  status: "ready" | "needs_action" | "not_configured";
   stripePublishableKey: string | null;
   stripeConnectAccountId: string | null;
   authNetApiLoginId: string | null;

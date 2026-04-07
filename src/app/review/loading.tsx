@@ -1,21 +1,21 @@
 export default function ReviewLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 py-12">
-      <div className="max-w-lg w-full">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center p-4 py-12">
+      <div className="w-full max-w-lg">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
           {/* Product image + name */}
           <div className="px-8 pt-8 pb-4 text-center">
             <div
-              className="skeleton w-24 h-24 mx-auto mb-4 !rounded-xl"
-              style={{ animationDelay: '0ms' }}
+              className="skeleton mx-auto mb-4 h-24 w-24 !rounded-xl"
+              style={{ animationDelay: "0ms" }}
             />
             <div
-              className="skeleton h-5 w-48 mx-auto mb-2"
-              style={{ animationDelay: '80ms' }}
+              className="skeleton mx-auto mb-2 h-5 w-48"
+              style={{ animationDelay: "80ms" }}
             />
             <div
-              className="skeleton h-3 w-32 mx-auto"
-              style={{ animationDelay: '120ms' }}
+              className="skeleton mx-auto h-3 w-32"
+              style={{ animationDelay: "120ms" }}
             />
           </div>
 
@@ -25,7 +25,7 @@ export default function ReviewLoading() {
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="skeleton w-8 h-8 !rounded"
+                  className="skeleton h-8 w-8 !rounded"
                   style={{ animationDelay: `${160 + i * 40}ms` }}
                 />
               ))}
@@ -33,49 +33,49 @@ export default function ReviewLoading() {
           </div>
 
           {/* Form skeleton */}
-          <div className="px-8 pb-8 space-y-5">
-            <div className="border-t border-secondary-100" />
+          <div className="space-y-5 px-8 pb-8">
+            <div className="border-secondary-100 border-t" />
 
             {/* Title input */}
             <div>
               <div
-                className="skeleton h-3 w-28 mb-2"
-                style={{ animationDelay: '360ms' }}
+                className="skeleton mb-2 h-3 w-28"
+                style={{ animationDelay: "360ms" }}
               />
               <div
                 className="skeleton h-11 w-full !rounded-xl"
-                style={{ animationDelay: '400ms' }}
+                style={{ animationDelay: "400ms" }}
               />
             </div>
 
             {/* Textarea */}
             <div>
               <div
-                className="skeleton h-3 w-24 mb-2"
-                style={{ animationDelay: '440ms' }}
+                className="skeleton mb-2 h-3 w-24"
+                style={{ animationDelay: "440ms" }}
               />
               <div
                 className="skeleton h-24 w-full !rounded-xl"
-                style={{ animationDelay: '480ms' }}
+                style={{ animationDelay: "480ms" }}
               />
             </div>
 
             {/* Photo upload */}
             <div>
               <div
-                className="skeleton h-3 w-24 mb-2"
-                style={{ animationDelay: '520ms' }}
+                className="skeleton mb-2 h-3 w-24"
+                style={{ animationDelay: "520ms" }}
               />
               <div
                 className="skeleton h-9 w-32 !rounded-lg"
-                style={{ animationDelay: '560ms' }}
+                style={{ animationDelay: "560ms" }}
               />
             </div>
 
             {/* Submit button */}
             <div
               className="skeleton h-12 w-full !rounded-xl"
-              style={{ animationDelay: '600ms' }}
+              style={{ animationDelay: "600ms" }}
             />
           </div>
         </div>

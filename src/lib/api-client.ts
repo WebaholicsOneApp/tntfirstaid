@@ -12,9 +12,9 @@
  * - Typed response helpers for every storefront endpoint
  */
 
-const ONEAPP_API_URL = process.env.ONEAPP_API_URL || 'http://localhost:3001';
-const ONEAPP_API_KEY = process.env.ONEAPP_API_KEY || '';
-const IS_BUILD_PHASE = process.env.NEXT_PHASE === 'phase-production-build';
+const ONEAPP_API_URL = process.env.ONEAPP_API_URL || "http://localhost:3001";
+const ONEAPP_API_KEY = process.env.ONEAPP_API_KEY || "";
+const IS_BUILD_PHASE = process.env.NEXT_PHASE === "phase-production-build";
 
 const DEFAULT_TIMEOUT = 10_000; // 10 seconds
 const MAX_RETRIES = 1;
@@ -70,7 +70,7 @@ export class ApiClientError extends Error {
   status: number;
   constructor(message: string, status: number) {
     super(message);
-    this.name = 'ApiClientError';
+    this.name = "ApiClientError";
     this.status = status;
   }
 }
@@ -79,7 +79,7 @@ export class ApiClientError extends Error {
 // Core client
 // ---------------------------------------------------------------------------
 
-type HttpMethod = 'GET' | 'POST';
+type HttpMethod = "GET" | "POST";
 
 interface RequestOptions {
   params?: Record<string, string | number | boolean | undefined | null>;
@@ -104,7 +104,12 @@ class StorefrontApiClient {
     path: string,
     options?: RequestOptions,
   ): Promise<T> {
-    const { params, body, timeout = DEFAULT_TIMEOUT, customerToken } = options || {};
+    const {
+      params,
+      body,
+      timeout = DEFAULT_TIMEOUT,
+      customerToken,
+    } = options || {};
 
     // During Vercel build, the OneApp API is unreachable. Fail fast so
     // callers hit their existing fallback paths immediately instead of
@@ -117,7 +122,7 @@ class StorefrontApiClient {
     if (params) {
       const searchParams = new URLSearchParams();
       for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null && value !== "") {
           searchParams.set(key, String(value));
         }
       }
@@ -126,12 +131,12 @@ class StorefrontApiClient {
     }
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-Storefront-Api-Key': this.apiKey,
+      "Content-Type": "application/json",
+      "X-Storefront-Api-Key": this.apiKey,
     };
 
     if (customerToken) {
-      headers['X-Customer-Token'] = customerToken;
+      headers["X-Customer-Token"] = customerToken;
     }
 
     let lastError: Error | null = null;
@@ -180,13 +185,9 @@ class StorefrontApiClient {
 
         if (error instanceof ApiClientError) throw error;
 
-        lastError =
-          error instanceof Error ? error : new Error(String(error));
+        lastError = error instanceof Error ? error : new Error(String(error));
 
-        if (
-          error instanceof Error &&
-          error.name === 'AbortError'
-        ) {
+        if (error instanceof Error && error.name === "AbortError") {
           lastError = new Error(
             `Request timed out after ${timeout}ms: ${method} ${path}`,
           );
@@ -211,11 +212,11 @@ class StorefrontApiClient {
     path: string,
     params?: Record<string, string | number | boolean | undefined | null>,
   ): Promise<T> {
-    return this.request<T>('GET', path, { params });
+    return this.request<T>("GET", path, { params });
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
-    return this.request<T>('POST', path, { body });
+    return this.request<T>("POST", path, { body });
   }
 
   // ---- cached GET helper ----
@@ -239,14 +240,16 @@ class StorefrontApiClient {
     const pending = pendingRequests.get(cacheKey);
     if (pending) return pending as Promise<T>;
 
-    const promise = this.get<T>(path, params).then((data) => {
-      setCache(cacheKey, data, ttl);
-      pendingRequests.delete(cacheKey);
-      return data;
-    }).catch((err) => {
-      pendingRequests.delete(cacheKey);
-      throw err;
-    });
+    const promise = this.get<T>(path, params)
+      .then((data) => {
+        setCache(cacheKey, data, ttl);
+        pendingRequests.delete(cacheKey);
+        return data;
+      })
+      .catch((err) => {
+        pendingRequests.delete(cacheKey);
+        throw err;
+      });
 
     pendingRequests.set(cacheKey, promise);
     return promise;
@@ -258,12 +261,12 @@ class StorefrontApiClient {
 
   /** GET /config -- storefront branding, settings, etc. */
   getConfig<T = unknown>() {
-    return this.getCached<T>('/config', undefined, 5 * 60_000); // 5 min TTL
+    return this.getCached<T>("/config", undefined, 5 * 60_000); // 5 min TTL
   }
 
   /** GET /home -- homepage data (hero, featured products, etc.) */
   getHomePage<T = unknown>() {
-    return this.getCached<T>('/home', undefined, 60_000);
+    return this.getCached<T>("/home", undefined, 60_000);
   }
 
   // --------------------------------------------------------------------------
@@ -283,7 +286,10 @@ class StorefrontApiClient {
     search?: string;
     [key: string]: string | number | boolean | undefined | null;
   }) {
-    return this.getCached<T>('/products', params as Record<string, string | number | boolean | undefined | null>);
+    return this.getCached<T>(
+      "/products",
+      params as Record<string, string | number | boolean | undefined | null>,
+    );
   }
 
   /** GET /products/:slug */
@@ -302,32 +308,44 @@ class StorefrontApiClient {
 
   /** GET /categories/top (flat list of root categories with products) */
   getCategories<T = unknown>() {
-    return this.getCached<T>('/categories/top', undefined, 5 * 60_000);
+    return this.getCached<T>("/categories/top", undefined, 5 * 60_000);
   }
 
   /** GET /categories/tree */
   getCategoryTree<T = unknown>() {
-    return this.getCached<T>('/categories/tree', undefined, 5 * 60_000);
+    return this.getCached<T>("/categories/tree", undefined, 5 * 60_000);
   }
 
   /** GET /categories/top */
   getTopCategories<T = unknown>() {
-    return this.getCached<T>('/categories/top', undefined, 5 * 60_000);
+    return this.getCached<T>("/categories/top", undefined, 5 * 60_000);
   }
 
   /** GET /categories/:slug */
   getCategoryBySlug<T = unknown>(slug: string) {
-    return this.getCached<T>(`/categories/${encodeURIComponent(slug)}`, undefined, 5 * 60_000);
+    return this.getCached<T>(
+      `/categories/${encodeURIComponent(slug)}`,
+      undefined,
+      5 * 60_000,
+    );
   }
 
   /** GET /categories/:id/hierarchy */
   getCategoryHierarchy<T = unknown>(categoryId: number) {
-    return this.getCached<T>(`/categories/${categoryId}/hierarchy`, undefined, 5 * 60_000);
+    return this.getCached<T>(
+      `/categories/${categoryId}/hierarchy`,
+      undefined,
+      5 * 60_000,
+    );
   }
 
   /** GET /categories/:id/descendants */
   getCategoryDescendants<T = unknown>(categoryId: number) {
-    return this.getCached<T>(`/categories/${categoryId}/descendants`, undefined, 5 * 60_000);
+    return this.getCached<T>(
+      `/categories/${categoryId}/descendants`,
+      undefined,
+      5 * 60_000,
+    );
   }
 
   // --------------------------------------------------------------------------
@@ -335,18 +353,22 @@ class StorefrontApiClient {
   // --------------------------------------------------------------------------
 
   /** GET /products/search?q=... (full-text search with relevance ranking) */
-  searchProductsFts<T = unknown>(params: Record<string, string | number | boolean | undefined | null>) {
-    return this.getCached<T>('/products/search', params, 30_000);
+  searchProductsFts<T = unknown>(
+    params: Record<string, string | number | boolean | undefined | null>,
+  ) {
+    return this.getCached<T>("/products/search", params, 30_000);
   }
 
   /** GET /search/suggestions?q=... */
   getSearchSuggestions<T = unknown>(query: string) {
-    return this.get<T>('/search/suggestions', { q: query });
+    return this.get<T>("/search/suggestions", { q: query });
   }
 
   /** GET /search/price-range */
-  getPriceRange<T = unknown>(params?: Record<string, string | number | boolean | undefined | null>) {
-    return this.getCached<T>('/search/price-range', params, 5 * 60_000);
+  getPriceRange<T = unknown>(
+    params?: Record<string, string | number | boolean | undefined | null>,
+  ) {
+    return this.getCached<T>("/search/price-range", params, 5 * 60_000);
   }
 
   // --------------------------------------------------------------------------
@@ -360,12 +382,12 @@ class StorefrontApiClient {
 
   /** POST /orders/sync */
   syncOrder<T = unknown>(body: unknown) {
-    return this.post<T>('/orders/sync', body);
+    return this.post<T>("/orders/sync", body);
   }
 
   /** POST /orders/fulfillment-webhook */
   fulfillmentWebhook<T = unknown>(body: unknown) {
-    return this.post<T>('/orders/fulfillment-webhook', body);
+    return this.post<T>("/orders/fulfillment-webhook", body);
   }
 
   // --------------------------------------------------------------------------
@@ -373,8 +395,10 @@ class StorefrontApiClient {
   // --------------------------------------------------------------------------
 
   /** GET /reviews/feed */
-  getReviewsFeed<T = unknown>(params?: Record<string, string | number | boolean | undefined | null>) {
-    return this.getCached<T>('/reviews/feed', params);
+  getReviewsFeed<T = unknown>(
+    params?: Record<string, string | number | boolean | undefined | null>,
+  ) {
+    return this.getCached<T>("/reviews/feed", params);
   }
 
   /** GET /reviews/product/:productId */
@@ -392,27 +416,29 @@ class StorefrontApiClient {
 
   /** POST /reviews/submit */
   submitReview<T = unknown>(body: unknown) {
-    return this.post<T>('/reviews/submit', body);
+    return this.post<T>("/reviews/submit", body);
   }
 
   /** POST /reviews/helpful */
   markReviewHelpful<T = unknown>(body: unknown) {
-    return this.post<T>('/reviews/helpful', body);
+    return this.post<T>("/reviews/helpful", body);
   }
 
   /** POST /reviews/upload */
   uploadReviewImage<T = unknown>(body: unknown) {
-    return this.post<T>('/reviews/upload', body);
+    return this.post<T>("/reviews/upload", body);
   }
 
   /** GET /reviews/validate-token */
-  validateReviewToken<T = unknown>(params?: Record<string, string | number | boolean | undefined | null>) {
-    return this.get<T>('/reviews/validate-token', params);
+  validateReviewToken<T = unknown>(
+    params?: Record<string, string | number | boolean | undefined | null>,
+  ) {
+    return this.get<T>("/reviews/validate-token", params);
   }
 
   /** POST /reviews/unsubscribe */
   unsubscribeReviews<T = unknown>(body: unknown) {
-    return this.post<T>('/reviews/unsubscribe', body);
+    return this.post<T>("/reviews/unsubscribe", body);
   }
 
   // --------------------------------------------------------------------------
@@ -421,7 +447,7 @@ class StorefrontApiClient {
 
   /** POST /contact */
   submitContactForm<T = unknown>(body: unknown) {
-    return this.post<T>('/contact', body);
+    return this.post<T>("/contact", body);
   }
 }
 
@@ -440,10 +466,10 @@ function buildCacheKey(
   let key = path;
   if (params) {
     const sorted = Object.entries(params)
-      .filter(([, v]) => v !== undefined && v !== null && v !== '')
+      .filter(([, v]) => v !== undefined && v !== null && v !== "")
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, v]) => `${k}=${v}`)
-      .join('&');
+      .join("&");
     if (sorted) key += `?${sorted}`;
   }
   return key;

@@ -13,7 +13,7 @@ export interface StoreProduct {
   metaData: Record<string, unknown>;
   keywords: string | null;
   brandId: number | null;
-  productType: 'simple' | 'grouped';
+  productType: "simple" | "grouped";
   isGroup: boolean;
   channelCategoryId: number | null;
   createdAt: Date;
@@ -193,15 +193,15 @@ export interface ProductFilters {
 
 // Sort options
 export type ProductSortOption =
-  | 'name_asc'
-  | 'name_desc'
-  | 'price_asc'
-  | 'price_desc'
-  | 'newest'
-  | 'oldest'
-  | 'best_sellers'
-  | 'relevance'
-  | 'top_rated';
+  | "name_asc"
+  | "name_desc"
+  | "price_asc"
+  | "price_desc"
+  | "newest"
+  | "oldest"
+  | "best_sellers"
+  | "relevance"
+  | "top_rated";
 
 // Pagination
 export interface PaginationParams {
@@ -238,5 +238,5 @@ export interface CategorySuggestion {
 export interface SearchSuggestionsResponse {
   products: ProductSuggestion[];
   categories: CategorySuggestion[];
-  queryType: 'sku' | 'keyword' | 'ymm';
+  queryType: "sku" | "keyword" | "ymm";
 }

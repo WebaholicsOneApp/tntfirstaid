@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useCallback } from 'react';
-import type { VariationDetail } from '~/types';
+import { useState, useMemo, useCallback } from "react";
+import type { VariationDetail } from "~/types";
 
 interface VariantSelectorProps {
   variations: VariationDetail[];
@@ -16,12 +16,17 @@ export default function VariantSelector({
   onSelect,
   onClear,
 }: VariantSelectorProps) {
-  const hasSecondDimension = variations.some((v) => v.variationTwo != null && v.variationTwo !== '');
+  const hasSecondDimension = variations.some(
+    (v) => v.variationTwo != null && v.variationTwo !== "",
+  );
 
   // Derive selected values from the currently selected variation
-  const selectedVariation = variations.find((v) => v.id === selectedVariationId) ?? null;
-  const [sel1, setSel1] = useState<string>(selectedVariation?.variation ?? '');
-  const [sel2, setSel2] = useState<string>(selectedVariation?.variationTwo ?? '');
+  const selectedVariation =
+    variations.find((v) => v.id === selectedVariationId) ?? null;
+  const [sel1, setSel1] = useState<string>(selectedVariation?.variation ?? "");
+  const [sel2, setSel2] = useState<string>(
+    selectedVariation?.variationTwo ?? "",
+  );
 
   // Get unique in-stock values for each dimension
   const options1 = useMemo(() => {
@@ -30,7 +35,7 @@ export default function VariantSelector({
       .filter((v) => v.inStock)
       .map((v) => v.variation)
       .filter((val): val is string => {
-        if (val == null || val === '' || seen.has(val)) return false;
+        if (val == null || val === "" || seen.has(val)) return false;
         seen.add(val);
         return true;
       });
@@ -47,7 +52,7 @@ export default function VariantSelector({
       })
       .map((v) => v.variationTwo)
       .filter((val): val is string => {
-        if (val == null || val === '' || seen.has(val)) return false;
+        if (val == null || val === "" || seen.has(val)) return false;
         seen.add(val);
         return true;
       });
@@ -62,23 +67,25 @@ export default function VariantSelector({
         return match1 && v.variationTwo === v2;
       });
     },
-    [variations, hasSecondDimension]
+    [variations, hasSecondDimension],
   );
 
   if (variations.length <= 1) return null;
 
-  const label1 = variations[0]?.variantType ?? 'Option';
-  const label2 = hasSecondDimension ? (variations[0]?.variantTypeTwo ?? 'Option 2') : null;
+  const label1 = variations[0]?.variantType ?? "Option";
+  const label2 = hasSecondDimension
+    ? (variations[0]?.variantTypeTwo ?? "Option 2")
+    : null;
 
   const handleSelect1 = (value: string) => {
     setSel1(value);
     // Auto-clear sel2 if it's no longer valid for the new dim1 selection
     if (hasSecondDimension && sel2) {
       const stillValid = variations.some(
-        (v) => v.inStock && v.variation === value && v.variationTwo === sel2
+        (v) => v.inStock && v.variation === value && v.variationTwo === sel2,
       );
       if (!stillValid) {
-        setSel2('');
+        setSel2("");
         onClear();
         return;
       }
@@ -98,31 +105,35 @@ export default function VariantSelector({
   };
 
   const handleClear = () => {
-    setSel1('');
-    setSel2('');
+    setSel1("");
+    setSel2("");
     onClear();
   };
 
-  const hasSelection = sel1 !== '' || sel2 !== '';
+  const hasSelection = sel1 !== "" || sel2 !== "";
 
   return (
     <div className="space-y-4">
       {/* First dimension */}
       <div>
-        <label className="block text-sm font-medium text-secondary-700 mb-1.5">
+        <label className="text-secondary-700 mb-1.5 block text-sm font-medium">
           {label1}
         </label>
         {options1.length === 0 ? (
-          <p className="text-sm text-secondary-500 italic">Currently unavailable</p>
+          <p className="text-secondary-500 text-sm italic">
+            Currently unavailable
+          </p>
         ) : (
           <select
             value={sel1}
             onChange={(e) => handleSelect1(e.target.value)}
-            className="w-full max-w-xs rounded-md border border-secondary-300 bg-white px-3 py-2.5 text-sm text-secondary-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="border-secondary-300 text-secondary-800 focus:border-primary-500 focus:ring-primary-500 w-full max-w-xs rounded-md border bg-white px-3 py-2.5 text-sm shadow-sm focus:ring-1 focus:outline-none"
           >
             <option value="">Choose an option</option>
             {options1.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         )}
@@ -131,17 +142,19 @@ export default function VariantSelector({
       {/* Second dimension */}
       {hasSecondDimension && label2 && (
         <div>
-          <label className="block text-sm font-medium text-secondary-700 mb-1.5">
+          <label className="text-secondary-700 mb-1.5 block text-sm font-medium">
             {label2}
           </label>
           <select
             value={sel2}
             onChange={(e) => handleSelect2(e.target.value)}
-            className="w-full max-w-xs rounded-md border border-secondary-300 bg-white px-3 py-2.5 text-sm text-secondary-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="border-secondary-300 text-secondary-800 focus:border-primary-500 focus:ring-primary-500 w-full max-w-xs rounded-md border bg-white px-3 py-2.5 text-sm shadow-sm focus:ring-1 focus:outline-none"
           >
             <option value="">Choose an option</option>
             {options2.map((opt) => (
-              <option key={opt} value={opt}>{opt}</option>
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
             ))}
           </select>
         </div>
@@ -152,7 +165,7 @@ export default function VariantSelector({
         <button
           type="button"
           onClick={handleClear}
-          className="text-sm text-primary-600 hover:text-primary-800 underline"
+          className="text-primary-600 hover:text-primary-800 text-sm underline"
         >
           Clear
         </button>

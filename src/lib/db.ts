@@ -6,9 +6,9 @@
  * No database credentials or Knex required.
  */
 
-import { getApiClient, clearCache } from './api-client';
+import { getApiClient, clearCache } from "./api-client";
 
-const IS_BUILD_PHASE = process.env.NEXT_PHASE === 'phase-production-build';
+const IS_BUILD_PHASE = process.env.NEXT_PHASE === "phase-production-build";
 
 // ---------------------------------------------------------------------------
 // API config response shape (subset we care about)
@@ -87,14 +87,17 @@ export async function getStorefrontBranding(): Promise<StorefrontBrandingConfig>
     };
   } catch (error) {
     if (!IS_BUILD_PHASE) {
-      console.error('[db.ts] Failed to fetch storefront branding via API:', error);
+      console.error(
+        "[db.ts] Failed to fetch storefront branding via API:",
+        error,
+      );
     }
     return {};
   }
 }
 
 export function clearBrandingCache(): void {
-  clearCache('/config');
+  clearCache("/config");
 }
 
 // ---------------------------------------------------------------------------
@@ -114,18 +117,19 @@ export async function getPolicyTemplates(): Promise<PolicyTemplatesConfig> {
     return {
       privacy_policy: policies.privacyPolicy ?? undefined,
       terms_of_service: policies.termsOfService ?? undefined,
-      shipping_returns: policies.shippingPolicy ?? policies.returnPolicy ?? undefined,
+      shipping_returns:
+        policies.shippingPolicy ?? policies.returnPolicy ?? undefined,
     };
   } catch (error) {
     if (!IS_BUILD_PHASE) {
-      console.error('[db.ts] Failed to fetch policy templates via API:', error);
+      console.error("[db.ts] Failed to fetch policy templates via API:", error);
     }
     return {};
   }
 }
 
 export function clearPolicyCache(): void {
-  clearCache('/config');
+  clearCache("/config");
 }
 
 // ---------------------------------------------------------------------------

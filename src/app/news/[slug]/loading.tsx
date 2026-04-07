@@ -1,44 +1,44 @@
 export default function ArticleLoading() {
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-white">
       {/* Dark bar behind fixed header */}
       <div className="bg-secondary-900 h-20" />
 
       <main className="container mx-auto px-4 pt-10 pb-20">
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto max-w-3xl">
           {/* Back link skeleton */}
-          <div className="skeleton h-4 w-36 mb-8" />
+          <div className="skeleton mb-8 h-4 w-36" />
 
           {/* Title skeleton */}
           <div
-            className="skeleton h-10 w-full mb-3"
-            style={{ animationDelay: '100ms' }}
+            className="skeleton mb-3 h-10 w-full"
+            style={{ animationDelay: "100ms" }}
           />
           <div
-            className="skeleton h-10 w-3/4 mb-6"
-            style={{ animationDelay: '150ms' }}
+            className="skeleton mb-6 h-10 w-3/4"
+            style={{ animationDelay: "150ms" }}
           />
 
           {/* Meta line skeleton */}
-          <div className="flex items-center gap-4 mb-10">
+          <div className="mb-10 flex items-center gap-4">
             <div
               className="skeleton h-3 w-24"
-              style={{ animationDelay: '200ms' }}
+              style={{ animationDelay: "200ms" }}
             />
             <div
               className="skeleton h-3 w-20"
-              style={{ animationDelay: '250ms' }}
+              style={{ animationDelay: "250ms" }}
             />
             <div
               className="skeleton h-6 w-16 rounded-full"
-              style={{ animationDelay: '300ms' }}
+              style={{ animationDelay: "300ms" }}
             />
           </div>
 
           {/* Featured image skeleton */}
           <div
-            className="skeleton aspect-[16/9] rounded-xl mb-12"
-            style={{ animationDelay: '350ms' }}
+            className="skeleton mb-12 aspect-[16/9] rounded-xl"
+            style={{ animationDelay: "350ms" }}
           />
 
           {/* Paragraph skeletons */}
@@ -61,7 +61,7 @@ export default function ArticleLoading() {
                   className="skeleton h-4"
                   style={{
                     animationDelay: `${520 + i * 100}ms`,
-                    width: i % 2 === 0 ? '85%' : '70%',
+                    width: i % 2 === 0 ? "85%" : "70%",
                   }}
                 />
               </div>

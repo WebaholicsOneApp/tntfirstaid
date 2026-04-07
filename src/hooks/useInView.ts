@@ -1,8 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-export function useInView(options?: { threshold?: number; rootMargin?: string }) {
+export function useInView(options?: {
+  threshold?: number;
+  rootMargin?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
 
@@ -20,8 +23,8 @@ export function useInView(options?: { threshold?: number; rootMargin?: string })
       },
       {
         threshold: options?.threshold ?? 0.15,
-        rootMargin: options?.rootMargin ?? '0px 0px -40px 0px',
-      }
+        rootMargin: options?.rootMargin ?? "0px 0px -40px 0px",
+      },
     );
 
     observer.observe(el);

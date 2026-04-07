@@ -6,7 +6,7 @@
  * Internal Knex queries have been replaced with getApiClient() calls.
  * Adapter functions transform OneApp API responses into alphamunition types.
  */
-import { getApiClient } from './api-client';
+import { getApiClient } from "./api-client";
 import type {
   ProductListItem,
   ProductDetail,
@@ -15,10 +15,14 @@ import type {
   Category,
   ProductSuggestion,
   CategorySuggestion,
-  SearchSuggestionsResponse
-} from '~/types';
-import type { ReviewAggregate, ReviewsResponse, ReviewSortOption } from '~/types/review';
-import { parseSearchQuery } from './search-utils';
+  SearchSuggestionsResponse,
+} from "~/types";
+import type {
+  ReviewAggregate,
+  ReviewsResponse,
+  ReviewSortOption,
+} from "~/types/review";
+import { parseSearchQuery } from "./search-utils";
 
 // ============================================
 // PERFORMANCE: Simple in-memory cache for expensive operations
@@ -35,7 +39,10 @@ interface CacheEntry<T> {
 export const cache = new Map<string, CacheEntry<unknown>>();
 export const pendingRequests = new Map<string, Promise<unknown>>();
 
-export function getCached<T>(key: string, ttl: number = CACHE_TTL_MS): T | null {
+export function getCached<T>(
+  key: string,
+  ttl: number = CACHE_TTL_MS,
+): T | null {
   const entry = cache.get(key);
   if (!entry) return null;
   if (Date.now() - entry.timestamp > ttl) {
@@ -64,7 +71,10 @@ export function getCachedLong<T>(key: string): T | null {
  * If multiple callers request the same key before the first resolves,
  * they all share the same in-flight promise instead of firing duplicate requests.
  */
-export async function coalesceRequest<T>(cacheKey: string, fn: () => Promise<T>): Promise<T> {
+export async function coalesceRequest<T>(
+  cacheKey: string,
+  fn: () => Promise<T>,
+): Promise<T> {
   const pending = pendingRequests.get(cacheKey);
   if (pending) {
     return pending as Promise<T>;
@@ -81,7 +91,7 @@ export async function coalesceRequest<T>(cacheKey: string, fn: () => Promise<T>)
 // ============================================
 
 export function escapeLikePattern(str: string): string {
-  return str.replace(/[%_\\]/g, '\\$&');
+  return str.replace(/[%_\\]/g, "\\$&");
 }
 
 export const MAX_SEARCH_LENGTH = 100;
@@ -91,11 +101,11 @@ export const MIN_SEARCH_LENGTH = 2;
 // Slugify helper
 // ============================================
 function slugify(text: string | null | undefined): string {
-  return String(text || '')
+  return String(text || "")
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
     .trim();
 }
 
@@ -182,7 +192,10 @@ function toVariationDetail(v: any): VariationDetail {
   };
 }
 
-function toProductDetail(detail: any, relatedProducts: ProductListItem[] = []): ProductDetail {
+function toProductDetail(
+  detail: any,
+  relatedProducts: ProductListItem[] = [],
+): ProductDetail {
   const base = toProductListItem(detail);
   return {
     ...base,
@@ -197,7 +210,7 @@ function toProductDetail(detail: any, relatedProducts: ProductListItem[] = []): 
 function toCategoryWithChildren(cat: any): CategoryWithChildren {
   return {
     id: cat.id,
-    categoryName: cat.categoryName ?? cat.name ?? '',
+    categoryName: cat.categoryName ?? cat.name ?? "",
     parentCategoryId: cat.parentCategoryId ?? null,
     amazonCategoryId: cat.amazonCategoryId ?? null,
     walmartCategoryId: cat.walmartCategoryId ?? null,
@@ -214,7 +227,7 @@ function toCategoryWithChildren(cat: any): CategoryWithChildren {
 function toCategory(cat: any): Category {
   return {
     id: cat.id,
-    categoryName: cat.categoryName ?? cat.name ?? '',
+    categoryName: cat.categoryName ?? cat.name ?? "",
     parentCategoryId: cat.parentCategoryId ?? null,
     amazonCategoryId: cat.amazonCategoryId ?? null,
     walmartCategoryId: cat.walmartCategoryId ?? null,
@@ -232,7 +245,9 @@ function toCategory(cat: any): Category {
 /**
  * Get featured products for the homepage
  */
-export async function getFeaturedProducts(limit: number = 8): Promise<ProductListItem[]> {
+export async function getFeaturedProducts(
+  limit: number = 8,
+): Promise<ProductListItem[]> {
   const cacheKey = `featuredProducts:${limit}`;
   const cached = getCachedLong<ProductListItem[]>(cacheKey);
   if (cached) return cached;
@@ -244,11 +259,16 @@ export async function getFeaturedProducts(limit: number = 8): Promise<ProductLis
     try {
       const api = getApiClient();
       const data = await api.getHomePage<{ featuredProducts: any[] }>();
-      const products = (data.featuredProducts || []).slice(0, limit).map(toProductListItem);
+      const products = (data.featuredProducts || [])
+        .slice(0, limit)
+        .map(toProductListItem);
       setCache(cacheKey, products);
       return products;
     } catch (err) {
-      console.error('[getFeaturedProducts] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getFeaturedProducts] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -261,13 +281,17 @@ export async function getFeaturedProducts(limit: number = 8): Promise<ProductLis
 /**
  * Get top-level categories with product counts
  */
-export async function getTopLevelCategories(): Promise<(Category & { productCount: number })[]> {
-  const cacheKey = 'topLevelCategories';
-  const cached = getCachedLong<(Category & { productCount: number })[]>(cacheKey);
+export async function getTopLevelCategories(): Promise<
+  (Category & { productCount: number })[]
+> {
+  const cacheKey = "topLevelCategories";
+  const cached =
+    getCachedLong<(Category & { productCount: number })[]>(cacheKey);
   if (cached) return cached;
 
   return coalesceRequest(cacheKey, async () => {
-    const cachedAgain = getCachedLong<(Category & { productCount: number })[]>(cacheKey);
+    const cachedAgain =
+      getCachedLong<(Category & { productCount: number })[]>(cacheKey);
     if (cachedAgain) return cachedAgain;
 
     try {
@@ -280,7 +304,10 @@ export async function getTopLevelCategories(): Promise<(Category & { productCoun
       setCache(cacheKey, categories);
       return categories;
     } catch (err) {
-      console.error('[getTopLevelCategories] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getTopLevelCategories] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -289,8 +316,10 @@ export async function getTopLevelCategories(): Promise<(Category & { productCoun
 /**
  * Get hierarchical category tree for the storefront
  */
-export async function getCategoryTreeForStorefront(): Promise<CategoryWithChildren[]> {
-  const cacheKey = 'categoryTree';
+export async function getCategoryTreeForStorefront(): Promise<
+  CategoryWithChildren[]
+> {
+  const cacheKey = "categoryTree";
   const cached = getCachedLong<CategoryWithChildren[]>(cacheKey);
   if (cached) return cached;
 
@@ -305,7 +334,10 @@ export async function getCategoryTreeForStorefront(): Promise<CategoryWithChildr
       setCache(cacheKey, tree);
       return tree;
     } catch (err) {
-      console.error('[getCategoryTreeForStorefront] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getCategoryTreeForStorefront] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -315,7 +347,7 @@ export async function getCategoryTreeForStorefront(): Promise<CategoryWithChildr
  * Get all categories
  */
 export async function getCategories(): Promise<Category[]> {
-  const cacheKey = 'categories:all';
+  const cacheKey = "categories:all";
   const cached = getCachedLong<Category[]>(cacheKey);
   if (cached) return cached;
 
@@ -327,7 +359,10 @@ export async function getCategories(): Promise<Category[]> {
       setCache(cacheKey, categories);
       return categories;
     } catch (err) {
-      console.error('[getCategories] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getCategories] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -350,7 +385,9 @@ export async function getNestedCategoryTree(): Promise<CategoryWithChildren[]> {
 /**
  * Get category by slug
  */
-export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<Category | null> {
   try {
     const api = getApiClient();
     const data = await api.getCategoryBySlug<any>(slug);
@@ -364,10 +401,15 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 /**
  * Get all descendant category IDs for a given category (including itself)
  */
-export async function getCategoryWithDescendantIds(categoryId: number): Promise<number[]> {
+export async function getCategoryWithDescendantIds(
+  categoryId: number,
+): Promise<number[]> {
   try {
     const api = getApiClient();
-    const data = await api.getCategoryDescendants<{ categoryId: number; descendantIds: number[] }>(categoryId);
+    const data = await api.getCategoryDescendants<{
+      categoryId: number;
+      descendantIds: number[];
+    }>(categoryId);
     return [categoryId, ...(data.descendantIds || [])];
   } catch {
     return [categoryId];
@@ -377,11 +419,10 @@ export async function getCategoryWithDescendantIds(categoryId: number): Promise<
 /**
  * Get all category IDs that match a category name pattern
  */
-export async function getCategoryIdsByNamePattern(categoryName: string): Promise<number[]> {
-  const searchTerm = categoryName
-    .toLowerCase()
-    .replace(/s$/, '')
-    .trim();
+export async function getCategoryIdsByNamePattern(
+  categoryName: string,
+): Promise<number[]> {
+  const searchTerm = categoryName.toLowerCase().replace(/s$/, "").trim();
 
   try {
     const allCategories = await getCategories();
@@ -400,7 +441,10 @@ export async function getCategoryIdsByNamePattern(categoryName: string): Promise
 /**
  * Get all category IDs related to a category
  */
-export async function getAllRelatedCategoryIds(categoryId: number, categoryName: string): Promise<number[]> {
+export async function getAllRelatedCategoryIds(
+  categoryId: number,
+  categoryName: string,
+): Promise<number[]> {
   const [descendantIds, nameMatchIds] = await Promise.all([
     getCategoryWithDescendantIds(categoryId),
     getCategoryIdsByNamePattern(categoryName),
@@ -412,7 +456,9 @@ export async function getAllRelatedCategoryIds(categoryId: number, categoryName:
 /**
  * Get category with its hierarchy (breadcrumb)
  */
-export async function getCategoryWithHierarchy(categoryId: number): Promise<Category[]> {
+export async function getCategoryWithHierarchy(
+  categoryId: number,
+): Promise<Category[]> {
   try {
     const api = getApiClient();
     const data = await api.getCategoryHierarchy<any[]>(categoryId);
@@ -447,22 +493,22 @@ interface GetProductsPagination {
 
 // Map internal sort values to storefront API sort values
 const SORT_MAP: Record<string, string> = {
-  best_sellers: 'newest',
-  name_asc: 'name-asc',
-  name_desc: 'name-desc',
-  price_asc: 'price-asc',
-  price_desc: 'price-desc',
-  newest: 'newest',
-  oldest: 'oldest',
-  top_rated: 'rating-desc',
-  relevance: 'relevance',
+  best_sellers: "newest",
+  name_asc: "name-asc",
+  name_desc: "name-desc",
+  price_asc: "price-asc",
+  price_desc: "price-desc",
+  newest: "newest",
+  oldest: "oldest",
+  top_rated: "rating-desc",
+  relevance: "relevance",
 };
 
 /**
  * Get the price range for products matching the given filters.
  */
 export async function getPriceRange(
-  filters: Omit<GetProductsFilters, 'minPrice' | 'maxPrice'> = {}
+  filters: Omit<GetProductsFilters, "minPrice" | "maxPrice"> = {},
 ): Promise<{ min: number; max: number }> {
   const filterKey = JSON.stringify(filters);
   const cacheKey = `priceRange:${filterKey}`;
@@ -475,23 +521,35 @@ export async function getPriceRange(
 
     try {
       const api = getApiClient();
-      const params: Record<string, string | number | boolean | undefined | null> = {};
+      const params: Record<
+        string,
+        string | number | boolean | undefined | null
+      > = {};
       if (filters.categoryId) params.categoryId = filters.categoryId;
-      if (filters.categoryIds?.length) params.categoryIds = filters.categoryIds.join(',');
+      if (filters.categoryIds?.length)
+        params.categoryIds = filters.categoryIds.join(",");
       if (filters.brandId) params.brandId = filters.brandId;
-      if (filters.brandIds?.length) params.brandIds = filters.brandIds.join(',');
+      if (filters.brandIds?.length)
+        params.brandIds = filters.brandIds.join(",");
       if (filters.search) params.search = filters.search;
       if (filters.inStock) params.inStock = true;
       if (filters.onSale) params.onSale = true;
       if (filters.packAvailable) params.packAvailable = true;
-      if (filters.productIds?.length) params.productIds = filters.productIds.join(',');
+      if (filters.productIds?.length)
+        params.productIds = filters.productIds.join(",");
 
-      const data = await api.getPriceRange<{ minPrice: number; maxPrice: number }>(params);
+      const data = await api.getPriceRange<{
+        minPrice: number;
+        maxPrice: number;
+      }>(params);
       const result = { min: data.minPrice ?? 0, max: data.maxPrice ?? 10000 };
       setCache(cacheKey, result);
       return result;
     } catch (err) {
-      console.error('[getPriceRange] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getPriceRange] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       const fallback = { min: 0, max: 10000 };
       setCache(cacheKey, fallback);
       return fallback;
@@ -504,8 +562,8 @@ export async function getPriceRange(
  */
 export async function getProducts(
   filters: GetProductsFilters = {},
-  sortBy: string = 'name_asc',
-  pagination: GetProductsPagination = {}
+  sortBy: string = "name_asc",
+  pagination: GetProductsPagination = {},
 ): Promise<{
   products: ProductListItem[];
   totalCount: number;
@@ -516,34 +574,45 @@ export async function getProducts(
   // Validate search param length
   if (filters.search) {
     const trimmed = filters.search.trim();
-    if (trimmed.length < MIN_SEARCH_LENGTH || trimmed.length > MAX_SEARCH_LENGTH) {
+    if (
+      trimmed.length < MIN_SEARCH_LENGTH ||
+      trimmed.length > MAX_SEARCH_LENGTH
+    ) {
       return { products: [], totalCount: 0, totalPages: 0 };
     }
   }
 
   try {
     const api = getApiClient();
-    const params: Record<string, string | number | boolean | undefined | null> = {
-      page,
-      limit: pageSize,
-      sort: SORT_MAP[sortBy] || 'name-asc',
-    };
+    const params: Record<string, string | number | boolean | undefined | null> =
+      {
+        page,
+        limit: pageSize,
+        sort: SORT_MAP[sortBy] || "name-asc",
+      };
 
     if (filters.categoryId) params.categoryId = filters.categoryId;
-    if (filters.categoryIds?.length) params.categoryIds = filters.categoryIds.join(',');
+    if (filters.categoryIds?.length)
+      params.categoryIds = filters.categoryIds.join(",");
     if (filters.brandId) params.brandId = filters.brandId;
-    if (filters.brandIds?.length) params.brandIds = filters.brandIds.join(',');
+    if (filters.brandIds?.length) params.brandIds = filters.brandIds.join(",");
     if (filters.search) params.search = filters.search.trim();
     if (filters.minPrice != null) params.minPrice = filters.minPrice;
     if (filters.maxPrice != null) params.maxPrice = filters.maxPrice;
     if (filters.inStock) params.inStock = true;
     if (filters.onSale) params.onSale = true;
     if (filters.packAvailable) params.packAvailable = true;
-    if (filters.productIds?.length) params.productIds = filters.productIds.join(',');
+    if (filters.productIds?.length)
+      params.productIds = filters.productIds.join(",");
 
     const data = await api.getProducts<{
       data: any[];
-      pagination: { page: number; limit: number; total: number; totalPages: number };
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
     }>(params);
 
     const products = (data.data || []).map(toProductListItem);
@@ -553,7 +622,10 @@ export async function getProducts(
       totalPages: data.pagination?.totalPages ?? 1,
     };
   } catch (err) {
-    console.error('[getProducts] API call failed:', err instanceof Error ? err.message : err);
+    console.error(
+      "[getProducts] API call failed:",
+      err instanceof Error ? err.message : err,
+    );
     return { products: [], totalCount: 0, totalPages: 0 };
   }
 }
@@ -561,7 +633,9 @@ export async function getProducts(
 /**
  * Get a product by its slug
  */
-export async function getProductBySlug(slug: string): Promise<ProductListItem | null> {
+export async function getProductBySlug(
+  slug: string,
+): Promise<ProductListItem | null> {
   const cacheKey = `productBySlug:${slug}`;
   const missCacheKey = `productBySlugMiss:${slug}`;
   const cached = getCachedLong<ProductListItem>(cacheKey);
@@ -601,7 +675,7 @@ export async function getProductRecommendations(
   _options: {
     minCooccurrence?: number;
     sinceDays?: number;
-  } = {}
+  } = {},
 ): Promise<ProductListItem[]> {
   const cacheKey = `recommendations:${productId}:${limit}`;
   const cached = getCachedLong<ProductListItem[]>(cacheKey);
@@ -618,7 +692,10 @@ export async function getProductRecommendations(
       setCache(cacheKey, products);
       return products;
     } catch (err) {
-      console.error('[getProductRecommendations] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getProductRecommendations] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -629,11 +706,11 @@ export async function getProductRecommendations(
  */
 export async function getBatchedRecommendations(
   productIds: number[],
-  limit: number = 12
+  limit: number = 12,
 ): Promise<ProductListItem[]> {
   if (productIds.length === 0) return [];
 
-  const cacheKey = `batchRec:${[...productIds].sort().join(',')}:${limit}`;
+  const cacheKey = `batchRec:${[...productIds].sort().join(",")}:${limit}`;
   const cached = getCachedLong<ProductListItem[]>(cacheKey);
   if (cached) return cached;
 
@@ -643,7 +720,9 @@ export async function getBatchedRecommendations(
 
     try {
       const allRecommendations = await Promise.all(
-        productIds.map(id => getProductRecommendations(id, null, null, limit))
+        productIds.map((id) =>
+          getProductRecommendations(id, null, null, limit),
+        ),
       );
 
       const seen = new Set(productIds);
@@ -663,7 +742,10 @@ export async function getBatchedRecommendations(
       setCache(cacheKey, result);
       return result;
     } catch (err) {
-      console.error('[getBatchedRecommendations] API call failed:', err instanceof Error ? err.message : err);
+      console.error(
+        "[getBatchedRecommendations] API call failed:",
+        err instanceof Error ? err.message : err,
+      );
       return [];
     }
   });
@@ -672,7 +754,9 @@ export async function getBatchedRecommendations(
 /**
  * Get full product detail by slug (for product detail page)
  */
-export async function getProductDetailBySlug(slug: string): Promise<ProductDetail | null> {
+export async function getProductDetailBySlug(
+  slug: string,
+): Promise<ProductDetail | null> {
   const cacheKey = `productDetailBySlug:${slug}`;
   const missCacheKey = `productDetailBySlugMiss:${slug}`;
   const cached = getCachedLong<ProductDetail>(cacheKey);
@@ -696,7 +780,12 @@ export async function getProductDetailBySlug(slug: string): Promise<ProductDetai
       let relatedProducts: ProductListItem[] = [];
       if (data.id) {
         try {
-          relatedProducts = await getProductRecommendations(data.id, null, null, 12);
+          relatedProducts = await getProductRecommendations(
+            data.id,
+            null,
+            null,
+            12,
+          );
         } catch {
           // Silently fail — recommendations are non-critical
         }
@@ -722,7 +811,9 @@ export async function getProductDetailBySlug(slug: string): Promise<ProductDetai
 /**
  * Lightweight product detail — skips recommendations fetch for faster loading (used by QuickAddModal)
  */
-export async function getProductDetailOnly(slug: string): Promise<ProductDetail | null> {
+export async function getProductDetailOnly(
+  slug: string,
+): Promise<ProductDetail | null> {
   const cacheKey = `productDetailOnly:${slug}`;
   const missCacheKey = `productDetailOnlyMiss:${slug}`;
   const cached = getCachedLong<ProductDetail>(cacheKey);
@@ -774,23 +865,29 @@ export async function searchProducts(
     minPrice?: number;
     maxPrice?: number;
     sort?: string;
-  } = {}
-): Promise<{ products: ProductListItem[]; totalCount: number; totalPages: number }> {
+  } = {},
+): Promise<{
+  products: ProductListItem[];
+  totalCount: number;
+  totalPages: number;
+}> {
   const page = options.page || 1;
   const pageSize = options.pageSize || 24;
-  const sortVal = SORT_MAP[options.sort || 'relevance'] || 'relevance';
+  const sortVal = SORT_MAP[options.sort || "relevance"] || "relevance";
 
   try {
     const api = getApiClient();
-    const params: Record<string, string | number | boolean | undefined | null> = {
-      q: query,
-      page,
-      limit: pageSize,
-      sort: sortVal,
-    };
+    const params: Record<string, string | number | boolean | undefined | null> =
+      {
+        q: query,
+        page,
+        limit: pageSize,
+        sort: sortVal,
+      };
 
-    if (options.categoryIds?.length) params.categoryIds = options.categoryIds.join(',');
-    if (options.brandIds?.length) params.brandIds = options.brandIds.join(',');
+    if (options.categoryIds?.length)
+      params.categoryIds = options.categoryIds.join(",");
+    if (options.brandIds?.length) params.brandIds = options.brandIds.join(",");
     if (options.inStock) params.inStock = true;
     if (options.onSale) params.onSale = true;
     if (options.minPrice != null) params.minPrice = options.minPrice;
@@ -798,7 +895,12 @@ export async function searchProducts(
 
     const data = await api.searchProductsFts<{
       data: any[];
-      pagination: { page: number; limit: number; total: number; totalPages: number };
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
     }>(params);
 
     const products = (data.data || []).map(toProductListItem);
@@ -808,7 +910,10 @@ export async function searchProducts(
       totalPages: data.pagination?.totalPages ?? 1,
     };
   } catch (err) {
-    console.error('[searchProducts] API call failed:', err instanceof Error ? err.message : err);
+    console.error(
+      "[searchProducts] API call failed:",
+      err instanceof Error ? err.message : err,
+    );
     return { products: [], totalCount: 0, totalPages: 0 };
   }
 }
@@ -820,7 +925,9 @@ export async function searchProducts(
 /**
  * Get search suggestions for autocomplete
  */
-export async function getSearchSuggestions(query: string): Promise<SearchSuggestionsResponse> {
+export async function getSearchSuggestions(
+  query: string,
+): Promise<SearchSuggestionsResponse> {
   const trimmed = query.trim();
 
   const cacheKey = `searchSuggestions:${trimmed.toLowerCase()}`;
@@ -831,33 +938,41 @@ export async function getSearchSuggestions(query: string): Promise<SearchSuggest
 
   try {
     const api = getApiClient();
-    const data = await api.getSearchSuggestions<SearchSuggestionsResponse>(trimmed);
+    const data =
+      await api.getSearchSuggestions<SearchSuggestionsResponse>(trimmed);
 
     const result: SearchSuggestionsResponse = {
-      products: (data.products || []).map((p: any): ProductSuggestion => ({
-        id: p.id,
-        slug: p.slug || slugify(p.name),
-        name: p.name,
-        brandName: p.brandName ?? null,
-        primaryImage: p.primaryImage ?? p.imageUrl ?? null,
-        price: p.price ?? null,
-        maxPrice: p.maxPrice ?? null,
-        inStock: p.inStock ?? false,
-      })),
-      categories: (data.categories || []).map((c: any): CategorySuggestion => ({
-        id: c.id,
-        name: c.name ?? c.categoryName ?? '',
-        slug: c.slug || slugify(c.name ?? c.categoryName),
-        productCount: c.productCount ?? 0,
-        parentName: c.parentName ?? null,
-      })),
+      products: (data.products || []).map(
+        (p: any): ProductSuggestion => ({
+          id: p.id,
+          slug: p.slug || slugify(p.name),
+          name: p.name,
+          brandName: p.brandName ?? null,
+          primaryImage: p.primaryImage ?? p.imageUrl ?? null,
+          price: p.price ?? null,
+          maxPrice: p.maxPrice ?? null,
+          inStock: p.inStock ?? false,
+        }),
+      ),
+      categories: (data.categories || []).map(
+        (c: any): CategorySuggestion => ({
+          id: c.id,
+          name: c.name ?? c.categoryName ?? "",
+          slug: c.slug || slugify(c.name ?? c.categoryName),
+          productCount: c.productCount ?? 0,
+          parentName: c.parentName ?? null,
+        }),
+      ),
       queryType: data.queryType || parsed.type,
     };
 
     setCache(cacheKey, result);
     return result;
   } catch (err) {
-    console.error('[getSearchSuggestions] API call failed:', err instanceof Error ? err.message : err);
+    console.error(
+      "[getSearchSuggestions] API call failed:",
+      err instanceof Error ? err.message : err,
+    );
     return {
       products: [],
       categories: [],
@@ -873,7 +988,9 @@ export async function getSearchSuggestions(query: string): Promise<SearchSuggest
 /**
  * Get review aggregate (average rating, counts) for a product.
  */
-export async function getReviewAggregate(productId: number): Promise<ReviewAggregate | null> {
+export async function getReviewAggregate(
+  productId: number,
+): Promise<ReviewAggregate | null> {
   const cacheKey = `reviewAggregate:${productId}`;
   if (cache.has(cacheKey)) {
     return getCachedLong<ReviewAggregate | null>(cacheKey);
@@ -881,7 +998,10 @@ export async function getReviewAggregate(productId: number): Promise<ReviewAggre
 
   try {
     const api = getApiClient();
-    const data = await api.getProductReviews<any>(productId, { page: 1, limit: 1 });
+    const data = await api.getProductReviews<any>(productId, {
+      page: 1,
+      limit: 1,
+    });
 
     if (!data?.aggregate) {
       setCache(cacheKey, null);
@@ -902,7 +1022,10 @@ export async function getReviewAggregate(productId: number): Promise<ReviewAggre
     setCache(cacheKey, aggregate);
     return aggregate;
   } catch (err) {
-    console.error('[getReviewAggregate] API call failed:', err instanceof Error ? err.message : err);
+    console.error(
+      "[getReviewAggregate] API call failed:",
+      err instanceof Error ? err.message : err,
+    );
     return null;
   }
 }
@@ -912,11 +1035,11 @@ export async function getReviewAggregate(productId: number): Promise<ReviewAggre
  */
 export async function getProductReviews(
   productId: number,
-  options: { page?: number; limit?: number; sort?: ReviewSortOption } = {}
+  options: { page?: number; limit?: number; sort?: ReviewSortOption } = {},
 ): Promise<ReviewsResponse> {
   const page = options.page ?? 1;
   const limit = Math.min(options.limit ?? 10, 50);
-  const sort = options.sort ?? 'newest';
+  const sort = options.sort ?? "newest";
 
   const cacheKey = `productReviews:${productId}:${page}:${limit}:${sort}`;
   const cached = getCached<ReviewsResponse>(cacheKey);
@@ -938,7 +1061,11 @@ export async function getProductReviews(
 
   try {
     const api = getApiClient();
-    const data = await api.getProductReviews<ReviewsResponse>(productId, { page, limit, sort });
+    const data = await api.getProductReviews<ReviewsResponse>(productId, {
+      page,
+      limit,
+      sort,
+    });
 
     if (!data) return emptyResponse;
 
@@ -951,7 +1078,10 @@ export async function getProductReviews(
     setCache(cacheKey, result);
     return result;
   } catch (err) {
-    console.error('[getProductReviews] API call failed:', err instanceof Error ? err.message : err);
+    console.error(
+      "[getProductReviews] API call failed:",
+      err instanceof Error ? err.message : err,
+    );
     return emptyResponse;
   }
 }

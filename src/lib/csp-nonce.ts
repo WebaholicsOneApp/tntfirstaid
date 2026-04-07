@@ -24,7 +24,7 @@ export function generateNonce(): string {
 /**
  * Header name used to pass nonce from middleware to components
  */
-export const CSP_NONCE_HEADER = 'x-csp-nonce';
+export const CSP_NONCE_HEADER = "x-csp-nonce";
 
 /**
  * Builds CSP directives with nonce support
@@ -33,59 +33,62 @@ export const CSP_NONCE_HEADER = 'x-csp-nonce';
  * @param isProduction - Whether running in production
  * @returns CSP header value string
  */
-export function buildCSPWithNonce(nonce: string, isProduction: boolean): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3005';
+export function buildCSPWithNonce(
+  nonce: string,
+  isProduction: boolean,
+): string {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3005";
 
   const directives: Record<string, string[]> = {
-    'default-src': ["'self'"],
-    'script-src': [
+    "default-src": ["'self'"],
+    "script-src": [
       "'self'",
       `'nonce-${nonce}'`,
       // Strict dynamic allows scripts loaded by nonced scripts
       "'strict-dynamic'",
       // Fallbacks for browsers that don't support nonce
       ...(isProduction ? [] : ["'unsafe-inline'"]),
-      'https://js.stripe.com',
-      'https://js.authorize.net',
-      'https://jstest.authorize.net',
-      'https://maps.googleapis.com',
-      'https://apis.google.com',
+      "https://js.stripe.com",
+      "https://js.authorize.net",
+      "https://jstest.authorize.net",
+      "https://maps.googleapis.com",
+      "https://apis.google.com",
     ],
-    'style-src': [
+    "style-src": [
       "'self'",
       // Styles often need unsafe-inline for CSS-in-JS
       "'unsafe-inline'",
     ],
-    'img-src': ["'self'", 'data:', 'blob:', 'https:', 'http:'],
-    'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
-    'connect-src': [
+    "img-src": ["'self'", "data:", "blob:", "https:", "http:"],
+    "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+    "connect-src": [
       "'self'",
       siteUrl,
-      'https://api.stripe.com',
-      'https://api.authorize.net',
-      'https://apitest.authorize.net',
-      'https://maps.googleapis.com',
-      'https://apis.google.com',
-      ...(isProduction ? [] : ['http://localhost:*', 'ws://localhost:*']),
+      "https://api.stripe.com",
+      "https://api.authorize.net",
+      "https://apitest.authorize.net",
+      "https://maps.googleapis.com",
+      "https://apis.google.com",
+      ...(isProduction ? [] : ["http://localhost:*", "ws://localhost:*"]),
     ],
-    'frame-src': [
+    "frame-src": [
       "'self'",
-      'https://js.stripe.com',
-      'https://hooks.stripe.com',
-      'https://accept.authorize.net',
-      'https://test.authorize.net',
-      'https://www.google.com',
-      'https://www.youtube-nocookie.com',
+      "https://js.stripe.com",
+      "https://hooks.stripe.com",
+      "https://accept.authorize.net",
+      "https://test.authorize.net",
+      "https://www.google.com",
+      "https://www.youtube-nocookie.com",
     ],
-    'frame-ancestors': ["'self'"],
-    'form-action': ["'self'"],
-    'base-uri': ["'self'"],
-    'object-src': ["'none'"],
+    "frame-ancestors": ["'self'"],
+    "form-action": ["'self'"],
+    "base-uri": ["'self'"],
+    "object-src": ["'none'"],
   };
 
   // Add upgrade-insecure-requests in production
   if (isProduction) {
-    directives['upgrade-insecure-requests'] = [];
+    directives["upgrade-insecure-requests"] = [];
   }
 
   // Build the CSP string
@@ -94,35 +97,44 @@ export function buildCSPWithNonce(nonce: string, isProduction: boolean): string 
       if (values.length === 0) {
         return key;
       }
-      return `${key} ${values.join(' ')}`;
+      return `${key} ${values.join(" ")}`;
     })
-    .join('; ');
+    .join("; ");
 }
 
 /**
  * Security headers to apply alongside CSP
  */
-export function getSecurityHeaders(nonce: string, isProduction: boolean): Record<string, string> {
+export function getSecurityHeaders(
+  nonce: string,
+  isProduction: boolean,
+): Record<string, string> {
   const csp = buildCSPWithNonce(nonce, isProduction);
 
   return {
     // CSP - use report-only in development for easier debugging
-    [isProduction ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only']: csp,
+    [isProduction
+      ? "Content-Security-Policy"
+      : "Content-Security-Policy-Report-Only"]: csp,
     // Pass nonce to application
     [CSP_NONCE_HEADER]: nonce,
     // HSTS - only in production
     ...(isProduction
-      ? { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload' }
+      ? {
+          "Strict-Transport-Security":
+            "max-age=31536000; includeSubDomains; preload",
+        }
       : {}),
     // Prevent clickjacking
-    'X-Frame-Options': 'DENY',
+    "X-Frame-Options": "DENY",
     // Prevent MIME sniffing
-    'X-Content-Type-Options': 'nosniff',
+    "X-Content-Type-Options": "nosniff",
     // XSS protection for legacy browsers
-    'X-XSS-Protection': '1; mode=block',
+    "X-XSS-Protection": "1; mode=block",
     // Referrer policy
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    "Referrer-Policy": "strict-origin-when-cross-origin",
     // Permissions policy
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    "Permissions-Policy":
+      "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   };
 }

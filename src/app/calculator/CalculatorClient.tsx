@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 interface Inputs {
   distance: string;
@@ -23,8 +23,12 @@ function compute(inputs: Inputs): Results | null {
   const fieldConstant = parseFloat(inputs.fieldConstant);
 
   if (
-    isNaN(distance) || isNaN(windVelocity) || isNaN(softwareMoa) ||
-    distance <= 0 || windVelocity <= 0 || softwareMoa <= 0
+    isNaN(distance) ||
+    isNaN(windVelocity) ||
+    isNaN(softwareMoa) ||
+    distance <= 0 ||
+    windVelocity <= 0 ||
+    softwareMoa <= 0
   ) {
     return null;
   }
@@ -32,7 +36,8 @@ function compute(inputs: Inputs): Results | null {
   const yardsInHundreds = distance / 100;
   const trueConstant = (windVelocity * yardsInHundreds) / softwareMoa;
   const trueWindDrift = softwareMoa * yardsInHundreds * 1.047;
-  const fc = isNaN(fieldConstant) || fieldConstant <= 0 ? trueConstant : fieldConstant;
+  const fc =
+    isNaN(fieldConstant) || fieldConstant <= 0 ? trueConstant : fieldConstant;
   const fieldMoaCorrection = (windVelocity * yardsInHundreds) / fc;
   const fieldConstantDrift = fieldMoaCorrection * yardsInHundreds * 1.047;
   const deviation = fieldConstantDrift - trueWindDrift;
@@ -45,8 +50,16 @@ function compute(inputs: Inputs): Results | null {
   };
 }
 
-function InputField({ name, value, onChange, placeholder }: {
-  name: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; placeholder: string;
+function InputField({
+  name,
+  value,
+  onChange,
+  placeholder,
+}: {
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
 }) {
   return (
     <input
@@ -56,14 +69,14 @@ function InputField({ name, value, onChange, placeholder }: {
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full px-4 py-2.5 bg-white border border-primary-300 rounded-lg text-sm text-center focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20"
+      className="border-primary-300 focus:border-primary-500 focus:ring-primary-500/20 w-full rounded-lg border bg-white px-4 py-2.5 text-center text-sm focus:ring-1 focus:outline-none"
     />
   );
 }
 
 function OutputField({ value }: { value: string | number }) {
   return (
-    <div className="w-full px-4 py-2.5 bg-primary-500/15 border border-primary-300 rounded-lg text-sm text-center text-secondary-700 font-medium min-h-[40px]">
+    <div className="bg-primary-500/15 border-primary-300 text-secondary-700 min-h-[40px] w-full rounded-lg border px-4 py-2.5 text-center text-sm font-medium">
       {value}
     </div>
   );
@@ -79,10 +92,10 @@ interface Row {
 
 export default function CalculatorClient() {
   const [inputs, setInputs] = useState<Inputs>({
-    distance: '',
-    windVelocity: '',
-    softwareMoa: '',
-    fieldConstant: '',
+    distance: "",
+    windVelocity: "",
+    softwareMoa: "",
+    fieldConstant: "",
   });
 
   const results = compute(inputs);
@@ -93,32 +106,118 @@ export default function CalculatorClient() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setInputs({ distance: '', windVelocity: '', softwareMoa: '', fieldConstant: '' });
+    setInputs({
+      distance: "",
+      windVelocity: "",
+      softwareMoa: "",
+      fieldConstant: "",
+    });
   }, []);
 
   const inputRows: Row[] = [
-    { label: 'Distance (Yards)', hint: 'Enter yards in 100 yard increments', required: true, isInput: true, content: <InputField name="distance" value={inputs.distance} onChange={handleChange} placeholder="ex: 600" /> },
-    { label: 'Wind Velocity (MPH)', hint: 'Enter wind velocity', required: true, isInput: true, content: <InputField name="windVelocity" value={inputs.windVelocity} onChange={handleChange} placeholder="ex: 9" /> },
-    { label: 'Software Produced MOA Correction', hint: 'Ballistic app MOA correction for above wind', required: true, isInput: true, content: <InputField name="softwareMoa" value={inputs.softwareMoa} onChange={handleChange} placeholder="ex: 3.0" /> },
+    {
+      label: "Distance (Yards)",
+      hint: "Enter yards in 100 yard increments",
+      required: true,
+      isInput: true,
+      content: (
+        <InputField
+          name="distance"
+          value={inputs.distance}
+          onChange={handleChange}
+          placeholder="ex: 600"
+        />
+      ),
+    },
+    {
+      label: "Wind Velocity (MPH)",
+      hint: "Enter wind velocity",
+      required: true,
+      isInput: true,
+      content: (
+        <InputField
+          name="windVelocity"
+          value={inputs.windVelocity}
+          onChange={handleChange}
+          placeholder="ex: 9"
+        />
+      ),
+    },
+    {
+      label: "Software Produced MOA Correction",
+      hint: "Ballistic app MOA correction for above wind",
+      required: true,
+      isInput: true,
+      content: (
+        <InputField
+          name="softwareMoa"
+          value={inputs.softwareMoa}
+          onChange={handleChange}
+          placeholder="ex: 3.0"
+        />
+      ),
+    },
   ];
 
   const resultRows: Row[] = [
-    { label: 'True Constant', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.trueConstant ?? ''} /> },
-    { label: 'True Wind Drift (Inches)', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.trueWindDrift ?? ''} /> },
-    { label: 'Field Constant', hint: 'Adjust to meet your wind drift deviation limit', required: false, isInput: true, content: <InputField name="fieldConstant" value={inputs.fieldConstant} onChange={handleChange} placeholder={results ? `ex: ${Math.round(results.trueConstant)}` : 'ex: 18'} /> },
-    { label: 'Field Constant Produced Wind Drift (Inches)', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.fieldConstantDrift ?? ''} /> },
-    { label: 'Deviation From True Wind Drift', hint: 'Will auto-populate', required: false, isInput: false, content: <OutputField value={results?.deviation ?? ''} /> },
+    {
+      label: "True Constant",
+      hint: "Will auto-populate",
+      required: false,
+      isInput: false,
+      content: <OutputField value={results?.trueConstant ?? ""} />,
+    },
+    {
+      label: "True Wind Drift (Inches)",
+      hint: "Will auto-populate",
+      required: false,
+      isInput: false,
+      content: <OutputField value={results?.trueWindDrift ?? ""} />,
+    },
+    {
+      label: "Field Constant",
+      hint: "Adjust to meet your wind drift deviation limit",
+      required: false,
+      isInput: true,
+      content: (
+        <InputField
+          name="fieldConstant"
+          value={inputs.fieldConstant}
+          onChange={handleChange}
+          placeholder={
+            results ? `ex: ${Math.round(results.trueConstant)}` : "ex: 18"
+          }
+        />
+      ),
+    },
+    {
+      label: "Field Constant Produced Wind Drift (Inches)",
+      hint: "Will auto-populate",
+      required: false,
+      isInput: false,
+      content: <OutputField value={results?.fieldConstantDrift ?? ""} />,
+    },
+    {
+      label: "Deviation From True Wind Drift",
+      hint: "Will auto-populate",
+      required: false,
+      isInput: false,
+      content: <OutputField value={results?.deviation ?? ""} />,
+    },
   ];
 
   function renderRow(row: Row) {
     return (
-      <div key={row.label} className={row.isInput ? 'border-l-2 border-l-primary-500 pl-3' : ''}>
-        <label className="block text-[10px] font-bold text-secondary-600 uppercase tracking-[0.12em] text-center mb-1.5">
+      <div
+        key={row.label}
+        className={row.isInput ? "border-l-primary-500 border-l-2 pl-3" : ""}
+      >
+        <label className="text-secondary-600 mb-1.5 block text-center text-[10px] font-bold tracking-[0.12em] uppercase">
           {row.label}
-          {row.required && <span className="text-red-500 ml-0.5">*</span>}
+          {row.required && <span className="ml-0.5 text-red-500">*</span>}
         </label>
         <div>{row.content}</div>
-        <p className="text-[10px] text-gray-400 mt-1 text-center">{row.hint}</p>
+        <p className="mt-1 text-center text-[10px] text-gray-400">{row.hint}</p>
       </div>
     );
   }
@@ -126,21 +225,21 @@ export default function CalculatorClient() {
   return (
     <div>
       <div className="bg-primary-500 rounded-t-xl px-5 py-3 text-center">
-        <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-secondary-900">
+        <h2 className="text-secondary-900 text-xs font-bold tracking-[0.2em] uppercase">
           Type In Your Metrics Below
         </h2>
       </div>
 
-      <div className="bg-primary-500/20 px-5 py-4 space-y-3">
+      <div className="bg-primary-500/20 space-y-3 px-5 py-4">
         {/* YOUR INPUTS section */}
-        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary-500 text-center">
+        <div className="text-secondary-500 text-center text-[10px] font-bold tracking-[0.2em] uppercase">
           Your Inputs
         </div>
 
         {inputRows.map(renderRow)}
 
         {/* RESULTS section */}
-        <div className="border-t border-primary-300 pt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary-500 text-center">
+        <div className="border-primary-300 text-secondary-500 border-t pt-3 text-center text-[10px] font-bold tracking-[0.2em] uppercase">
           Results
         </div>
 
@@ -155,7 +254,7 @@ export default function CalculatorClient() {
           <button
             type="button"
             onClick={handleReset}
-            className="px-6 py-2 text-xs font-semibold uppercase tracking-wider border border-secondary-400 text-secondary-600 rounded-lg hover:bg-secondary-100 transition-colors"
+            className="border-secondary-400 text-secondary-600 hover:bg-secondary-100 rounded-lg border px-6 py-2 text-xs font-semibold tracking-wider uppercase transition-colors"
           >
             Reset
           </button>

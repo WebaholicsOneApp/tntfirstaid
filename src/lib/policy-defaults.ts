@@ -17,7 +17,7 @@ export interface ShippingReturnsConfig {
   deliveryTimeDaysMin: number;
   deliveryTimeDaysMax: number;
   freeShipping: boolean;
-  returnShippingPaidBy: 'customer' | 'store';
+  returnShippingPaidBy: "customer" | "store";
   shippingCarriers: string;
   shippingRegion: string;
   acceptPOBoxes: boolean;
@@ -69,8 +69,10 @@ export interface PrivacyPolicyConfig {
 }
 
 export const SHIPPING_RETURNS_DEFAULTS: ShippingReturnsConfig = {
-  heroSubtitle: 'Fast shipping on ammunition and reloading supplies with clear return and exchange policies.',
-  contactCtaText: 'Our support team is ready to help you with any shipping or return concerns.',
+  heroSubtitle:
+    "Fast shipping on ammunition and reloading supplies with clear return and exchange policies.",
+  contactCtaText:
+    "Our support team is ready to help you with any shipping or return concerns.",
   returnWindowDays: 30,
   inspectionTimeHours: 72,
   refundCreditDays: 7,
@@ -81,9 +83,9 @@ export const SHIPPING_RETURNS_DEFAULTS: ShippingReturnsConfig = {
   deliveryTimeDaysMin: 3,
   deliveryTimeDaysMax: 7,
   freeShipping: false,
-  returnShippingPaidBy: 'customer',
-  shippingCarriers: 'UPS and FedEx',
-  shippingRegion: 'continental United States',
+  returnShippingPaidBy: "customer",
+  shippingCarriers: "UPS and FedEx",
+  shippingRegion: "continental United States",
   acceptPOBoxes: false,
   showReturnsExchanges: true,
   showPackaging: true,
@@ -93,14 +95,17 @@ export const SHIPPING_RETURNS_DEFAULTS: ShippingReturnsConfig = {
 };
 
 export const TERMS_OF_SERVICE_DEFAULTS: TermsOfServiceConfig = {
-  heroSubtitle: 'Please read these terms carefully before using our website or services.',
-  agreementText: 'By accessing or using the {{siteName}} website at {{siteDomain}}, you agree to be bound by these Terms of Service. If you do not agree to all of these terms, you are not authorized to use our site or services.',
-  contactCtaText: 'If you have any questions about these Terms of Service, please reach out to our team.',
+  heroSubtitle:
+    "Please read these terms carefully before using our website or services.",
+  agreementText:
+    "By accessing or using the {{siteName}} website at {{siteDomain}}, you agree to be bound by these Terms of Service. If you do not agree to all of these terms, you are not authorized to use our site or services.",
+  contactCtaText:
+    "If you have any questions about these Terms of Service, please reach out to our team.",
   returnWindowDays: 30,
   liabilityPeriodMonths: 12,
-  governingState: 'Utah',
-  governingCounty: 'Salt Lake County',
-  lastUpdatedDate: 'March 10, 2026',
+  governingState: "Utah",
+  governingCounty: "Salt Lake County",
+  lastUpdatedDate: "March 10, 2026",
   showAgreementToTerms: true,
   showUseOfWebsite: true,
   showProductsAndOrders: true,
@@ -114,12 +119,15 @@ export const TERMS_OF_SERVICE_DEFAULTS: TermsOfServiceConfig = {
 };
 
 export const PRIVACY_POLICY_DEFAULTS: PrivacyPolicyConfig = {
-  heroSubtitle: 'Your privacy matters to us. Here\'s how we handle your information.',
-  overviewText: '{{siteName}} ("we," "us," or "our") operates the website {{siteDomain}}. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase.',
-  contactCtaText: 'If you have any questions about this Privacy Policy, please don\'t hesitate to reach out.',
+  heroSubtitle:
+    "Your privacy matters to us. Here's how we handle your information.",
+  overviewText:
+    '{{siteName}} ("we," "us," or "our") operates the website {{siteDomain}}. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase.',
+  contactCtaText:
+    "If you have any questions about this Privacy Policy, please don't hesitate to reach out.",
   childrenMinAge: 18,
   rightsResponseDays: 30,
-  lastUpdatedDate: 'March 10, 2026',
+  lastUpdatedDate: "March 10, 2026",
   showOverview: true,
   showInformationWeCollect: true,
   showHowWeUseInfo: true,
@@ -133,20 +141,29 @@ export const PRIVACY_POLICY_DEFAULTS: PrivacyPolicyConfig = {
 };
 
 /** Merge saved partial config with defaults */
-export function mergeShippingReturns(saved?: Partial<ShippingReturnsConfig>): ShippingReturnsConfig {
+export function mergeShippingReturns(
+  saved?: Partial<ShippingReturnsConfig>,
+): ShippingReturnsConfig {
   return { ...SHIPPING_RETURNS_DEFAULTS, ...(saved || {}) };
 }
 
-export function mergeTermsOfService(saved?: Partial<TermsOfServiceConfig>): TermsOfServiceConfig {
+export function mergeTermsOfService(
+  saved?: Partial<TermsOfServiceConfig>,
+): TermsOfServiceConfig {
   return { ...TERMS_OF_SERVICE_DEFAULTS, ...(saved || {}) };
 }
 
-export function mergePrivacyPolicy(saved?: Partial<PrivacyPolicyConfig>): PrivacyPolicyConfig {
+export function mergePrivacyPolicy(
+  saved?: Partial<PrivacyPolicyConfig>,
+): PrivacyPolicyConfig {
   return { ...PRIVACY_POLICY_DEFAULTS, ...(saved || {}) };
 }
 
 /** Simple {{var}} replacement */
-export function resolveTemplate(template: string, vars: Record<string, string>): string {
+export function resolveTemplate(
+  template: string,
+  vars: Record<string, string>,
+): string {
   return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
     return vars[key] !== undefined ? vars[key] : match;
   });

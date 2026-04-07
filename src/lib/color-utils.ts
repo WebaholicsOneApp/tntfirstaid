@@ -64,7 +64,7 @@ function hslToHex(h: number, s: number, l: number): string {
   const toHex = (c: number) =>
     Math.round(c * 255)
       .toString(16)
-      .padStart(2, '0');
+      .padStart(2, "0");
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
@@ -84,7 +84,9 @@ const SHADE_LIGHTNESS: Record<number, number> = {
   950: 10,
 };
 
-export const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+export const SHADES = [
+  50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950,
+] as const;
 
 /**
  * Generate a full Tailwind-compatible palette from a single hex color.

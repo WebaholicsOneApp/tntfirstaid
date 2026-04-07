@@ -3,13 +3,15 @@
  * Accepts a Stripe instance as a parameter (route-specific lazy init).
  * Never throws — returns null on failure so the caller falls back to guest checkout.
  */
-import type Stripe from 'stripe';
-import type { Customer } from '~/types/auth';
+import type Stripe from "stripe";
+import type { Customer } from "~/types/auth";
 
 /**
  * Map our Customer + defaultAddress into the Stripe shipping format.
  */
-function buildShipping(customer: Customer): Stripe.CustomerCreateParams['shipping'] | undefined {
+function buildShipping(
+  customer: Customer,
+): Stripe.CustomerCreateParams["shipping"] | undefined {
   const addr = customer.defaultAddress;
   if (!addr?.line1) return undefined;
 
@@ -21,7 +23,7 @@ function buildShipping(customer: Customer): Stripe.CustomerCreateParams['shippin
       city: addr.city,
       state: addr.state,
       postal_code: addr.postalCode,
-      country: addr.country || 'US',
+      country: addr.country || "US",
     },
   };
 }

@@ -2,7 +2,7 @@
  * Types for order fulfillment notifications from OneApp
  */
 
-export type FulfillmentStatus = 'SHIPPED' | 'DELIVERED';
+export type FulfillmentStatus = "SHIPPED" | "DELIVERED";
 
 export interface FulfillmentItem {
   orderItemId: number;
@@ -41,5 +41,5 @@ export interface OrderWithCustomerInfo {
 
 export interface NotificationConfig {
   email: boolean;
-  template: 'order-shipped' | 'order-delivered';
+  template: "order-shipped" | "order-delivered";
 }

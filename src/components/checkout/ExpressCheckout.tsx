@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   ExpressCheckoutElement,
   useStripe,
   useElements,
-} from '@stripe/react-stripe-js';
-import type { StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js';
+} from "@stripe/react-stripe-js";
+import type { StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 
 interface CartItem {
   id: number;
@@ -43,9 +43,11 @@ export default function ExpressCheckout({
   const elements = useElements();
   const [isReady, setIsReady] = useState(false);
 
-  const handleConfirm = async (event: StripeExpressCheckoutElementConfirmEvent) => {
+  const handleConfirm = async (
+    event: StripeExpressCheckoutElementConfirmEvent,
+  ) => {
     if (!stripe || !elements) {
-      onError('Payment system not ready. Please try again.');
+      onError("Payment system not ready. Please try again.");
       return;
     }
 
@@ -55,32 +57,36 @@ export default function ExpressCheckout({
         confirmParams: {
           return_url: `${window.location.origin}/checkout/success`,
         },
-        redirect: 'if_required',
+        redirect: "if_required",
       });
 
       if (error) {
-        onError(error.message || 'Payment failed. Please try again.');
+        onError(error.message || "Payment failed. Please try again.");
         return;
       }
 
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
+      if (paymentIntent && paymentIntent.status === "succeeded") {
         // Determine payment method type
-        const pmType = event.expressPaymentType || 'card';
-        let paymentMethod = 'card';
-        if (pmType === 'apple_pay') paymentMethod = 'apple_pay';
-        else if (pmType === 'google_pay') paymentMethod = 'google_pay';
-        else if (pmType === 'amazon_pay') paymentMethod = 'amazon_pay';
-        else if (pmType === 'link') paymentMethod = 'link';
+        const pmType = event.expressPaymentType || "card";
+        let paymentMethod = "card";
+        if (pmType === "apple_pay") paymentMethod = "apple_pay";
+        else if (pmType === "google_pay") paymentMethod = "google_pay";
+        else if (pmType === "amazon_pay") paymentMethod = "amazon_pay";
+        else if (pmType === "link") paymentMethod = "link";
 
         onSuccess(paymentIntent.id, paymentMethod);
       }
     } catch (err) {
-      console.error('Express checkout error:', err);
-      onError('Payment failed. Please try again.');
+      console.error("Express checkout error:", err);
+      onError("Payment failed. Please try again.");
     }
   };
 
-  const handleReady = ({ availablePaymentMethods }: { availablePaymentMethods?: Record<string, boolean> }) => {
+  const handleReady = ({
+    availablePaymentMethods,
+  }: {
+    availablePaymentMethods?: Record<string, boolean>;
+  }) => {
     if (availablePaymentMethods) {
       const hasMethod = Object.values(availablePaymentMethods).some(Boolean);
       setIsReady(hasMethod);
@@ -90,31 +96,31 @@ export default function ExpressCheckout({
   return (
     <div className="express-checkout-container">
       {!isReady && (
-        <p className="mb-3 text-xs text-secondary-400">
+        <p className="text-secondary-400 mb-3 text-xs">
           Checking Apple Pay and Google Pay availability...
         </p>
       )}
-      <div className={isReady ? '' : 'pointer-events-none opacity-0'}>
+      <div className={isReady ? "" : "pointer-events-none opacity-0"}>
         <ExpressCheckoutElement
           onConfirm={handleConfirm}
           onReady={handleReady}
           options={{
             buttonType: {
-              applePay: 'buy',
-              googlePay: 'buy',
+              applePay: "buy",
+              googlePay: "buy",
             },
             buttonTheme: {
-              applePay: 'black',
-              googlePay: 'black',
+              applePay: "black",
+              googlePay: "black",
             },
             layout: {
               maxColumns: 2,
               maxRows: 1,
             },
             paymentMethods: {
-              applePay: 'always',
-              googlePay: 'always',
-              link: 'auto',
+              applePay: "always",
+              googlePay: "always",
+              link: "auto",
             },
           }}
         />

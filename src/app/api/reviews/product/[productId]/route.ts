@@ -1,10 +1,10 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
-import { getApiClient } from '~/lib/api-client';
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { getApiClient } from "~/lib/api-client";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<{ productId: string }> },
 ) {
   try {
     const { productId: productIdParam } = await params;
@@ -12,15 +12,15 @@ export async function GET(
 
     if (isNaN(productId)) {
       return NextResponse.json(
-        { error: 'Invalid product ID' },
-        { status: 400 }
+        { error: "Invalid product ID" },
+        { status: 400 },
       );
     }
 
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page') || '1';
-    const limit = searchParams.get('limit') || '10';
-    const sort = searchParams.get('sort') || 'newest';
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
+    const sort = searchParams.get("sort") || "newest";
 
     // Fetch reviews via API (handles pagination, sorting, images, aggregates)
     const data = await getApiClient().getProductReviews(productId, {
@@ -31,27 +31,36 @@ export async function GET(
 
     // Normalize: OneApp API returns images as plain URL strings,
     // but the frontend expects { id, imageUrl, thumbnailUrl } objects
-    const rawReviews = ((data as Record<string, unknown>).data ?? (data as Record<string, unknown>).reviews ?? []) as Record<string, unknown>[];
+    const rawReviews = ((data as Record<string, unknown>).data ??
+      (data as Record<string, unknown>).reviews ??
+      []) as Record<string, unknown>[];
     const reviews = rawReviews.map((review) => ({
       ...review,
-      images: (Array.isArray(review.images) ? review.images : []).map((img: unknown, i: number) => {
-        if (typeof img === 'string') {
-          return { id: i, imageUrl: img, thumbnailUrl: null };
-        }
-        return img;
-      }),
+      images: (Array.isArray(review.images) ? review.images : []).map(
+        (img: unknown, i: number) => {
+          if (typeof img === "string") {
+            return { id: i, imageUrl: img, thumbnailUrl: null };
+          }
+          return img;
+        },
+      ),
     }));
 
     return NextResponse.json({
       reviews,
       aggregate: (data as Record<string, unknown>).aggregate ?? null,
-      pagination: (data as Record<string, unknown>).pagination ?? { page: 1, limit: 10, total: 0, totalPages: 0 },
+      pagination: (data as Record<string, unknown>).pagination ?? {
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
+      },
     });
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+    console.error("Error fetching reviews:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch reviews' },
-      { status: 500 }
+      { error: "Failed to fetch reviews" },
+      { status: 500 },
     );
   }
 }

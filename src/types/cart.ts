@@ -27,7 +27,11 @@ export interface Cart {
 
 export interface CartContextType {
   cart: Cart;
-  addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number, options?: { skipDrawer?: boolean }) => void;
+  addItem: (
+    item: Omit<CartItem, "quantity">,
+    quantity?: number,
+    options?: { skipDrawer?: boolean },
+  ) => void;
   removeItem: (variationId: number) => void;
   updateQuantity: (variationId: number, quantity: number) => void;
   clearCart: () => void;
@@ -70,7 +74,13 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
-  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status:
+    | "pending"
+    | "paid"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled";
   items: OrderItem[];
   subtotal: number;
   tax: number;

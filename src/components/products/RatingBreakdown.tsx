@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { ReviewAggregate } from '~/types/review';
+import type { ReviewAggregate } from "~/types/review";
 
 interface RatingBreakdownProps {
   aggregate: ReviewAggregate;
@@ -38,23 +38,18 @@ export default function RatingBreakdown({
             key={stars}
             onClick={() => onFilterClick?.(isActive ? null : stars)}
             disabled={!onFilterClick}
-            className={`w-full flex items-center gap-2.5 py-1.5 px-2 rounded-lg
-              transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-                onFilterClick
-                  ? 'hover:bg-secondary-50 cursor-pointer'
-                  : 'cursor-default'
-              } ${
-                isActive
-                  ? 'bg-primary-50/50 ring-1 ring-primary-200/50'
-                  : ''
-              }`}
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              onFilterClick
+                ? "hover:bg-secondary-50 cursor-pointer"
+                : "cursor-default"
+            } ${isActive ? "bg-primary-50/50 ring-primary-200/50 ring-1" : ""}`}
           >
             {/* Star label */}
-            <span className="text-xs font-medium text-secondary-600 w-8 text-right tabular-nums">
+            <span className="text-secondary-600 w-8 text-right text-xs font-medium tabular-nums">
               {stars}
             </span>
             <svg
-              className="w-3.5 h-3.5 text-amber-400 flex-shrink-0"
+              className="h-3.5 w-3.5 flex-shrink-0 text-amber-400"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -62,19 +57,19 @@ export default function RatingBreakdown({
             </svg>
 
             {/* Progress bar */}
-            <div className="flex-1 h-2.5 bg-secondary-100 rounded-full overflow-hidden">
+            <div className="bg-secondary-100 h-2.5 flex-1 overflow-hidden rounded-full">
               <div
-                className="h-full bg-amber-400 rounded-full transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                className="h-full rounded-full bg-amber-400 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
                 style={{ width: `${barWidth}%` }}
               />
             </div>
 
             {/* Count and percentage */}
-            <div className="flex items-center gap-1.5 w-16 justify-end">
-              <span className="text-xs font-medium text-secondary-600 tabular-nums">
+            <div className="flex w-16 items-center justify-end gap-1.5">
+              <span className="text-secondary-600 text-xs font-medium tabular-nums">
                 {count}
               </span>
-              <span className="text-[10px] text-secondary-400 w-8 text-right tabular-nums">
+              <span className="text-secondary-400 w-8 text-right text-[10px] tabular-nums">
                 ({percentage}%)
               </span>
             </div>

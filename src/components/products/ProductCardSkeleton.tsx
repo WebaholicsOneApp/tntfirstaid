@@ -1,4 +1,4 @@
-import { cn } from '~/lib/utils';
+import { cn } from "~/lib/utils";
 
 interface ProductCardSkeletonProps {
   className?: string;
@@ -7,33 +7,36 @@ interface ProductCardSkeletonProps {
 
 function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn('animate-pulse', className)}>
+    <div className={cn("animate-pulse", className)}>
       {/* Image placeholder */}
-      <div className="aspect-square bg-secondary-100 rounded-lg" />
+      <div className="bg-secondary-100 aspect-square rounded-lg" />
 
       {/* Content */}
       <div className="mt-3 space-y-2">
         {/* Title */}
-        <div className="h-4 bg-secondary-100 rounded w-3/4" />
-        <div className="h-4 bg-secondary-100 rounded w-1/2" />
+        <div className="bg-secondary-100 h-4 w-3/4 rounded" />
+        <div className="bg-secondary-100 h-4 w-1/2 rounded" />
 
         {/* Price */}
-        <div className="h-5 bg-secondary-100 rounded w-1/4 mt-2" />
+        <div className="bg-secondary-100 mt-2 h-5 w-1/4 rounded" />
 
         {/* Stock badge */}
-        <div className="h-5 bg-secondary-100 rounded-full w-20" />
+        <div className="bg-secondary-100 h-5 w-20 rounded-full" />
       </div>
     </div>
   );
 }
 
-export default function ProductCardSkeleton({ className, count = 1 }: ProductCardSkeletonProps) {
+export default function ProductCardSkeleton({
+  className,
+  count = 1,
+}: ProductCardSkeletonProps) {
   if (count === 1) {
     return <SkeletonCard className={className} />;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: count }, (_, i) => (
         <SkeletonCard key={i} className={className} />
       ))}

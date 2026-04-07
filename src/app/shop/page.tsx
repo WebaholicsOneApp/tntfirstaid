@@ -1,15 +1,22 @@
-import type { Metadata } from 'next';
-import { getProducts, getCategoryTreeForStorefront, getCategoryBySlug, getAllRelatedCategoryIds, getPriceRange } from '~/lib/data';
-import { convertDollarsToCents, getPaginationRange } from '~/lib/utils';
-import ShopPageClient from '~/components/products/ShopPageClient';
-import Breadcrumbs from '~/components/common/Breadcrumbs';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import {
+  getProducts,
+  getCategoryTreeForStorefront,
+  getCategoryBySlug,
+  getAllRelatedCategoryIds,
+  getPriceRange,
+} from "~/lib/data";
+import { convertDollarsToCents, getPaginationRange } from "~/lib/utils";
+import ShopPageClient from "~/components/products/ShopPageClient";
+import Breadcrumbs from "~/components/common/Breadcrumbs";
+import Link from "next/link";
 
 export const revalidate = 900;
 
 export const metadata: Metadata = {
-  title: 'Shop',
-  description: 'Browse our selection of premium ammunition and reloading supplies.',
+  title: "Shop",
+  description:
+    "Browse our selection of premium ammunition and reloading supplies.",
 };
 
 interface ShopPageProps {
@@ -38,7 +45,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   if (params.category) {
     const category = await getCategoryBySlug(params.category);
     if (category) {
-      const categoryIds = await getAllRelatedCategoryIds(category.id, category.categoryName);
+      const categoryIds = await getAllRelatedCategoryIds(
+        category.id,
+        category.categoryName,
+      );
       filters.categoryIds = categoryIds;
     }
   }
@@ -54,12 +64,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   }
 
   // Stock filter
-  if (params.inStock === 'true') {
+  if (params.inStock === "true") {
     filters.inStock = true;
   }
 
-  const sortBy = params.sort ?? 'best_sellers';
-  const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
+  const sortBy = params.sort ?? "best_sellers";
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   const pageSize = 24;
 
   // Build price range filters (exclude price filters to get full range)
@@ -80,18 +90,20 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Page heading */}
-      <div className="mb-10 border-b border-secondary-100 pb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-px w-8 bg-primary-500" />
-          <span className="font-mono text-[0.6rem] tracking-[0.35em] text-secondary-400 uppercase">All Products</span>
+      <div className="border-secondary-100 mb-10 border-b pb-8">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="bg-primary-500 h-px w-8" />
+          <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.35em] uppercase">
+            All Products
+          </span>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900 tracking-tight">
+            <h1 className="font-display text-secondary-900 text-3xl font-bold tracking-tight sm:text-4xl">
               Shop
             </h1>
             <Breadcrumbs
-              items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]}
+              items={[{ label: "Home", href: "/" }, { label: "Shop" }]}
               className="mt-2"
             />
           </div>
@@ -105,7 +117,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         page={page}
         pageSize={pageSize}
         categories={categoryTree}
-        priceRange={{ min: Math.round(priceRange.min / 100), max: Math.round(priceRange.max / 100) }}
+        priceRange={{
+          min: Math.round(priceRange.min / 100),
+          max: Math.round(priceRange.max / 100),
+        }}
       />
 
       {/* Pagination */}
@@ -115,8 +130,18 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             {/* Previous */}
             {page > 1 && (
               <PaginationLink page={page - 1} params={params} label="Previous">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </PaginationLink>
             )}
@@ -137,8 +162,18 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             {/* Next */}
             {page < totalPages && (
               <PaginationLink page={page + 1} params={params} label="Next">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </PaginationLink>
             )}
@@ -165,23 +200,23 @@ function PaginationLink({
 }) {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
-    if (value && key !== 'page') {
+    if (value && key !== "page") {
       searchParams.set(key, value);
     }
   }
-  if (page > 1) searchParams.set('page', String(page));
+  if (page > 1) searchParams.set("page", String(page));
 
-  const href = `/shop${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+  const href = `/shop${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
   return (
     <Link
       href={href}
       aria-label={label}
-      aria-current={isActive ? 'page' : undefined}
+      aria-current={isActive ? "page" : undefined}
       className={
         isActive
-          ? 'w-10 h-11 flex items-center justify-center bg-primary-500 text-secondary-900 text-sm font-mono font-semibold tracking-tight rounded-lg'
-          : 'w-10 h-11 flex items-center justify-center border border-secondary-200 text-secondary-500 text-sm hover:border-secondary-300 hover:text-secondary-800 hover:bg-secondary-50 transition-colors rounded-lg'
+          ? "bg-primary-500 text-secondary-900 flex h-11 w-10 items-center justify-center rounded-lg font-mono text-sm font-semibold tracking-tight"
+          : "border-secondary-200 text-secondary-500 hover:border-secondary-300 hover:text-secondary-800 hover:bg-secondary-50 flex h-11 w-10 items-center justify-center rounded-lg border text-sm transition-colors"
       }
     >
       {children}

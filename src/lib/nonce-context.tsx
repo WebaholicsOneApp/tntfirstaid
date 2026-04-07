@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
 /**
  * CSP Nonce Context
  * Provides the CSP nonce to client components for inline scripts
  */
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from "react";
 
 const NonceContext = createContext<string | undefined>(undefined);
 
@@ -19,9 +19,7 @@ interface NonceProviderProps {
  */
 export function NonceProvider({ nonce, children }: NonceProviderProps) {
   return (
-    <NonceContext.Provider value={nonce}>
-      {children}
-    </NonceContext.Provider>
+    <NonceContext.Provider value={nonce}>{children}</NonceContext.Provider>
   );
 }
 

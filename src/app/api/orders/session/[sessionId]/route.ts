@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { ApiClientError, getApiClient } from '~/lib/api-client';
+import { NextResponse } from "next/server";
+import { ApiClientError, getApiClient } from "~/lib/api-client";
 
 export async function GET(
   _request: Request,
@@ -10,7 +10,7 @@ export async function GET(
 
     if (!sessionId) {
       return NextResponse.json(
-        { error: 'Session ID is required' },
+        { error: "Session ID is required" },
         { status: 400 },
       );
     }
@@ -23,17 +23,14 @@ export async function GET(
 
     return NextResponse.json(order);
   } catch (error) {
-    console.error('Error fetching order by session:', error);
+    console.error("Error fetching order by session:", error);
 
     if (error instanceof ApiClientError && error.status === 404) {
-      return NextResponse.json(
-        { error: 'Order not found' },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     return NextResponse.json(
-      { error: 'Failed to fetch order' },
+      { error: "Failed to fetch order" },
       { status: 500 },
     );
   }

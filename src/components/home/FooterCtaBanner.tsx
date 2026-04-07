@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import AnimateIn from '~/components/ui/AnimateIn';
-import { useParallax } from '~/hooks/useParallax';
+import Image from "next/image";
+import Link from "next/link";
+import AnimateIn from "~/components/ui/AnimateIn";
+import { useParallax } from "~/hooks/useParallax";
 
 const badges = [
-  { label: 'Quality Guaranteed' },
-  { label: 'Match-Grade Precision' },
-  { label: 'American Made' },
+  { label: "Quality Guaranteed" },
+  { label: "Match-Grade Precision" },
+  { label: "American Made" },
 ];
 
 export default function FooterCtaBanner() {
@@ -18,7 +18,11 @@ export default function FooterCtaBanner() {
     <section className="relative overflow-hidden">
       {/* Background with parallax */}
       <div className="relative py-28 sm:py-40">
-        <div ref={parallaxRef} className="absolute inset-[-10%]" style={parallaxStyle}>
+        <div
+          ref={parallaxRef}
+          className="absolute inset-[-10%]"
+          style={parallaxStyle}
+        >
           <Image
             src="/images/cta-brass-casings.jpg"
             alt="Brass casings"
@@ -28,66 +32,73 @@ export default function FooterCtaBanner() {
           />
         </div>
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-secondary-950/75" />
+        <div className="bg-secondary-950/75 absolute inset-0" />
 
-        <div className="relative mx-auto max-w-3xl px-6 lg:px-8 text-center">
+        <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
           <AnimateIn animation="fade-up">
-
             {/* Eyebrow */}
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="h-px w-6 bg-primary-500/60 shrink-0" />
-              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-primary-400/70 uppercase">
+            <div className="mb-8 flex items-center justify-center gap-3">
+              <div className="bg-primary-500/60 h-px w-6 shrink-0" />
+              <span className="text-primary-400/70 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
                 Made in the USA
               </span>
-              <div className="h-px w-6 bg-primary-500/60 shrink-0" />
+              <div className="bg-primary-500/60 h-px w-6 shrink-0" />
             </div>
 
             {/* Headline */}
-            <h2 className="font-serif italic text-4xl sm:text-5xl lg:text-6xl font-bold text-primary-400 leading-tight">
-              American Made<br />Alpha Grade
+            <h2 className="text-primary-400 font-serif text-4xl leading-tight font-bold italic sm:text-5xl lg:text-6xl">
+              American Made
+              <br />
+              Alpha Grade
             </h2>
 
             {/* Gold divider */}
-            <div className="mx-auto mt-7 mb-8 h-px w-16 bg-gradient-to-r from-transparent via-primary-500 to-transparent" />
+            <div className="via-primary-500 mx-auto mt-7 mb-8 h-px w-16 bg-gradient-to-r from-transparent to-transparent" />
 
             {/* Pipe-separated trust line */}
-            <p className="flex items-center justify-center flex-wrap gap-x-4 gap-y-2 mb-12">
+            <p className="mb-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
               {badges.map((b, i) => (
                 <span key={b.label} className="flex items-center gap-4">
-                  <span className="font-mono text-[0.6rem] tracking-[0.2em] text-primary-500/60 uppercase">
+                  <span className="text-primary-500/60 font-mono text-[0.6rem] tracking-[0.2em] uppercase">
                     {b.label}
                   </span>
                   {i < badges.length - 1 && (
-                    <span className="w-px h-3 bg-primary-500/25" />
+                    <span className="bg-primary-500/25 h-3 w-px" />
                   )}
                 </span>
               ))}
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/shop"
-                className="group inline-flex items-center gap-3 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                className="group bg-primary-500 text-secondary-950 hover:bg-primary-400 inline-flex items-center gap-3 rounded-full px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
               >
                 Shop Now
-                <span className="w-5 h-5 rounded-full bg-secondary-950/10 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
+                <span className="bg-secondary-950/10 flex h-5 w-5 items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110">
                   <svg
-                    className="w-2.5 h-2.5"
-                    fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"
+                    className="h-2.5 w-2.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                    />
                   </svg>
                 </span>
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center rounded-full border border-primary-500/40 px-8 py-3.5 text-[0.7rem] font-mono tracking-[0.15em] text-primary-400/80 uppercase hover:border-primary-500 hover:text-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                className="border-primary-500/40 text-primary-400/80 hover:border-primary-500 hover:text-primary-400 inline-flex items-center rounded-full border px-8 py-3.5 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
               >
                 Contact Us
               </Link>
             </div>
-
           </AnimateIn>
         </div>
       </div>

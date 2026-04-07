@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import type { SearchSuggestionsResponse } from '~/types';
+import { useState, useEffect, useRef, useCallback } from "react";
+import type { SearchSuggestionsResponse } from "~/types";
 
 interface UseSearchSuggestionsOptions {
   minLength?: number;
@@ -17,7 +17,7 @@ interface UseSearchSuggestionsResult {
 const EMPTY_SUGGESTIONS: SearchSuggestionsResponse = {
   products: [],
   categories: [],
-  queryType: 'keyword',
+  queryType: "keyword",
 };
 
 /**
@@ -30,11 +30,12 @@ const EMPTY_SUGGESTIONS: SearchSuggestionsResponse = {
  */
 export function useSearchSuggestions(
   query: string,
-  options: UseSearchSuggestionsOptions = {}
+  options: UseSearchSuggestionsOptions = {},
 ): UseSearchSuggestionsResult {
   const { minLength = 2 } = options;
 
-  const [suggestions, setSuggestions] = useState<SearchSuggestionsResponse | null>(null);
+  const [suggestions, setSuggestions] =
+    useState<SearchSuggestionsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,23 +75,23 @@ export function useSearchSuggestions(
       try {
         const response = await fetch(
           `/api/search/suggestions?q=${encodeURIComponent(trimmed)}`,
-          { signal: abortController.signal }
+          { signal: abortController.signal },
         );
 
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || 'Failed to fetch suggestions');
+          throw new Error(data.error || "Failed to fetch suggestions");
         }
 
         const data: SearchSuggestionsResponse = await response.json();
         setSuggestions(data);
       } catch (err) {
         // Ignore abort errors
-        if (err instanceof Error && err.name === 'AbortError') {
+        if (err instanceof Error && err.name === "AbortError") {
           return;
         }
 
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
         setSuggestions(EMPTY_SUGGESTIONS);
       } finally {
         // Only update loading state if this is still the current request

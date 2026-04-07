@@ -1,5 +1,5 @@
-'use client';
-import { createContext, useContext, useState } from 'react';
+"use client";
+import { createContext, useContext, useState } from "react";
 
 interface NavigationLoadingContextType {
   isNavigating: boolean;
@@ -11,10 +11,16 @@ const NavigationLoadingContext = createContext<NavigationLoadingContextType>({
   setIsNavigating: () => {},
 });
 
-export function NavigationLoadingProvider({ children }: { children: React.ReactNode }) {
+export function NavigationLoadingProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isNavigating, setIsNavigating] = useState(false);
   return (
-    <NavigationLoadingContext.Provider value={{ isNavigating, setIsNavigating }}>
+    <NavigationLoadingContext.Provider
+      value={{ isNavigating, setIsNavigating }}
+    >
       {children}
     </NavigationLoadingContext.Provider>
   );

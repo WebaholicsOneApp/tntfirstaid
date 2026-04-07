@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 export function useParallax(factor = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -9,7 +9,7 @@ export function useParallax(factor = 0.1) {
   useEffect(() => {
     // Disable on mobile or reduced motion
     if (window.innerWidth < 768) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let ticking = false;
 
@@ -29,10 +29,10 @@ export function useParallax(factor = 0.1) {
       }
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
 
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, [factor]);
 
   return {

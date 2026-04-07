@@ -3,8 +3,8 @@
  * Orchestrates sending order notifications via email
  */
 
-import { sendOrderEmail, type OrderEmailData } from './email-service';
-import type { FulfillmentStatus } from '~/types/fulfillment';
+import { sendOrderEmail, type OrderEmailData } from "./email-service";
+import type { FulfillmentStatus } from "~/types/fulfillment";
 
 interface SendNotificationParams {
   status: FulfillmentStatus;
@@ -34,8 +34,12 @@ interface SendNotificationParams {
 /**
  * Send order notification based on fulfillment status
  */
-export async function sendOrderNotification(params: SendNotificationParams): Promise<void> {
-  console.log(`[NOTIFICATION] Sending ${params.status} notification for order ${params.orderId}`);
+export async function sendOrderNotification(
+  params: SendNotificationParams,
+): Promise<void> {
+  console.log(
+    `[NOTIFICATION] Sending ${params.status} notification for order ${params.orderId}`,
+  );
 
   const emailData: OrderEmailData = {
     status: params.status,
@@ -52,12 +56,16 @@ export async function sendOrderNotification(params: SendNotificationParams): Pro
   const result = await sendOrderEmail(emailData);
 
   if (result.success) {
-    console.log(`[NOTIFICATION] Email sent successfully for order ${params.orderId}`);
+    console.log(
+      `[NOTIFICATION] Email sent successfully for order ${params.orderId}`,
+    );
   } else {
-    console.error(`[NOTIFICATION] Failed to send email for order ${params.orderId}: ${result.error}`);
+    console.error(
+      `[NOTIFICATION] Failed to send email for order ${params.orderId}: ${result.error}`,
+    );
     throw new Error(result.error);
   }
 }
 
-export { sendOrderEmail } from './email-service';
-export type { OrderEmailData } from './email-service';
+export { sendOrderEmail } from "./email-service";
+export type { OrderEmailData } from "./email-service";

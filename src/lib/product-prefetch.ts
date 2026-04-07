@@ -17,7 +17,7 @@ export function prefetchProduct(slug: string): void {
 
   const promise = fetch(`/api/products/${slug}`)
     .then((res) => {
-      if (!res.ok) throw new Error('Not found');
+      if (!res.ok) throw new Error("Not found");
       return res.json();
     })
     .catch((err) => {

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -8,8 +8,8 @@ import {
   useEffect,
   useRef,
   type ReactNode,
-} from 'react';
-import type { Customer } from '~/types/auth';
+} from "react";
+import type { Customer } from "~/types/auth";
 
 interface AuthContextType {
   customer: Customer | null;
@@ -36,25 +36,27 @@ export function AuthProvider({
   const [customer, setCustomer] = useState<Customer | null>(initialCustomer);
   // Start loading if auth is enabled but server didn't provide initial customer
   // (client-side hydration via /api/auth/me will resolve it)
-  const [isLoading, setIsLoading] = useState(customerAuthEnabled && !initialCustomer);
+  const [isLoading, setIsLoading] = useState(
+    customerAuthEnabled && !initialCustomer,
+  );
   const didHydrate = useRef(false);
 
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch("/api/auth/logout", { method: "POST" });
     } catch {
       // Best-effort — cookie gets cleared server-side
     }
     setCustomer(null);
     setIsLoading(false);
-    window.location.href = '/account';
+    window.location.href = "/account";
   }, []);
 
   const refreshUser = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch("/api/auth/me");
       if (res.ok) {
         const data = (await res.json()) as { customer: Customer | null };
         setCustomer(data.customer);
@@ -96,7 +98,7 @@ export function AuthProvider({
 export function useAuth(): AuthContextType {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return ctx;
 }

@@ -1,47 +1,52 @@
-import '~/app/globals.css';
+import "~/app/globals.css";
 
-import { type Metadata } from 'next';
+import { type Metadata } from "next";
 
 export const revalidate = 300;
-import { Playfair_Display, Inter, Cardo, JetBrains_Mono } from 'next/font/google';
-import NextTopLoader from 'nextjs-toploader';
-import { getNonce } from '~/lib/get-nonce';
-import { NonceProvider } from '~/lib/nonce-context';
-import { CartProvider } from '~/lib/cart';
-import { AuthProvider } from '~/lib/auth';
-import { NavigationLoadingProvider } from '~/lib/navigation-loading-context';
-import { getStoreConfig } from '~/lib/store-config.server';
-import { storeConfig } from '~/lib/store-config';
-import { generatePalette, SHADES } from '~/lib/color-utils';
-import StickyHeader from '~/components/layout/StickyHeader';
-import HeaderWrapper from '~/components/layout/HeaderWrapper';
-import Footer from '~/components/layout/Footer';
-import { CartDrawer } from '~/components/cart';
+import {
+  Playfair_Display,
+  Inter,
+  Cardo,
+  JetBrains_Mono,
+} from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
+import { getNonce } from "~/lib/get-nonce";
+import { NonceProvider } from "~/lib/nonce-context";
+import { CartProvider } from "~/lib/cart";
+import { AuthProvider } from "~/lib/auth";
+import { NavigationLoadingProvider } from "~/lib/navigation-loading-context";
+import { getStoreConfig } from "~/lib/store-config.server";
+import { storeConfig } from "~/lib/store-config";
+import { generatePalette, SHADES } from "~/lib/color-utils";
+import StickyHeader from "~/components/layout/StickyHeader";
+import HeaderWrapper from "~/components/layout/HeaderWrapper";
+import Footer from "~/components/layout/Footer";
+import { CartDrawer } from "~/components/cart";
 
 const playfair = Playfair_Display({
-  subsets: ['latin'],
-  variable: '--font-playfair',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
 const cardo = Cardo({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cardo',
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-cardo",
+  display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+  display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,9 +58,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: `${storeConfig.siteName} - Premium ammunition and reloading supplies`,
     icons: [
-      { rel: 'icon', url: '/favicon.ico', sizes: 'any' },
-      { rel: 'icon', url: '/favicon.png', type: 'image/png' },
-      { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
+      { rel: "icon", url: "/favicon.ico", sizes: "any" },
+      { rel: "icon", url: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
     ],
     metadataBase: new URL(storeConfig.siteUrl),
   };
@@ -80,36 +85,37 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} ${cardo.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      className={`${playfair.variable} ${inter.variable} ${cardo.variable} ${jetbrainsMono.variable}`}
+    >
       <body
-        className="font-sans antialiased bg-white text-secondary-800 min-h-screen flex flex-col"
+        className="text-secondary-800 flex min-h-screen flex-col bg-white font-sans antialiased"
         style={paletteStyle as React.CSSProperties}
       >
         <NextTopLoader color={storeConfig.primaryColor} showSpinner={false} />
         <NonceProvider nonce={nonce}>
           <AuthProvider initialCustomer={null} customerAuthEnabled={true}>
-          <CartProvider>
-            <NavigationLoadingProvider>
-              <StickyHeader>
-                <HeaderWrapper
+            <CartProvider>
+              <NavigationLoadingProvider>
+                <StickyHeader>
+                  <HeaderWrapper
+                    siteName={storeConfig.siteName}
+                    logoUrl={storeConfig.logoUrl}
+                  />
+                </StickyHeader>
+
+                <main className="flex-1">{children}</main>
+
+                <Footer
                   siteName={storeConfig.siteName}
-                  logoUrl={storeConfig.logoUrl}
+                  logoUrl="/apple-touch-icon.png"
+                  storeConfig={storeConfig}
                 />
-              </StickyHeader>
 
-              <main className="flex-1">
-                {children}
-              </main>
-
-              <Footer
-                siteName={storeConfig.siteName}
-                logoUrl="/apple-touch-icon.png"
-                storeConfig={storeConfig}
-              />
-
-              <CartDrawer />
-            </NavigationLoadingProvider>
-          </CartProvider>
+                <CartDrawer />
+              </NavigationLoadingProvider>
+            </CartProvider>
           </AuthProvider>
         </NonceProvider>
       </body>

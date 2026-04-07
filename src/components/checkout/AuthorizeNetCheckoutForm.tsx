@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { Spinner } from '~/components/ui/Spinner';
-import type { ShippingFields } from '~/components/checkout/ShippingForm';
+import { useEffect, useMemo, useState } from "react";
+import { Spinner } from "~/components/ui/Spinner";
+import type { ShippingFields } from "~/components/checkout/ShippingForm";
 
 declare global {
   interface Window {
@@ -21,7 +21,7 @@ declare global {
         },
         callback: (response: {
           messages: {
-            resultCode: 'Ok' | 'Error';
+            resultCode: "Ok" | "Error";
             message: Array<{ code: string; text: string }>;
           };
           opaqueData?: { dataDescriptor: string; dataValue: string };
@@ -48,18 +48,18 @@ interface AuthorizeNetCheckoutFormProps {
   onShippingFieldErrors?: (errors: Set<string>) => void;
 }
 
-type ScriptStatus = 'loading' | 'ready' | 'error';
+type ScriptStatus = "loading" | "ready" | "error";
 
 function formatCardNumber(value: string): string {
   return value
-    .replace(/\D/g, '')
+    .replace(/\D/g, "")
     .slice(0, 16)
-    .replace(/(.{4})/g, '$1 ')
+    .replace(/(.{4})/g, "$1 ")
     .trim();
 }
 
 function formatExpiry(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 6);
+  const digits = value.replace(/\D/g, "").slice(0, 6);
 
   if (digits.length <= 2) return digits;
 
@@ -70,9 +70,9 @@ function formatExpiry(value: string): string {
 }
 
 function parseExpiry(expiry: string): { month: string; year: string } | null {
-  const [monthRaw, yearRaw] = expiry.split('/');
-  const month = monthRaw?.trim() || '';
-  const year = yearRaw?.trim() || '';
+  const [monthRaw, yearRaw] = expiry.split("/");
+  const month = monthRaw?.trim() || "";
+  const year = yearRaw?.trim() || "";
 
   if (!month || !year || month.length !== 2) {
     return null;
@@ -104,43 +104,45 @@ export default function AuthorizeNetCheckoutForm({
   onError,
   onShippingFieldErrors,
 }: AuthorizeNetCheckoutFormProps) {
-  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('loading');
+  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>("loading");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cardCode, setCardCode] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cardCode, setCardCode] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
-  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(new Set());
+  const [shippingFieldErrors, setShippingFieldErrors] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === "undefined") return undefined;
 
     if (window.Accept) {
-      setScriptStatus('ready');
+      setScriptStatus("ready");
       return undefined;
     }
 
-    setScriptStatus('loading');
+    setScriptStatus("loading");
 
     const existingScript = document.querySelector<HTMLScriptElement>(
       `script[data-authorize-net="${acceptJsUrl}"]`,
     );
 
-    const handleLoad = () => setScriptStatus('ready');
-    const handleError = () => setScriptStatus('error');
+    const handleLoad = () => setScriptStatus("ready");
+    const handleError = () => setScriptStatus("error");
 
     if (existingScript) {
-      existingScript.addEventListener('load', handleLoad);
-      existingScript.addEventListener('error', handleError);
+      existingScript.addEventListener("load", handleLoad);
+      existingScript.addEventListener("error", handleError);
 
       return () => {
-        existingScript.removeEventListener('load', handleLoad);
-        existingScript.removeEventListener('error', handleError);
+        existingScript.removeEventListener("load", handleLoad);
+        existingScript.removeEventListener("error", handleError);
       };
     }
 
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = acceptJsUrl;
     script.async = true;
     script.dataset.authorizeNet = acceptJsUrl;
@@ -155,12 +157,12 @@ export default function AuthorizeNetCheckoutForm({
   }, [acceptJsUrl]);
 
   const readinessMessage = useMemo(() => {
-    if (scriptStatus === 'loading') {
-      return 'Loading secure card form...';
+    if (scriptStatus === "loading") {
+      return "Loading secure card form...";
     }
 
-    if (scriptStatus === 'error') {
-      return 'Unable to load the secure card form. Refresh the page and try again.';
+    if (scriptStatus === "error") {
+      return "Unable to load the secure card form. Refresh the page and try again.";
     }
 
     return null;
@@ -169,11 +171,11 @@ export default function AuthorizeNetCheckoutForm({
   const tokenizeCard = async () => {
     const parsedExpiry = parseExpiry(expiry);
     if (!parsedExpiry) {
-      throw new Error('Enter a valid expiration date in MM/YY format.');
+      throw new Error("Enter a valid expiration date in MM/YY format.");
     }
 
     if (!window.Accept) {
-      throw new Error('Secure card form is not ready yet.');
+      throw new Error("Secure card form is not ready yet.");
     }
 
     return await new Promise<{ dataDescriptor: string; dataValue: string }>(
@@ -185,19 +187,22 @@ export default function AuthorizeNetCheckoutForm({
               apiLoginID: apiLoginId,
             },
             cardData: {
-              cardNumber: cardNumber.replace(/\D/g, ''),
+              cardNumber: cardNumber.replace(/\D/g, ""),
               month: parsedExpiry.month,
               year: parsedExpiry.year,
-              cardCode: cardCode.replace(/\D/g, ''),
+              cardCode: cardCode.replace(/\D/g, ""),
               zip: shippingData.postalCode.trim(),
               fullName: shippingData.name.trim(),
             },
           },
           (response) => {
-            if (response.messages.resultCode === 'Error' || !response.opaqueData) {
+            if (
+              response.messages.resultCode === "Error" ||
+              !response.opaqueData
+            ) {
               const message =
-                response.messages.message.map((item) => item.text).join(' ') ||
-                'Card verification failed.';
+                response.messages.message.map((item) => item.text).join(" ") ||
+                "Card verification failed.";
               reject(new Error(message));
               return;
             }
@@ -212,27 +217,28 @@ export default function AuthorizeNetCheckoutForm({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLocalError(null);
-    onError('');
+    onError("");
 
     const cardErrors = new Set<string>();
     const shipErrors = new Set<string>();
 
-    if (!shippingData.email.trim()) shipErrors.add('email');
-    if (!shippingData.name.trim()) shipErrors.add('name');
-    if (!shippingData.line1.trim()) shipErrors.add('line1');
-    if (!shippingData.city.trim()) shipErrors.add('city');
-    if (!shippingData.state.trim()) shipErrors.add('state');
-    if (!shippingData.postalCode.trim()) shipErrors.add('postalCode');
-    if (cardNumber.replace(/\D/g, '').length < 13) cardErrors.add('cardNumber');
-    if (cardCode.replace(/\D/g, '').length < 3) cardErrors.add('cardCode');
+    if (!shippingData.email.trim()) shipErrors.add("email");
+    if (!shippingData.name.trim()) shipErrors.add("name");
+    if (!shippingData.line1.trim()) shipErrors.add("line1");
+    if (!shippingData.city.trim()) shipErrors.add("city");
+    if (!shippingData.state.trim()) shipErrors.add("state");
+    if (!shippingData.postalCode.trim()) shipErrors.add("postalCode");
+    if (cardNumber.replace(/\D/g, "").length < 13) cardErrors.add("cardNumber");
+    if (cardCode.replace(/\D/g, "").length < 3) cardErrors.add("cardCode");
 
     if (shipErrors.size > 0 || cardErrors.size > 0) {
       setFieldErrors(cardErrors);
       setShippingFieldErrors(shipErrors);
       onShippingFieldErrors?.(shipErrors);
-      const message = shipErrors.size > 0
-        ? 'Complete the shipping address above before submitting payment.'
-        : 'Enter a valid card number and security code.';
+      const message =
+        shipErrors.size > 0
+          ? "Complete the shipping address above before submitting payment."
+          : "Enter a valid card number and security code.";
       setLocalError(message);
       onError(message);
       return;
@@ -246,10 +252,10 @@ export default function AuthorizeNetCheckoutForm({
     try {
       const opaqueData = await tokenizeCard();
 
-      const response = await fetch('/api/authorize-net/charge', {
-        method: 'POST',
+      const response = await fetch("/api/authorize-net/charge", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           customerEmail: shippingData.email.trim(),
@@ -263,7 +269,7 @@ export default function AuthorizeNetCheckoutForm({
             city: shippingData.city.trim(),
             state: shippingData.state.trim(),
             postalCode: shippingData.postalCode.trim(),
-            country: shippingData.country.trim() || 'US',
+            country: shippingData.country.trim() || "US",
           },
         }),
       });
@@ -275,19 +281,19 @@ export default function AuthorizeNetCheckoutForm({
       };
 
       if (!response.ok || !result.orderId) {
-        throw new Error(result.error || 'Payment failed.');
+        throw new Error(result.error || "Payment failed.");
       }
 
-      setCardNumber('');
-      setExpiry('');
-      setCardCode('');
+      setCardNumber("");
+      setExpiry("");
+      setCardCode("");
       onSuccess({
         orderId: result.orderId,
         orderNumber: result.orderNumber || null,
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Unable to process payment.';
+        error instanceof Error ? error.message : "Unable to process payment.";
       setLocalError(message);
       onError(message);
     } finally {
@@ -300,9 +306,9 @@ export default function AuthorizeNetCheckoutForm({
       {readinessMessage && (
         <div
           className={`mb-4 rounded-xl border p-3 text-sm ${
-            scriptStatus === 'error'
-              ? 'border-red-200 bg-red-50 text-red-700'
-              : 'border-secondary-200 bg-secondary-50 text-secondary-500'
+            scriptStatus === "error"
+              ? "border-red-200 bg-red-50 text-red-700"
+              : "border-secondary-200 bg-secondary-50 text-secondary-500"
           }`}
         >
           {readinessMessage}
@@ -316,24 +322,25 @@ export default function AuthorizeNetCheckoutForm({
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="rounded-2xl border border-secondary-100 bg-secondary-50/80 p-4">
+        <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="font-display text-lg font-semibold text-secondary-900">
+              <p className="font-display text-secondary-900 text-lg font-semibold">
                 Card Details
               </p>
-              <p className="text-xs text-secondary-500">
-                Card details are tokenized by Authorize.net before anything is sent to the server.
+              <p className="text-secondary-500 text-xs">
+                Card details are tokenized by Authorize.net before anything is
+                sent to the server.
               </p>
             </div>
-            <span className="rounded-full border border-secondary-200 bg-white px-3 py-1 text-[0.65rem] font-mono uppercase tracking-[0.12em] text-secondary-500">
+            <span className="border-secondary-200 text-secondary-500 rounded-full border bg-white px-3 py-1 font-mono text-[0.65rem] tracking-[0.12em] uppercase">
               Total {totalLabel}
             </span>
           </div>
 
           <div className="space-y-4">
             <label className="block">
-              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                 Card Number
               </span>
               <input
@@ -342,9 +349,14 @@ export default function AuthorizeNetCheckoutForm({
                 value={cardNumber}
                 onChange={(event) => {
                   setCardNumber(formatCardNumber(event.target.value));
-                  if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('cardNumber'); return n; });
+                  if (fieldErrors.size)
+                    setFieldErrors((prev) => {
+                      const n = new Set(prev);
+                      n.delete("cardNumber");
+                      return n;
+                    });
                 }}
-                className={`w-full rounded-xl border ${fieldErrors.has('cardNumber') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                className={`w-full rounded-xl border ${fieldErrors.has("cardNumber") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                 placeholder="4111 1111 1111 1111"
                 required
               />
@@ -352,21 +364,23 @@ export default function AuthorizeNetCheckoutForm({
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block">
-                <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                   Expiration
                 </span>
                 <input
                   inputMode="numeric"
                   autoComplete="cc-exp"
                   value={expiry}
-                  onChange={(event) => setExpiry(formatExpiry(event.target.value))}
-                  className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                  onChange={(event) =>
+                    setExpiry(formatExpiry(event.target.value))
+                  }
+                  className="border-secondary-200 text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 w-full rounded-xl border bg-white px-4 py-3 text-sm transition outline-none focus:ring-2"
                   placeholder="MM/YY"
                   required
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                   Security Code
                 </span>
                 <input
@@ -374,10 +388,17 @@ export default function AuthorizeNetCheckoutForm({
                   autoComplete="cc-csc"
                   value={cardCode}
                   onChange={(event) => {
-                    setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4));
-                    if (fieldErrors.size) setFieldErrors(prev => { const n = new Set(prev); n.delete('cardCode'); return n; });
+                    setCardCode(
+                      event.target.value.replace(/\D/g, "").slice(0, 4),
+                    );
+                    if (fieldErrors.size)
+                      setFieldErrors((prev) => {
+                        const n = new Set(prev);
+                        n.delete("cardCode");
+                        return n;
+                      });
                   }}
-                  className={`w-full rounded-xl border ${fieldErrors.has('cardCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                  className={`w-full rounded-xl border ${fieldErrors.has("cardCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                   placeholder="CVV"
                   required
                 />
@@ -388,8 +409,8 @@ export default function AuthorizeNetCheckoutForm({
 
         <button
           type="submit"
-          disabled={isSubmitting || scriptStatus !== 'ready'}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono uppercase tracking-[0.15em] text-secondary-950 transition-all duration-300 hover:bg-primary-400 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={isSubmitting || scriptStatus !== "ready"}
+          className="bg-primary-500 text-secondary-950 hover:bg-primary-400 flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? (
             <>
@@ -397,7 +418,7 @@ export default function AuthorizeNetCheckoutForm({
               Processing Payment...
             </>
           ) : (
-            'Submit Secure Payment'
+            "Submit Secure Payment"
           )}
         </button>
       </form>

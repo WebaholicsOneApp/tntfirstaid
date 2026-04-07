@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET(
   _request: Request,
@@ -10,7 +10,7 @@ export async function GET(
 
     if (!orderId || Number.isNaN(id) || id <= 0) {
       return NextResponse.json(
-        { error: 'Valid order ID is required' },
+        { error: "Valid order ID is required" },
         { status: 400 },
       );
     }
@@ -21,9 +21,9 @@ export async function GET(
       customerEmail: null,
     });
   } catch (error) {
-    console.error('Error fetching order by ID:', error);
+    console.error("Error fetching order by ID:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch order' },
+      { error: "Failed to fetch order" },
       { status: 500 },
     );
   }

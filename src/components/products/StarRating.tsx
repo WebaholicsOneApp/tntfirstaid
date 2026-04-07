@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface StarRatingProps {
   rating: number;
   maxRating?: number;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   interactive?: boolean;
   onChange?: (rating: number) => void;
   showValue?: boolean;
@@ -14,7 +14,7 @@ interface StarRatingProps {
 export default function StarRating({
   rating,
   maxRating = 5,
-  size = 'md',
+  size = "md",
   interactive = false,
   onChange,
   showValue = false,
@@ -22,11 +22,11 @@ export default function StarRating({
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6',
-    xl: 'w-8 h-8',
-    '2xl': 'w-10 h-10',
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
+    xl: "w-8 h-8",
+    "2xl": "w-10 h-10",
   };
 
   const displayRating = hoverRating !== null ? hoverRating : rating;
@@ -53,7 +53,10 @@ export default function StarRating({
     <div className="flex items-center gap-0.5">
       {Array.from({ length: maxRating }, (_, index) => {
         const starIndex = index + 1;
-        const fillPercentage = Math.min(100, Math.max(0, (displayRating - index) * 100));
+        const fillPercentage = Math.min(
+          100,
+          Math.max(0, (displayRating - index) * 100),
+        );
 
         const starSvgs = (
           <>
@@ -79,7 +82,10 @@ export default function StarRating({
 
         if (!interactive) {
           return (
-            <span key={index} className={`relative ${sizeClasses[size]} cursor-default`}>
+            <span
+              key={index}
+              className={`relative ${sizeClasses[size]} cursor-default`}
+            >
               {starSvgs}
             </span>
           );
@@ -92,7 +98,7 @@ export default function StarRating({
             onClick={() => handleClick(starIndex)}
             onMouseEnter={() => handleMouseEnter(starIndex)}
             onMouseLeave={handleMouseLeave}
-            className={`relative ${sizeClasses[size]} cursor-pointer hover:scale-110 transition-transform`}
+            className={`relative ${sizeClasses[size]} cursor-pointer transition-transform hover:scale-110`}
             aria-label={`Rate ${starIndex} of ${maxRating} stars`}
           >
             {starSvgs}
@@ -100,7 +106,7 @@ export default function StarRating({
         );
       })}
       {showValue && (
-        <span className="ml-1.5 text-sm font-medium text-secondary-700">
+        <span className="text-secondary-700 ml-1.5 text-sm font-medium">
           {rating.toFixed(1)}
         </span>
       )}

@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import CheckoutStepIndicator from '~/components/checkout/CheckoutStepIndicator';
-import OrderSummary from '~/components/checkout/OrderSummary';
-import CardBrandIcon from '~/components/checkout/CardBrandIcon';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import CheckoutStepIndicator from "~/components/checkout/CheckoutStepIndicator";
+import OrderSummary from "~/components/checkout/OrderSummary";
+import CardBrandIcon from "~/components/checkout/CardBrandIcon";
 import {
   SESSION_KEY,
   type CheckoutSessionData,
   type PaymentConfig,
   type PaymentMethod,
-} from '~/components/checkout/CheckoutTypes';
-import { Spinner } from '~/components/ui/Spinner';
-import { useCart } from '~/lib/cart/CartContext';
+} from "~/components/checkout/CheckoutTypes";
+import { Spinner } from "~/components/ui/Spinner";
+import { useCart } from "~/lib/cart/CartContext";
 
 // Re-export PaymentConfig so page.tsx can import from here during transition
 export type { PaymentConfig };
@@ -39,7 +39,7 @@ declare global {
         },
         callback: (response: {
           messages: {
-            resultCode: 'Ok' | 'Error';
+            resultCode: "Ok" | "Error";
             message: Array<{ code: string; text: string }>;
           };
           opaqueData?: { dataDescriptor: string; dataValue: string };
@@ -55,14 +55,14 @@ declare global {
 
 function formatCardNumber(value: string): string {
   return value
-    .replace(/\D/g, '')
+    .replace(/\D/g, "")
     .slice(0, 16)
-    .replace(/(.{4})/g, '$1 ')
+    .replace(/(.{4})/g, "$1 ")
     .trim();
 }
 
 function formatExpiry(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 6);
+  const digits = value.replace(/\D/g, "").slice(0, 6);
   if (digits.length <= 2) return digits;
   const month = digits.slice(0, 2);
   const year = digits.slice(2);
@@ -70,14 +70,15 @@ function formatExpiry(value: string): string {
 }
 
 function parseExpiry(expiry: string): { month: string; year: string } | null {
-  const [monthRaw, yearRaw] = expiry.split('/');
-  const month = monthRaw?.trim() || '';
-  const year = yearRaw?.trim() || '';
+  const [monthRaw, yearRaw] = expiry.split("/");
+  const month = monthRaw?.trim() || "";
+  const year = yearRaw?.trim() || "";
 
   if (!month || !year || month.length !== 2) return null;
 
   const monthNumber = Number(month);
-  if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12) return null;
+  if (!Number.isInteger(monthNumber) || monthNumber < 1 || monthNumber > 12)
+    return null;
 
   if (year.length !== 2 && year.length !== 4) return null;
 
@@ -88,12 +89,12 @@ function parseExpiry(expiry: string): { month: string; year: string } | null {
 }
 
 function detectCardBrand(number: string): string {
-  const d = number.replace(/\D/g, '');
-  if (d.startsWith('4')) return 'visa';
-  if (/^5[1-5]/.test(d)) return 'mastercard';
-  if (/^3[47]/.test(d)) return 'amex';
-  if (d.startsWith('6011') || d.startsWith('65')) return 'discover';
-  return 'card';
+  const d = number.replace(/\D/g, "");
+  if (d.startsWith("4")) return "visa";
+  if (/^5[1-5]/.test(d)) return "mastercard";
+  if (/^3[47]/.test(d)) return "amex";
+  if (d.startsWith("6011") || d.startsWith("65")) return "discover";
+  return "card";
 }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +105,7 @@ interface Props {
   devBypass: boolean;
 }
 
-type ScriptStatus = 'idle' | 'loading' | 'ready' | 'error';
+type ScriptStatus = "idle" | "loading" | "ready" | "error";
 
 export default function CheckoutPaymentClient({ devBypass }: Props) {
   const router = useRouter();
@@ -112,13 +113,27 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
   // Payment config fetched client-side for instant page load
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(
-    devBypass ? { providerType: null, status: 'not_configured', stripePublishableKey: null, stripeConnectAccountId: null, authNetApiLoginId: null, authNetClientKey: null, authNetAcceptJsUrl: null, expressCheckoutEnabled: false, checkoutMode: null, supportedMethods: ['card'], devBypass: true } : null,
+    devBypass
+      ? {
+          providerType: null,
+          status: "not_configured",
+          stripePublishableKey: null,
+          stripeConnectAccountId: null,
+          authNetApiLoginId: null,
+          authNetClientKey: null,
+          authNetAcceptJsUrl: null,
+          expressCheckoutEnabled: false,
+          checkoutMode: null,
+          supportedMethods: ["card"],
+          devBypass: true,
+        }
+      : null,
   );
 
   // Fetch payment config client-side (non-blocking)
   useEffect(() => {
     if (devBypass) return;
-    fetch('/api/checkout/config')
+    fetch("/api/checkout/config")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) setPaymentConfig({ ...data, devBypass: false });
@@ -127,26 +142,39 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   }, [devBypass]);
 
   // Session data loaded from sessionStorage
-  const [sessionData, setSessionData] = useState<CheckoutSessionData | null>(null);
+  const [sessionData, setSessionData] = useState<CheckoutSessionData | null>(
+    null,
+  );
 
   // Payment method selection
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>('credit_card');
+  const [selectedMethod, setSelectedMethod] =
+    useState<PaymentMethod>("credit_card");
 
   // Card form state
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cardCode, setCardCode] = useState('');
-  const [cardFieldErrors, setCardFieldErrors] = useState<Map<string, string>>(new Map());
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cardCode, setCardCode] = useState("");
+  const [cardFieldErrors, setCardFieldErrors] = useState<Map<string, string>>(
+    new Map(),
+  );
 
   // Accept.js script loading
-  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('idle');
+  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>("idle");
 
   // Billing address state
   const [sameAsShipping, setSameAsShipping] = useState(true);
   const [billing, setBilling] = useState({
-    name: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: 'US',
+    name: "",
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "US",
   });
-  const [billingErrors, setBillingErrors] = useState<Map<string, string>>(new Map());
+  const [billingErrors, setBillingErrors] = useState<Map<string, string>>(
+    new Map(),
+  );
 
   // General state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -155,14 +183,14 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   // ---- Compute shipping cost from sessionStorage ----
   const shippingCost = useMemo(() => {
     if (!sessionData) return 0;
-    return sessionData.shippingMethod === 'standard' ? 0 : 0;
+    return sessionData.shippingMethod === "standard" ? 0 : 0;
   }, [sessionData]);
 
   // ---- Redirect to shop if cart is empty ----
   useEffect(() => {
     if (cart.items.length !== 0) return undefined;
     const timer = setTimeout(() => {
-      if (cart.items.length === 0) router.push('/shop');
+      if (cart.items.length === 0) router.push("/shop");
     }, 1000);
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
@@ -172,12 +200,12 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     try {
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (!saved) {
-        router.push('/checkout/shipping');
+        router.push("/checkout/shipping");
         return;
       }
       const data = JSON.parse(saved) as CheckoutSessionData;
       if (!data.shipping || !data.shipping.name || !data.shipping.email) {
-        router.push('/checkout/shipping');
+        router.push("/checkout/shipping");
         return;
       }
       setSessionData(data);
@@ -193,50 +221,50 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
         setBilling({
           name: data.billing.name,
           line1: data.billing.line1,
-          line2: data.billing.line2 ?? '',
+          line2: data.billing.line2 ?? "",
           city: data.billing.city,
           state: data.billing.state,
           postalCode: data.billing.postalCode,
-          country: data.billing.country ?? 'US',
+          country: data.billing.country ?? "US",
         });
       }
     } catch {
-      router.push('/checkout/shipping');
+      router.push("/checkout/shipping");
     }
   }, [router]);
 
   // ---- Load Accept.js when credit card is selected ----
   useEffect(() => {
-    if (selectedMethod !== 'credit_card') return undefined;
+    if (selectedMethod !== "credit_card") return undefined;
     if (paymentConfig?.devBypass) return undefined;
     if (!paymentConfig?.authNetAcceptJsUrl) return undefined;
 
     const acceptJsUrl = paymentConfig.authNetAcceptJsUrl;
 
     if (window.Accept) {
-      setScriptStatus('ready');
+      setScriptStatus("ready");
       return undefined;
     }
 
-    setScriptStatus('loading');
+    setScriptStatus("loading");
 
     const existingScript = document.querySelector<HTMLScriptElement>(
       `script[data-authorize-net="${acceptJsUrl}"]`,
     );
 
-    const handleLoad = () => setScriptStatus('ready');
-    const handleError = () => setScriptStatus('error');
+    const handleLoad = () => setScriptStatus("ready");
+    const handleError = () => setScriptStatus("error");
 
     if (existingScript) {
-      existingScript.addEventListener('load', handleLoad);
-      existingScript.addEventListener('error', handleError);
+      existingScript.addEventListener("load", handleLoad);
+      existingScript.addEventListener("error", handleError);
       return () => {
-        existingScript.removeEventListener('load', handleLoad);
-        existingScript.removeEventListener('error', handleError);
+        existingScript.removeEventListener("load", handleLoad);
+        existingScript.removeEventListener("error", handleError);
       };
     }
 
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = acceptJsUrl;
     script.async = true;
     script.dataset.authorizeNet = acceptJsUrl;
@@ -251,22 +279,28 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   }, [selectedMethod, paymentConfig]);
 
   const scriptMessage = useMemo(() => {
-    if (selectedMethod !== 'credit_card' || paymentConfig?.devBypass) return null;
-    if (scriptStatus === 'loading') return 'Loading secure card form...';
-    if (scriptStatus === 'error') return 'Unable to load the secure card form. Refresh the page and try again.';
+    if (selectedMethod !== "credit_card" || paymentConfig?.devBypass)
+      return null;
+    if (scriptStatus === "loading") return "Loading secure card form...";
+    if (scriptStatus === "error")
+      return "Unable to load the secure card form. Refresh the page and try again.";
     return null;
   }, [selectedMethod, scriptStatus, paymentConfig?.devBypass]);
 
   // ---- Tokenize card via Accept.js ----
-  const tokenizeCard = useCallback(async (): Promise<{ dataDescriptor: string; dataValue: string }> => {
-    if (!sessionData?.shipping) throw new Error('Missing shipping data.');
+  const tokenizeCard = useCallback(async (): Promise<{
+    dataDescriptor: string;
+    dataValue: string;
+  }> => {
+    if (!sessionData?.shipping) throw new Error("Missing shipping data.");
     if (!paymentConfig?.authNetApiLoginId || !paymentConfig?.authNetClientKey) {
-      throw new Error('Payment not configured.');
+      throw new Error("Payment not configured.");
     }
 
     const parsedExpiry = parseExpiry(expiry);
-    if (!parsedExpiry) throw new Error('Enter a valid expiration date in MM/YY format.');
-    if (!window.Accept) throw new Error('Secure card form is not ready yet.');
+    if (!parsedExpiry)
+      throw new Error("Enter a valid expiration date in MM/YY format.");
+    if (!window.Accept) throw new Error("Secure card form is not ready yet.");
 
     return await new Promise<{ dataDescriptor: string; dataValue: string }>(
       (resolve, reject) => {
@@ -277,19 +311,25 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               apiLoginID: paymentConfig.authNetApiLoginId!,
             },
             cardData: {
-              cardNumber: cardNumber.replace(/\D/g, ''),
+              cardNumber: cardNumber.replace(/\D/g, ""),
               month: parsedExpiry.month,
               year: parsedExpiry.year,
-              cardCode: cardCode.replace(/\D/g, ''),
-              zip: (sameAsShipping ? sessionData.shipping.postalCode : billing.postalCode)?.trim(),
+              cardCode: cardCode.replace(/\D/g, ""),
+              zip: (sameAsShipping
+                ? sessionData.shipping.postalCode
+                : billing.postalCode
+              )?.trim(),
               fullName: sessionData.shipping.name?.trim(),
             },
           },
           (response) => {
-            if (response.messages.resultCode === 'Error' || !response.opaqueData) {
+            if (
+              response.messages.resultCode === "Error" ||
+              !response.opaqueData
+            ) {
               const message =
-                response.messages.message.map((item) => item.text).join(' ') ||
-                'Card verification failed.';
+                response.messages.message.map((item) => item.text).join(" ") ||
+                "Card verification failed.";
               reject(new Error(message));
               return;
             }
@@ -305,18 +345,22 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     setError(null);
 
     if (!sessionData) {
-      setError('Session data missing. Please go back to shipping.');
+      setError("Session data missing. Please go back to shipping.");
       return;
     }
 
     // Validate billing address if not same as shipping
     if (!sameAsShipping) {
       const bErrors = new Map<string, string>();
-      if (!billing.name.trim()) bErrors.set('billing_name', 'Full name is required');
-      if (!billing.line1.trim()) bErrors.set('billing_line1', 'Street address is required');
-      if (!billing.city.trim()) bErrors.set('billing_city', 'City is required');
-      if (!billing.state.trim()) bErrors.set('billing_state', 'State is required');
-      if (!billing.postalCode.trim()) bErrors.set('billing_postalCode', 'ZIP code is required');
+      if (!billing.name.trim())
+        bErrors.set("billing_name", "Full name is required");
+      if (!billing.line1.trim())
+        bErrors.set("billing_line1", "Street address is required");
+      if (!billing.city.trim()) bErrors.set("billing_city", "City is required");
+      if (!billing.state.trim())
+        bErrors.set("billing_state", "State is required");
+      if (!billing.postalCode.trim())
+        bErrors.set("billing_postalCode", "ZIP code is required");
       if (bErrors.size > 0) {
         setBillingErrors(bErrors);
         return;
@@ -336,19 +380,22 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
           city: billing.city,
           state: billing.state,
           postalCode: billing.postalCode,
-          country: billing.country || 'US',
+          country: billing.country || "US",
         };
       }
     };
 
-    if (selectedMethod === 'credit_card') {
+    if (selectedMethod === "credit_card") {
       // Validate card fields
       const errors = new Map<string, string>();
-      if (cardNumber.replace(/\D/g, '').length < 13) errors.set('cardNumber', 'Card number must be at least 13 digits');
-      if (cardCode.replace(/\D/g, '').length < 3) errors.set('cardCode', 'Security code must be at least 3 digits');
+      if (cardNumber.replace(/\D/g, "").length < 13)
+        errors.set("cardNumber", "Card number must be at least 13 digits");
+      if (cardCode.replace(/\D/g, "").length < 3)
+        errors.set("cardCode", "Security code must be at least 3 digits");
 
       const parsedExpiry = parseExpiry(expiry);
-      if (!parsedExpiry) errors.set('expiry', 'Enter a valid expiration date (MM/YY)');
+      if (!parsedExpiry)
+        errors.set("expiry", "Enter a valid expiration date (MM/YY)");
 
       if (errors.size > 0) {
         setCardFieldErrors(errors);
@@ -357,20 +404,22 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
       setCardFieldErrors(new Map<string, string>());
 
       // Detect card brand and last 4 before tokenization
-      const rawNumber = cardNumber.replace(/\D/g, '');
+      const rawNumber = cardNumber.replace(/\D/g, "");
       const brand = detectCardBrand(rawNumber);
       const last4 = rawNumber.slice(-4);
 
       // Dev bypass — skip tokenization
       if (paymentConfig?.devBypass) {
-        const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
-        existingData.paymentMethod = 'credit_card';
+        const existingData = JSON.parse(
+          sessionStorage.getItem(SESSION_KEY)!,
+        ) as CheckoutSessionData;
+        existingData.paymentMethod = "credit_card";
         existingData.cardBrand = brand;
         existingData.cardLast4 = last4;
         delete existingData.opaqueData;
         attachBilling(existingData);
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
-        router.push('/checkout/confirm');
+        router.push("/checkout/confirm");
         return;
       }
 
@@ -378,31 +427,48 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
       setIsProcessing(true);
       try {
         const opaqueData = await tokenizeCard();
-        const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
-        existingData.paymentMethod = 'credit_card';
+        const existingData = JSON.parse(
+          sessionStorage.getItem(SESSION_KEY)!,
+        ) as CheckoutSessionData;
+        existingData.paymentMethod = "credit_card";
         existingData.opaqueData = opaqueData;
         existingData.cardBrand = brand;
         existingData.cardLast4 = last4;
         attachBilling(existingData);
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
-        router.push('/checkout/confirm');
+        router.push("/checkout/confirm");
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Card verification failed.');
+        setError(
+          err instanceof Error ? err.message : "Card verification failed.",
+        );
       } finally {
         setIsProcessing(false);
       }
     } else {
       // PrecisionPay — no tokenization needed
-      const existingData = JSON.parse(sessionStorage.getItem(SESSION_KEY)!) as CheckoutSessionData;
-      existingData.paymentMethod = 'precision_pay';
+      const existingData = JSON.parse(
+        sessionStorage.getItem(SESSION_KEY)!,
+      ) as CheckoutSessionData;
+      existingData.paymentMethod = "precision_pay";
       delete existingData.opaqueData;
       delete existingData.cardBrand;
       delete existingData.cardLast4;
       attachBilling(existingData);
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(existingData));
-      router.push('/checkout/confirm');
+      router.push("/checkout/confirm");
     }
-  }, [selectedMethod, cardNumber, cardCode, expiry, sessionData, paymentConfig, tokenizeCard, router, sameAsShipping, billing]);
+  }, [
+    selectedMethod,
+    cardNumber,
+    cardCode,
+    expiry,
+    sessionData,
+    paymentConfig,
+    tokenizeCard,
+    router,
+    sameAsShipping,
+    billing,
+  ]);
 
   // ---- CTA button for sidebar ----
   const ctaButton = (
@@ -410,11 +476,13 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
       onClick={handleContinueToReview}
       disabled={
         isProcessing ||
-        (selectedMethod === 'credit_card' && !paymentConfig?.devBypass && scriptStatus !== 'ready')
+        (selectedMethod === "credit_card" &&
+          !paymentConfig?.devBypass &&
+          scriptStatus !== "ready")
       }
-      className="group flex w-full items-center justify-center gap-3 rounded-full bg-secondary-900 py-4 pl-8 pr-5 font-mono text-[0.7rem] uppercase tracking-[0.2em] text-white transition-all duration-300 hover:bg-secondary-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       style={{
-        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
       }}
     >
       {isProcessing ? (
@@ -426,8 +494,18 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
         <>
           <span>Continue to Review</span>
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
             </svg>
           </span>
         </>
@@ -436,11 +514,15 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   );
 
   // ---- Empty cart / loading state (includes waiting for config fetch) ----
-  if (cart.items.length === 0 || !sessionData || (!devBypass && !paymentConfig)) {
+  if (
+    cart.items.length === 0 ||
+    !sessionData ||
+    (!devBypass && !paymentConfig)
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAF8]">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+          <div className="border-primary-500 mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
           <p className="text-secondary-600">Loading...</p>
         </div>
       </div>
@@ -450,7 +532,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   // ---- Payment not configured ----
   const isPaymentReady =
     paymentConfig?.devBypass ||
-    (paymentConfig && paymentConfig.status === 'ready');
+    (paymentConfig && paymentConfig.status === "ready");
 
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
@@ -462,21 +544,31 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
         <div className="mb-10 flex items-end justify-between">
           <div>
             <div className="mb-3 flex items-center gap-3">
-              <div className="h-px w-8 bg-primary-500" />
-              <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+              <div className="bg-primary-500 h-px w-8" />
+              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
                 Checkout
               </span>
             </div>
-            <h1 className="font-display text-4xl font-bold tracking-tight text-secondary-900 sm:text-5xl">
+            <h1 className="font-display text-secondary-900 text-4xl font-bold tracking-tight sm:text-5xl">
               Payment Method
             </h1>
           </div>
           <Link
             href="/checkout/shipping"
-            className="hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase text-secondary-400 transition-colors hover:text-primary-600 sm:flex"
+            className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
           >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Back to Shipping
           </Link>
@@ -488,19 +580,30 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
             {/* Back link mobile */}
             <Link
               href="/checkout/shipping"
-              className="flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase text-secondary-400 transition-colors hover:text-primary-600 sm:hidden"
+              className="text-secondary-400 hover:text-primary-600 flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:hidden"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               Back to Shipping
             </Link>
 
             {!isPaymentReady ? (
               <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                   <div className="rounded-xl border border-amber-200/80 bg-amber-50 p-6 text-sm text-amber-800">
-                    Checkout is not configured for this storefront yet. Please contact Alpha Munitions support.
+                    Checkout is not configured for this storefront yet. Please
+                    contact Alpha Munitions support.
                   </div>
                 </div>
               </div>
@@ -508,10 +611,10 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               <>
                 {/* Billing Address Card */}
                 <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                  <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                     <div className="mb-5 flex items-center gap-3">
-                      <div className="h-px w-6 bg-primary-500" />
-                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
                         Billing Address
                       </span>
                     </div>
@@ -524,72 +627,119 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                           checked={sameAsShipping}
                           onChange={(e) => {
                             setSameAsShipping(e.target.checked);
-                            if (e.target.checked) setBillingErrors(new Map<string, string>());
+                            if (e.target.checked)
+                              setBillingErrors(new Map<string, string>());
                           }}
                           className="peer sr-only"
                         />
-                        <div className="h-5 w-5 rounded border-2 border-secondary-300 bg-white transition-colors peer-checked:border-primary-500 peer-checked:bg-primary-500 flex items-center justify-center">
+                        <div className="border-secondary-300 peer-checked:border-primary-500 peer-checked:bg-primary-500 flex h-5 w-5 items-center justify-center rounded border-2 bg-white transition-colors">
                           {sameAsShipping && (
-                            <svg className="h-3 w-3 text-secondary-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            <svg
+                              className="text-secondary-900 h-3 w-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
                             </svg>
                           )}
                         </div>
                       </div>
-                      <span className="text-sm text-secondary-700">Same as shipping address</span>
+                      <span className="text-secondary-700 text-sm">
+                        Same as shipping address
+                      </span>
                     </label>
 
                     {/* Billing form — animated expand */}
-                    <div className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                    >
                       <div className="overflow-hidden">
-                        <div className="pt-5 space-y-4">
+                        <div className="space-y-4 pt-5">
                           {/* Name */}
                           <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Full Name</span>
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Full Name
+                            </span>
                             <input
                               type="text"
                               autoComplete="billing name"
                               value={billing.name}
                               onChange={(e) => {
-                                setBilling((p) => ({ ...p, name: e.target.value }));
-                                setBillingErrors((p) => { const n = new Map(p); n.delete('billing_name'); return n; });
+                                setBilling((p) => ({
+                                  ...p,
+                                  name: e.target.value,
+                                }));
+                                setBillingErrors((p) => {
+                                  const n = new Map(p);
+                                  n.delete("billing_name");
+                                  return n;
+                                });
                               }}
-                              className={`w-full rounded-xl border ${billingErrors.has('billing_name') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              className={`w-full rounded-xl border ${billingErrors.has("billing_name") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                               placeholder="Jane Smith"
                             />
-                            {billingErrors.has('billing_name') && (
-                              <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_name')}</p>
+                            {billingErrors.has("billing_name") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                {billingErrors.get("billing_name")}
+                              </p>
                             )}
                           </label>
 
                           {/* Address line 1 */}
                           <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Address</span>
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Address
+                            </span>
                             <input
                               type="text"
                               autoComplete="billing address-line1"
                               value={billing.line1}
                               onChange={(e) => {
-                                setBilling((p) => ({ ...p, line1: e.target.value }));
-                                setBillingErrors((p) => { const n = new Map(p); n.delete('billing_line1'); return n; });
+                                setBilling((p) => ({
+                                  ...p,
+                                  line1: e.target.value,
+                                }));
+                                setBillingErrors((p) => {
+                                  const n = new Map(p);
+                                  n.delete("billing_line1");
+                                  return n;
+                                });
                               }}
-                              className={`w-full rounded-xl border ${billingErrors.has('billing_line1') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                              className={`w-full rounded-xl border ${billingErrors.has("billing_line1") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                               placeholder="123 Main St"
                             />
-                            {billingErrors.has('billing_line1') && (
-                              <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_line1')}</p>
+                            {billingErrors.has("billing_line1") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                {billingErrors.get("billing_line1")}
+                              </p>
                             )}
                           </label>
 
                           {/* Address line 2 */}
                           <label className="block">
-                            <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">Apt, Suite, etc. <span className="normal-case tracking-normal text-secondary-400">(optional)</span></span>
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Apt, Suite, etc.{" "}
+                              <span className="text-secondary-400 tracking-normal normal-case">
+                                (optional)
+                              </span>
+                            </span>
                             <input
                               type="text"
                               autoComplete="billing address-line2"
                               value={billing.line2}
-                              onChange={(e) => setBilling((p) => ({ ...p, line2: e.target.value }))}
-                              className="w-full rounded-xl border border-secondary-200 bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                              onChange={(e) =>
+                                setBilling((p) => ({
+                                  ...p,
+                                  line2: e.target.value,
+                                }))
+                              }
+                              className="border-secondary-200 text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 w-full rounded-xl border bg-white px-4 py-3 text-sm transition outline-none focus:ring-2"
                               placeholder="Apt 4B"
                             />
                           </label>
@@ -597,56 +747,93 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                           {/* City / State / ZIP */}
                           <div className="grid grid-cols-3 gap-3">
                             <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">City</span>
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                City
+                              </span>
                               <input
                                 type="text"
                                 autoComplete="billing address-level2"
                                 value={billing.city}
                                 onChange={(e) => {
-                                  setBilling((p) => ({ ...p, city: e.target.value }));
-                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_city'); return n; });
+                                  setBilling((p) => ({
+                                    ...p,
+                                    city: e.target.value,
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_city");
+                                    return n;
+                                  });
                                 }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_city') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_city") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                 placeholder="Salt Lake City"
                               />
-                              {billingErrors.has('billing_city') && (
-                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_city')}</p>
+                              {billingErrors.has("billing_city") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_city")}
+                                </p>
                               )}
                             </label>
                             <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">State</span>
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                State
+                              </span>
                               <input
                                 type="text"
                                 autoComplete="billing address-level1"
                                 value={billing.state}
                                 onChange={(e) => {
-                                  setBilling((p) => ({ ...p, state: e.target.value.toUpperCase().slice(0, 2) }));
-                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_state'); return n; });
+                                  setBilling((p) => ({
+                                    ...p,
+                                    state: e.target.value
+                                      .toUpperCase()
+                                      .slice(0, 2),
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_state");
+                                    return n;
+                                  });
                                 }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_state') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_state") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                 placeholder="UT"
                                 maxLength={2}
                               />
-                              {billingErrors.has('billing_state') && (
-                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_state')}</p>
+                              {billingErrors.has("billing_state") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_state")}
+                                </p>
                               )}
                             </label>
                             <label className="col-span-1 block">
-                              <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">ZIP</span>
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                ZIP
+                              </span>
                               <input
                                 type="text"
                                 inputMode="numeric"
                                 autoComplete="billing postal-code"
                                 value={billing.postalCode}
                                 onChange={(e) => {
-                                  setBilling((p) => ({ ...p, postalCode: e.target.value.replace(/\D/g, '').slice(0, 10) }));
-                                  setBillingErrors((p) => { const n = new Map(p); n.delete('billing_postalCode'); return n; });
+                                  setBilling((p) => ({
+                                    ...p,
+                                    postalCode: e.target.value
+                                      .replace(/\D/g, "")
+                                      .slice(0, 10),
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_postalCode");
+                                    return n;
+                                  });
                                 }}
-                                className={`w-full rounded-xl border ${billingErrors.has('billing_postalCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_postalCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                 placeholder="84101"
                               />
-                              {billingErrors.has('billing_postalCode') && (
-                                <p className="mt-1 text-sm text-red-500">{billingErrors.get('billing_postalCode')}</p>
+                              {billingErrors.has("billing_postalCode") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_postalCode")}
+                                </p>
                               )}
                             </label>
                           </div>
@@ -658,10 +845,10 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
                 {/* Payment Method Selector Card */}
                 <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                  <div className="rounded-[calc(2rem-0.375rem)] border border-secondary-100/60 p-6 sm:p-8">
+                  <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                     <div className="mb-6 flex items-center gap-3">
-                      <div className="h-px w-6 bg-primary-500" />
-                      <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
                         Select Payment Method
                       </span>
                     </div>
@@ -676,25 +863,37 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                       {/* Credit Card option */}
                       <label
                         className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                          selectedMethod === 'credit_card'
-                            ? 'border-primary-500 bg-primary-50/30'
-                            : 'border-secondary-200 hover:border-secondary-300'
+                          selectedMethod === "credit_card"
+                            ? "border-primary-500 bg-primary-50/30"
+                            : "border-secondary-200 hover:border-secondary-300"
                         }`}
                       >
                         <input
                           type="radio"
                           name="paymentMethod"
                           value="credit_card"
-                          checked={selectedMethod === 'credit_card'}
-                          onChange={() => setSelectedMethod('credit_card')}
-                          className="h-4 w-4 border-secondary-300 text-primary-500 focus:ring-primary-500"
+                          checked={selectedMethod === "credit_card"}
+                          onChange={() => setSelectedMethod("credit_card")}
+                          className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
                         />
                         <div>
                           <div className="flex items-center gap-3">
-                            <svg className="h-5 w-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            <svg
+                              className="text-secondary-500 h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                              />
                             </svg>
-                            <p className="text-sm font-medium text-secondary-900">Credit Card</p>
+                            <p className="text-secondary-900 text-sm font-medium">
+                              Credit Card
+                            </p>
                           </div>
                           <div className="mt-2 ml-8 flex items-center gap-2">
                             <CardBrandIcon brand="visa" />
@@ -710,7 +909,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                       {/* Credit Card Form (animated expand) */}
                       <div
                         className={`grid transition-all duration-300 ease-out ${
-                          selectedMethod === 'credit_card' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                          selectedMethod === "credit_card"
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
                         }`}
                       >
                         <div className="overflow-hidden">
@@ -718,28 +919,29 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                             {scriptMessage && (
                               <div
                                 className={`mb-3 rounded-xl border p-3 text-sm ${
-                                  scriptStatus === 'error'
-                                    ? 'border-red-200 bg-red-50 text-red-700'
-                                    : 'border-secondary-200 bg-secondary-50 text-secondary-500'
+                                  scriptStatus === "error"
+                                    ? "border-red-200 bg-red-50 text-red-700"
+                                    : "border-secondary-200 bg-secondary-50 text-secondary-500"
                                 }`}
                               >
                                 {scriptMessage}
                               </div>
                             )}
 
-                            <div className="rounded-2xl border border-secondary-100 bg-secondary-50/80 p-4">
+                            <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
                               <div className="mb-4">
-                                <p className="font-display text-lg font-semibold text-secondary-900">
+                                <p className="font-display text-secondary-900 text-lg font-semibold">
                                   Card Details
                                 </p>
-                                <p className="text-xs text-secondary-500">
-                                  Card details are tokenized by Authorize.net before anything is sent to the server.
+                                <p className="text-secondary-500 text-xs">
+                                  Card details are tokenized by Authorize.net
+                                  before anything is sent to the server.
                                 </p>
                               </div>
 
                               <div className="space-y-4">
                                 <label className="block">
-                                  <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                  <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                                     Card Number
                                   </span>
                                   <input
@@ -747,26 +949,30 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                     autoComplete="cc-number"
                                     value={cardNumber}
                                     onChange={(event) => {
-                                      setCardNumber(formatCardNumber(event.target.value));
+                                      setCardNumber(
+                                        formatCardNumber(event.target.value),
+                                      );
                                       if (cardFieldErrors.size) {
                                         setCardFieldErrors((prev) => {
                                           const n = new Map(prev);
-                                          n.delete('cardNumber');
+                                          n.delete("cardNumber");
                                           return n;
                                         });
                                       }
                                     }}
-                                    className={`w-full rounded-xl border ${cardFieldErrors.has('cardNumber') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                    className={`w-full rounded-xl border ${cardFieldErrors.has("cardNumber") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                     placeholder="4111 1111 1111 1111"
                                   />
-                                  {cardFieldErrors.has('cardNumber') && (
-                                    <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('cardNumber')}</p>
+                                  {cardFieldErrors.has("cardNumber") && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {cardFieldErrors.get("cardNumber")}
+                                    </p>
                                   )}
                                 </label>
 
                                 <div className="grid gap-4 md:grid-cols-2">
                                   <label className="block">
-                                    <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                    <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                                       Expiration
                                     </span>
                                     <input
@@ -774,24 +980,28 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                       autoComplete="cc-exp"
                                       value={expiry}
                                       onChange={(event) => {
-                                        setExpiry(formatExpiry(event.target.value));
+                                        setExpiry(
+                                          formatExpiry(event.target.value),
+                                        );
                                         if (cardFieldErrors.size) {
                                           setCardFieldErrors((prev) => {
                                             const n = new Map(prev);
-                                            n.delete('expiry');
+                                            n.delete("expiry");
                                             return n;
                                           });
                                         }
                                       }}
-                                      className={`w-full rounded-xl border ${cardFieldErrors.has('expiry') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has("expiry") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                       placeholder="MM/YY"
                                     />
-                                    {cardFieldErrors.has('expiry') && (
-                                      <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('expiry')}</p>
+                                    {cardFieldErrors.has("expiry") && (
+                                      <p className="mt-1 text-sm text-red-500">
+                                        {cardFieldErrors.get("expiry")}
+                                      </p>
                                     )}
                                   </label>
                                   <label className="block">
-                                    <span className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-secondary-400">
+                                    <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
                                       Security Code
                                     </span>
                                     <input
@@ -799,20 +1009,26 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                       autoComplete="cc-csc"
                                       value={cardCode}
                                       onChange={(event) => {
-                                        setCardCode(event.target.value.replace(/\D/g, '').slice(0, 4));
+                                        setCardCode(
+                                          event.target.value
+                                            .replace(/\D/g, "")
+                                            .slice(0, 4),
+                                        );
                                         if (cardFieldErrors.size) {
                                           setCardFieldErrors((prev) => {
                                             const n = new Map(prev);
-                                            n.delete('cardCode');
+                                            n.delete("cardCode");
                                             return n;
                                           });
                                         }
                                       }}
-                                      className={`w-full rounded-xl border ${cardFieldErrors.has('cardCode') ? 'border-red-400' : 'border-secondary-200'} bg-white px-4 py-3 text-sm text-secondary-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20`}
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has("cardCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
                                       placeholder="CVV"
                                     />
-                                    {cardFieldErrors.has('cardCode') && (
-                                      <p className="mt-1 text-sm text-red-500">{cardFieldErrors.get('cardCode')}</p>
+                                    {cardFieldErrors.has("cardCode") && (
+                                      <p className="mt-1 text-sm text-red-500">
+                                        {cardFieldErrors.get("cardCode")}
+                                      </p>
                                     )}
                                   </label>
                                 </div>
@@ -825,18 +1041,18 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                       {/* PrecisionPay option */}
                       <label
                         className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                          selectedMethod === 'precision_pay'
-                            ? 'border-primary-500 bg-primary-50/30'
-                            : 'border-secondary-200 hover:border-secondary-300'
+                          selectedMethod === "precision_pay"
+                            ? "border-primary-500 bg-primary-50/30"
+                            : "border-secondary-200 hover:border-secondary-300"
                         }`}
                       >
                         <input
                           type="radio"
                           name="paymentMethod"
                           value="precision_pay"
-                          checked={selectedMethod === 'precision_pay'}
-                          onChange={() => setSelectedMethod('precision_pay')}
-                          className="h-4 w-4 border-secondary-300 text-primary-500 focus:ring-primary-500"
+                          checked={selectedMethod === "precision_pay"}
+                          onChange={() => setSelectedMethod("precision_pay")}
+                          className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
                         />
                         <img
                           src="/images/payment/precisionpay.png"
@@ -848,21 +1064,37 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                       {/* PrecisionPay description (animated expand) */}
                       <div
                         className={`grid transition-all duration-300 ease-out ${
-                          selectedMethod === 'precision_pay' ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                          selectedMethod === "precision_pay"
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
                         }`}
                       >
                         <div className="overflow-hidden">
                           <div className="pt-0.5">
-                            <div className="rounded-2xl border border-secondary-100 bg-secondary-50/80 p-4">
+                            <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
                               <div className="flex items-start gap-3">
-                                <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg
+                                  className="text-primary-500 mt-0.5 h-5 w-5 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
                                 </svg>
                                 <div>
-                                  <p className="text-sm font-medium text-secondary-900">About PrecisionPay</p>
-                                  <p className="mt-1 text-sm text-secondary-600">
-                                    Pay directly from your bank account with PrecisionPay. Lower fees, no credit card needed.
-                                    You&apos;ll complete the bank transfer on the next step.
+                                  <p className="text-secondary-900 text-sm font-medium">
+                                    About PrecisionPay
+                                  </p>
+                                  <p className="text-secondary-600 mt-1 text-sm">
+                                    Pay directly from your bank account with
+                                    PrecisionPay. Lower fees, no credit card
+                                    needed. You&apos;ll complete the bank
+                                    transfer on the next step.
                                   </p>
                                 </div>
                               </div>
@@ -877,7 +1109,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                 {/* Dev bypass badge */}
                 {paymentConfig?.devBypass && (
                   <div className="flex items-center justify-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-secondary-200 px-2.5 py-0.5 text-[0.6rem] font-medium uppercase tracking-[0.15em] text-secondary-400">
+                    <span className="border-secondary-200 text-secondary-400 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[0.6rem] font-medium tracking-[0.15em] uppercase">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       Test Mode
                     </span>
@@ -889,7 +1121,12 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
           {/* Right column — Order Summary */}
           <div className="lg:col-span-1">
-            <OrderSummary cart={cart} showItemDetails={false} shippingCost={shippingCost} ctaButton={isPaymentReady ? ctaButton : undefined} />
+            <OrderSummary
+              cart={cart}
+              showItemDetails={false}
+              shippingCost={shippingCost}
+              ctaButton={isPaymentReady ? ctaButton : undefined}
+            />
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import type { Stripe, StripeElementsOptions } from '@stripe/stripe-js';
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import type { Stripe, StripeElementsOptions } from "@stripe/stripe-js";
 
 const stripePromiseCache = new Map<string, Promise<Stripe | null>>();
 
@@ -19,7 +19,7 @@ function getStripePromise(
   publishableKey: string,
   stripeAccountId?: string | null,
 ): Promise<Stripe | null> {
-  const cacheKey = `${publishableKey}:${stripeAccountId || 'platform'}`;
+  const cacheKey = `${publishableKey}:${stripeAccountId || "platform"}`;
 
   if (!stripePromiseCache.has(cacheKey)) {
     stripePromiseCache.set(
@@ -45,14 +45,14 @@ export default function StripeProvider({
   const options: StripeElementsOptions = {
     clientSecret,
     appearance: {
-      theme: 'stripe',
+      theme: "stripe",
       variables: {
-        colorPrimary: primaryColor || '#C4A035',
-        colorBackground: '#ffffff',
-        colorText: '#1e293b',
-        colorDanger: '#dc2626',
-        fontFamily: 'system-ui, sans-serif',
-        borderRadius: '12px',
+        colorPrimary: primaryColor || "#C4A035",
+        colorBackground: "#ffffff",
+        colorText: "#1e293b",
+        colorDanger: "#dc2626",
+        fontFamily: "system-ui, sans-serif",
+        borderRadius: "12px",
       },
     },
   };

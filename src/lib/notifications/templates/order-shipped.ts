@@ -31,7 +31,10 @@ interface OrderShippedTemplateData {
   siteUrl: string;
 }
 
-export function orderShippedTemplate(data: OrderShippedTemplateData): { subject: string; html: string } {
+export function orderShippedTemplate(data: OrderShippedTemplateData): {
+  subject: string;
+  html: string;
+} {
   const subject = `Your ${data.storeName} Order Has Shipped! - Order #${data.orderId}`;
 
   const itemsHtml = data.items
@@ -39,29 +42,30 @@ export function orderShippedTemplate(data: OrderShippedTemplateData): { subject:
       (item) => `
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; width: 60px; vertical-align: middle;">
-          ${item.imageUrl
-            ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background-color: #f9fafb;" />`
-            : `<div style="width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 4px;"></div>`
+          ${
+            item.imageUrl
+              ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background-color: #f9fafb;" />`
+              : `<div style="width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 4px;"></div>`
           }
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; vertical-align: middle;">
           ${item.name}
-          ${item.variationName ? `<br><span style="color: #6b7280; font-size: 13px;">${item.variationName}</span>` : ''}
-          ${item.sku ? `<br><span style="color: #9ca3af; font-size: 12px;">SKU: ${item.sku}</span>` : ''}
+          ${item.variationName ? `<br><span style="color: #6b7280; font-size: 13px;">${item.variationName}</span>` : ""}
+          ${item.sku ? `<br><span style="color: #9ca3af; font-size: 12px;">SKU: ${item.sku}</span>` : ""}
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: middle;">$${(item.price / 100).toFixed(2)}</td>
       </tr>
-    `
+    `,
     )
-    .join('');
+    .join("");
 
   const trackingSection = data.trackingNumber
     ? `
       <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Tracking Information</h3>
         <p style="margin: 0 0 8px 0; color: #6b7280;">
-          <strong>Carrier:</strong> ${data.carrier || 'N/A'}
+          <strong>Carrier:</strong> ${data.carrier || "N/A"}
         </p>
         <p style="margin: 0 0 16px 0; color: #6b7280;">
           <strong>Tracking Number:</strong> ${data.trackingNumber}
@@ -69,16 +73,16 @@ export function orderShippedTemplate(data: OrderShippedTemplateData): { subject:
         ${
           data.trackingUrl
             ? `<a href="${data.trackingUrl}" style="display: inline-block; background-color: #C4A035; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600;">Track Your Package</a>`
-            : ''
+            : ""
         }
         ${
           data.estimatedDelivery
             ? `<p style="margin: 16px 0 0 0; color: #6b7280;"><strong>Estimated Delivery:</strong> ${data.estimatedDelivery}</p>`
-            : ''
+            : ""
         }
       </div>
     `
-    : '';
+    : "";
 
   const html = `
 <!DOCTYPE html>
@@ -113,7 +117,7 @@ export function orderShippedTemplate(data: OrderShippedTemplateData): { subject:
         <p style="margin: 0; color: #6b7280; line-height: 1.6;">
           ${data.shippingAddress.name}<br>
           ${data.shippingAddress.line1}<br>
-          ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ''}
+          ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ""}
           ${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.postalCode}<br>
           ${data.shippingAddress.country}
         </p>

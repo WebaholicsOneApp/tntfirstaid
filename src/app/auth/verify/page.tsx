@@ -1,15 +1,15 @@
-import { Suspense } from 'react';
-import VerifyClient from './VerifyClient';
-import { Spinner } from '~/components/ui/Spinner';
+import { Suspense } from "react";
+import VerifyClient from "./VerifyClient";
+import { Spinner } from "~/components/ui/Spinner";
 
-export const metadata = { title: 'Verify Sign-In' };
+export const metadata = { title: "Verify Sign-In" };
 
 export default function VerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-white flex items-center justify-center px-4 py-16">
-          <Spinner className="w-8 h-8 text-primary-500" />
+        <div className="flex min-h-screen items-center justify-center bg-white px-4 py-16">
+          <Spinner className="text-primary-500 h-8 w-8" />
         </div>
       }
     >

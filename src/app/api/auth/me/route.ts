@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getMe } from '~/lib/auth/auth-api';
-import { getCustomerToken, clearCustomerToken } from '~/lib/auth/cookies';
+import { NextResponse } from "next/server";
+import { getMe } from "~/lib/auth/auth-api";
+import { getCustomerToken, clearCustomerToken } from "~/lib/auth/cookies";
 
 export async function GET() {
   const token = await getCustomerToken();

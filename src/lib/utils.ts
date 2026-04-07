@@ -6,22 +6,22 @@
  * Convert a string to URL-friendly slug
  */
 export function slugify(text: string | null | undefined): string {
-  return String(text || '')
+  return String(text || "")
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '') // Remove non-word chars
-    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    .replace(/[^\w\s-]/g, "") // Remove non-word chars
+    .replace(/[\s_-]+/g, "-") // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
 }
 
 /**
  * Format cents to dollar display string
  */
 export function formatCentsToDollars(cents: number | null | undefined): string {
-  if (cents == null) return '$0.00';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  if (cents == null) return "$0.00";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(cents / 100);
 }
 
@@ -37,7 +37,7 @@ export function convertDollarsToCents(dollars: number): number {
  */
 export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + '...';
+  return text.slice(0, maxLength - 3) + "...";
 }
 
 /**
@@ -51,7 +51,7 @@ export function generateProductSlug(name: string, id: number): string {
  * Extract product ID from slug
  */
 export function extractIdFromSlug(slug: string): number | null {
-  const parts = slug.split('-');
+  const parts = slug.split("-");
   const lastPart = parts[parts.length - 1]!;
   const id = parseInt(lastPart, 10);
   return isNaN(id) ? null : id;
@@ -62,7 +62,7 @@ export function extractIdFromSlug(slug: string): number | null {
  */
 export function calculateDiscountPercentage(
   originalPrice: number,
-  salePrice: number
+  salePrice: number,
 ): number {
   if (originalPrice <= 0) return 0;
   const discount = ((originalPrice - salePrice) / originalPrice) * 100;
@@ -90,7 +90,7 @@ export function clamp(value: number, min: number, max: number): number {
 export function getPaginationRange(
   currentPage: number,
   totalPages: number,
-  maxVisible: number = 5
+  maxVisible: number = 5,
 ): number[] {
   const halfVisible = Math.floor(maxVisible / 2);
   let start = Math.max(1, currentPage - halfVisible);
@@ -112,12 +112,12 @@ export function getPaginationRange(
  * Clean and validate image URL
  */
 export function getImageUrl(url: string | null | undefined): string {
-  if (!url) return '/placeholder-product.svg';
+  if (!url) return "/placeholder-product.svg";
   // Upgrade http to https — DB has mixed protocols but next/image config only allows https
-  if (url.startsWith('http://')) {
-    return url.replace('http://', 'https://');
+  if (url.startsWith("http://")) {
+    return url.replace("http://", "https://");
   }
-  if (url.startsWith('https://')) {
+  if (url.startsWith("https://")) {
     return url;
   }
   // Otherwise, assume it's a relative path
@@ -128,24 +128,27 @@ export function getImageUrl(url: string | null | undefined): string {
  * Build query string from params object
  */
 export function buildQueryString(
-  params: Record<string, string | number | boolean | undefined>
+  params: Record<string, string | number | boolean | undefined>,
 ): string {
   const filtered = Object.entries(params)
-    .filter(([, value]) => value !== undefined && value !== '')
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+    .filter(([, value]) => value !== undefined && value !== "")
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+    );
 
-  return filtered.length > 0 ? `?${filtered.join('&')}` : '';
+  return filtered.length > 0 ? `?${filtered.join("&")}` : "";
 }
 
 /**
  * Parse query string to object
  */
-export function parseQueryString(
-  queryString: string
-): Record<string, string> {
-  if (!queryString || queryString === '?') return {};
+export function parseQueryString(queryString: string): Record<string, string> {
+  if (!queryString || queryString === "?") return {};
 
-  const params = new URLSearchParams(queryString.startsWith('?') ? queryString.slice(1) : queryString);
+  const params = new URLSearchParams(
+    queryString.startsWith("?") ? queryString.slice(1) : queryString,
+  );
   const result: Record<string, string> = {};
 
   params.forEach((value, key) => {
@@ -160,7 +163,7 @@ export function parseQueryString(
  */
 export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -178,7 +181,7 @@ export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
  * Class name utility (like clsx/classnames)
  */
 export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
 /**
@@ -186,14 +189,14 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
  * Unknown hosts are served unoptimized (no cost, no errors).
  */
 const OPTIMIZED_IMAGE_HOSTS = new Set([
-  'cdn.shopify.com',
-  'cdn.wpsstatic.com',
-  'd32vzsop7y1h3k.cloudfront.net',
-  'images.rockymountainatvmc.com',
-  'm.media-amazon.com',
-  'i5.walmartimages.com',
-  'i.ebayimg.com',
-  'images.unsplash.com',
+  "cdn.shopify.com",
+  "cdn.wpsstatic.com",
+  "d32vzsop7y1h3k.cloudfront.net",
+  "images.rockymountainatvmc.com",
+  "m.media-amazon.com",
+  "i5.walmartimages.com",
+  "i.ebayimg.com",
+  "images.unsplash.com",
 ]);
 
 export function isOptimizedImageHost(url: string): boolean {
@@ -201,7 +204,7 @@ export function isOptimizedImageHost(url: string): boolean {
     const hostname = new URL(url).hostname;
     if (OPTIMIZED_IMAGE_HOSTS.has(hostname)) return true;
     // Wildcard: *.blob.core.windows.net (Azure Blob Storage)
-    return hostname.endsWith('.blob.core.windows.net');
+    return hostname.endsWith(".blob.core.windows.net");
   } catch {
     return true; // relative paths are local — always optimized
   }
@@ -211,8 +214,8 @@ export function isOptimizedImageHost(url: string): boolean {
  * Format digits into (555) 123-4567 pattern
  */
 export function formatPhone(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 10);
-  if (digits.length === 0) return '';
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length === 0) return "";
   if (digits.length <= 3) return `(${digits}`;
   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-const STORAGE_KEY = 'alpha-munitions-recent-searches';
+const STORAGE_KEY = "alpha-munitions-recent-searches";
 const MAX_SEARCHES = 8;
 
 export function useRecentSearches() {
@@ -33,23 +33,31 @@ export function useRecentSearches() {
   const addSearch = useCallback((query: string) => {
     const trimmed = query.trim();
     if (!trimmed) return;
-    setRecentSearches(prev => {
+    setRecentSearches((prev) => {
       // Deduplicate case-insensitive, keep most recent first
-      const filtered = prev.filter(s => s.toLowerCase() !== trimmed.toLowerCase());
+      const filtered = prev.filter(
+        (s) => s.toLowerCase() !== trimmed.toLowerCase(),
+      );
       const updated = [trimmed, ...filtered].slice(0, MAX_SEARCHES);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       return updated;
     });
   }, []);
 
   const removeSearch = useCallback((query: string) => {
-    setRecentSearches(prev => {
-      const updated = prev.filter(s => s.toLowerCase() !== query.toLowerCase());
+    setRecentSearches((prev) => {
+      const updated = prev.filter(
+        (s) => s.toLowerCase() !== query.toLowerCase(),
+      );
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       return updated;
     });
   }, []);

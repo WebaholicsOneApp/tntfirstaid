@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
 import {
   getProducts,
   getCategoryTreeForStorefront,
@@ -8,20 +8,20 @@ import {
   getCategoryWithHierarchy,
   getAllRelatedCategoryIds,
   getPriceRange,
-} from '~/lib/data';
-import { convertDollarsToCents, getPaginationRange } from '~/lib/utils';
-import ShopPageClient from '~/components/products/ShopPageClient';
-import Breadcrumbs from '~/components/common/Breadcrumbs';
-import type { BreadcrumbItem } from '~/components/common/Breadcrumbs';
+} from "~/lib/data";
+import { convertDollarsToCents, getPaginationRange } from "~/lib/utils";
+import ShopPageClient from "~/components/products/ShopPageClient";
+import Breadcrumbs from "~/components/common/Breadcrumbs";
+import type { BreadcrumbItem } from "~/components/common/Breadcrumbs";
 
 export const revalidate = 900;
 
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
     .trim();
 }
 
@@ -36,12 +36,14 @@ interface CategoryShopPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: CategoryShopPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CategoryShopPageProps): Promise<Metadata> {
   const { category: categorySlug } = await params;
   const category = await getCategoryBySlug(categorySlug);
 
   if (!category) {
-    return { title: 'Category Not Found' };
+    return { title: "Category Not Found" };
   }
 
   return {
@@ -50,7 +52,10 @@ export async function generateMetadata({ params }: CategoryShopPageProps): Promi
   };
 }
 
-export default async function CategoryShopPage({ params, searchParams }: CategoryShopPageProps) {
+export default async function CategoryShopPage({
+  params,
+  searchParams,
+}: CategoryShopPageProps) {
   const { category: categorySlug } = await params;
   const queryParams = await searchParams;
 
@@ -60,7 +65,10 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
   }
 
   // Build filters
-  const categoryIds = await getAllRelatedCategoryIds(category.id, category.categoryName);
+  const categoryIds = await getAllRelatedCategoryIds(
+    category.id,
+    category.categoryName,
+  );
 
   const filters: {
     categoryIds: number[];
@@ -77,16 +85,18 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
     const parsed = parseFloat(queryParams.maxPrice);
     if (!isNaN(parsed)) filters.maxPrice = convertDollarsToCents(parsed);
   }
-  if (queryParams.inStock === 'true') {
+  if (queryParams.inStock === "true") {
     filters.inStock = true;
   }
 
-  const sortBy = queryParams.sort ?? 'best_sellers';
-  const page = Math.max(1, parseInt(queryParams.page ?? '1', 10) || 1);
+  const sortBy = queryParams.sort ?? "best_sellers";
+  const page = Math.max(1, parseInt(queryParams.page ?? "1", 10) || 1);
   const pageSize = 24;
 
   // Build price range filters (exclude price filters to get full range)
-  const priceRangeFilters: { categoryIds: number[]; inStock?: boolean } = { categoryIds };
+  const priceRangeFilters: { categoryIds: number[]; inStock?: boolean } = {
+    categoryIds,
+  };
   if (filters.inStock) priceRangeFilters.inStock = true;
 
   // Fetch products, category tree, hierarchy, and price range in parallel
@@ -102,8 +112,8 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
 
   // Build breadcrumbs
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop' },
+    { label: "Home", href: "/" },
+    { label: "Shop", href: "/shop" },
   ];
   for (let i = 0; i < hierarchy.length; i++) {
     const cat = hierarchy[i]!;
@@ -121,7 +131,7 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
 
       {/* Page heading */}
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-secondary-900">
+        <h1 className="font-display text-secondary-900 text-3xl font-bold sm:text-4xl">
           {category.categoryName}
         </h1>
       </div>
@@ -134,7 +144,10 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
         pageSize={pageSize}
         categories={categoryTree}
         currentCategorySlug={categorySlug}
-        priceRange={{ min: Math.round(priceRange.min / 100), max: Math.round(priceRange.max / 100) }}
+        priceRange={{
+          min: Math.round(priceRange.min / 100),
+          max: Math.round(priceRange.max / 100),
+        }}
       />
 
       {/* Pagination */}
@@ -148,8 +161,18 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
                 params={queryParams}
                 label="Previous"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </PaginationLink>
             )}
@@ -174,8 +197,18 @@ export default async function CategoryShopPage({ params, searchParams }: Categor
                 params={queryParams}
                 label="Next"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </PaginationLink>
             )}
@@ -203,23 +236,23 @@ function PaginationLink({
 }) {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
-    if (value && key !== 'page') {
+    if (value && key !== "page") {
       searchParams.set(key, value);
     }
   }
-  if (page > 1) searchParams.set('page', String(page));
+  if (page > 1) searchParams.set("page", String(page));
 
-  const href = `/shop/${categorySlug}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+  const href = `/shop/${categorySlug}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
 
   return (
     <Link
       href={href}
       aria-label={label}
-      aria-current={isActive ? 'page' : undefined}
+      aria-current={isActive ? "page" : undefined}
       className={
         isActive
-          ? 'w-10 h-10 flex items-center justify-center rounded-md bg-primary-500 text-secondary-900 text-sm font-semibold'
-          : 'w-10 h-10 flex items-center justify-center rounded-md border border-secondary-200 text-secondary-600 text-sm hover:bg-secondary-50 transition-colors'
+          ? "bg-primary-500 text-secondary-900 flex h-10 w-10 items-center justify-center rounded-md text-sm font-semibold"
+          : "border-secondary-200 text-secondary-600 hover:bg-secondary-50 flex h-10 w-10 items-center justify-center rounded-md border text-sm transition-colors"
       }
     >
       {children}

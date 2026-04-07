@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { clearCustomerToken } from '~/lib/auth/cookies';
+import { NextResponse } from "next/server";
+import { clearCustomerToken } from "~/lib/auth/cookies";
 
 export async function POST() {
   await clearCustomerToken();

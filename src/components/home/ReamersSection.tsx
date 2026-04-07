@@ -1,43 +1,59 @@
-'use client';
+"use client";
 
-import { ProductImage } from '~/components/ui/ProductImage';
-import Link from 'next/link';
-import { useRef, useState, useCallback, useEffect } from 'react';
-import type { ProductListItem } from '~/types';
-import ProductCard from '~/components/products/ProductCard';
-import QuickAddModal from '~/components/products/QuickAddModal';
-import AnimateIn from '~/components/ui/AnimateIn';
+import { ProductImage } from "~/components/ui/ProductImage";
+import Link from "next/link";
+import { useRef, useState, useCallback, useEffect } from "react";
+import type { ProductListItem } from "~/types";
+import ProductCard from "~/components/products/ProductCard";
+import QuickAddModal from "~/components/products/QuickAddModal";
+import AnimateIn from "~/components/ui/AnimateIn";
 
 interface ReamersSectionProps {
   products: ProductListItem[];
 }
 
-const WP_UPLOADS = 'https://alphamunitions.com/wp-content/uploads/';
+const WP_UPLOADS = "https://alphamunitions.com/wp-content/uploads/";
 
 const placeholderReamers = [
   {
     name: 'Alpha Legacy Chamber Gauge + .004"',
-    price: '$140 – $175',
+    price: "$140 – $175",
     image: `${WP_UPLOADS}2025/10/CaseGauge_CM002-300x300.jpg`,
-    slug: 'alpha-legacy-chamber-gauge',
+    slug: "alpha-legacy-chamber-gauge",
   },
   {
-    name: 'Alpha Legacy Chamber Go Gauge',
-    price: '$140 – $175',
+    name: "Alpha Legacy Chamber Go Gauge",
+    price: "$140 – $175",
     image: `${WP_UPLOADS}2025/10/CaseGauge_CM002-300x300.jpg`,
-    slug: 'alpha-legacy-chamber-go-gauge',
+    slug: "alpha-legacy-chamber-go-gauge",
   },
 ];
 
-function CarouselArrow({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) {
+function CarouselArrow({
+  direction,
+  onClick,
+}: {
+  direction: "left" | "right";
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}
-      className="group w-10 h-10 rounded-full border border-secondary-200 flex items-center justify-center hover:border-primary-500 hover:bg-primary-50 active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      className="group border-secondary-200 hover:border-primary-500 hover:bg-primary-50 flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-95"
       aria-label={`Scroll ${direction}`}
     >
-      <svg className="w-3.5 h-3.5 text-secondary-400 group-hover:text-primary-600 transition-colors duration-300" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d={direction === 'left' ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'} />
+      <svg
+        className="text-secondary-400 group-hover:text-primary-600 h-3.5 w-3.5 transition-colors duration-300"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d={direction === "left" ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}
+        />
       </svg>
     </button>
   );
@@ -46,9 +62,12 @@ function CarouselArrow({ direction, onClick }: { direction: 'left' | 'right'; on
 export default function ReamersSection({ products }: ReamersSectionProps) {
   const hasDbProducts = products.length > 0;
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const [, setScrollState] = useState({ left: false, right: true });
-  const [quickAddProduct, setQuickAddProduct] = useState<ProductListItem | null>(null);
+  const [quickAddProduct, setQuickAddProduct] =
+    useState<ProductListItem | null>(null);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
@@ -59,13 +78,20 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
     });
   }, []);
 
-  const scroll = useCallback((direction: 'left' | 'right') => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = el.querySelector(':scope > *')?.clientWidth ?? 260;
-    el.scrollBy({ left: direction === 'left' ? -(cardWidth + 16) * 2 : (cardWidth + 16) * 2, behavior: 'smooth' });
-    scrollTimeoutRef.current = setTimeout(updateScrollState, 350);
-  }, [updateScrollState]);
+  const scroll = useCallback(
+    (direction: "left" | "right") => {
+      const el = scrollRef.current;
+      if (!el) return;
+      const cardWidth = el.querySelector(":scope > *")?.clientWidth ?? 260;
+      el.scrollBy({
+        left:
+          direction === "left" ? -(cardWidth + 16) * 2 : (cardWidth + 16) * 2,
+        behavior: "smooth",
+      });
+      scrollTimeoutRef.current = setTimeout(updateScrollState, 350);
+    },
+    [updateScrollState],
+  );
 
   useEffect(() => () => clearTimeout(scrollTimeoutRef.current), []);
 
@@ -73,103 +99,124 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
 
   return (
     <>
-    <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
-      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-
-        {/* ── Header ──────────────────────────────────────── */}
-        <AnimateIn animation="fade-up">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <div className="flex items-center gap-3 mb-5">
-                <div className="h-px w-6 bg-primary-500 shrink-0" />
-                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-secondary-400 uppercase">
-                  Tools &amp; Accessories
-                </span>
-              </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-900 leading-tight">
-                Reamers &amp; Gear
-              </h2>
-              <p className="mt-2 font-mono text-[0.65rem] tracking-[0.15em] text-secondary-300 uppercase">
-                Engineered for the Precision Shooter
-              </p>
-            </div>
-            <div className="flex items-center gap-2 mb-1">
-              <CarouselArrow direction="left" onClick={() => scroll('left')} />
-              <CarouselArrow direction="right" onClick={() => scroll('right')} />
-            </div>
-          </div>
-        </AnimateIn>
-
-        {/* ── Carousel ────────────────────────────────────── */}
-        <AnimateIn animation="fade-up" delay={100}>
-          <div
-            ref={scrollRef}
-            onScroll={updateScrollState}
-            className="flex gap-4 overflow-x-auto pt-2 -mt-2 pb-2 -mb-2 snap-x snap-mandatory"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {hasDbProducts ? (
-              (items as ProductListItem[]).map((product) => (
-                <div key={product.id} className="flex-shrink-0 w-[220px] sm:w-[260px] snap-start">
-                  <ProductCard product={product} onQuickAdd={() => setQuickAddProduct(product)} />
+      <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+          {/* ── Header ──────────────────────────────────────── */}
+          <AnimateIn animation="fade-up">
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="bg-primary-500 h-px w-6 shrink-0" />
+                  <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                    Tools &amp; Accessories
+                  </span>
                 </div>
-              ))
-            ) : (
-              (items as typeof placeholderReamers).map((item) => (
-                <Link
-                  key={item.slug}
-                  href={`/product/${item.slug}`}
-                  className="flex-shrink-0 w-[220px] sm:w-[260px] snap-start group block bg-white rounded-lg border border-secondary-100 hover:border-primary-300 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:scale-[0.99] active:translate-y-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-t-lg bg-secondary-50">
-                    <ProductImage
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-contain p-8 group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                      sizes="260px"
-                    />
-                  </div>
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-sm font-medium text-secondary-800 group-hover:text-primary-600 transition-colors duration-300 line-clamp-2 leading-snug">
-                      {item.name}
-                    </h3>
-                    <p className="mt-2 text-base font-semibold text-secondary-900">
-                      {item.price}
-                    </p>
-                    <p className="mt-1.5 text-xs font-medium uppercase tracking-wider text-primary-600">
-                      Select Options
-                    </p>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-        </AnimateIn>
+                <h2 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">
+                  Reamers &amp; Gear
+                </h2>
+                <p className="text-secondary-300 mt-2 font-mono text-[0.65rem] tracking-[0.15em] uppercase">
+                  Engineered for the Precision Shooter
+                </p>
+              </div>
+              <div className="mb-1 flex items-center gap-2">
+                <CarouselArrow
+                  direction="left"
+                  onClick={() => scroll("left")}
+                />
+                <CarouselArrow
+                  direction="right"
+                  onClick={() => scroll("right")}
+                />
+              </div>
+            </div>
+          </AnimateIn>
 
-        {/* ── CTA ─────────────────────────────────────────── */}
-        <AnimateIn animation="fade-up" delay={200}>
-          <div className="mt-10">
-            <Link
-              href="/shop"
-              className="group inline-flex items-center gap-3 rounded-full bg-primary-500 px-6 py-3 text-[0.7rem] font-mono tracking-[0.15em] text-secondary-950 uppercase hover:bg-primary-400 active:scale-[0.98] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          {/* ── Carousel ────────────────────────────────────── */}
+          <AnimateIn animation="fade-up" delay={100}>
+            <div
+              ref={scrollRef}
+              onScroll={updateScrollState}
+              className="-mt-2 -mb-2 flex snap-x snap-mandatory gap-4 overflow-x-auto pt-2 pb-2"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              Shop All Gear
-              <span className="w-5 h-5 rounded-full bg-secondary-950/10 flex items-center justify-center group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]">
-                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                </svg>
-              </span>
-            </Link>
-          </div>
-        </AnimateIn>
+              {hasDbProducts
+                ? (items as ProductListItem[]).map((product) => (
+                    <div
+                      key={product.id}
+                      className="w-[220px] flex-shrink-0 snap-start sm:w-[260px]"
+                    >
+                      <ProductCard
+                        product={product}
+                        onQuickAdd={() => setQuickAddProduct(product)}
+                      />
+                    </div>
+                  ))
+                : (items as typeof placeholderReamers).map((item) => (
+                    <Link
+                      key={item.slug}
+                      href={`/product/${item.slug}`}
+                      className="group border-secondary-100 hover:border-primary-300 block w-[220px] flex-shrink-0 snap-start rounded-lg border bg-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:translate-y-0 active:scale-[0.99] sm:w-[260px]"
+                    >
+                      <div className="bg-secondary-50 relative aspect-square overflow-hidden rounded-t-lg">
+                        <ProductImage
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-contain p-8 transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105"
+                          sizes="260px"
+                        />
+                      </div>
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-secondary-800 group-hover:text-primary-600 line-clamp-2 text-sm leading-snug font-medium transition-colors duration-300">
+                          {item.name}
+                        </h3>
+                        <p className="text-secondary-900 mt-2 text-base font-semibold">
+                          {item.price}
+                        </p>
+                        <p className="text-primary-600 mt-1.5 text-xs font-medium tracking-wider uppercase">
+                          Select Options
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+            </div>
+          </AnimateIn>
 
-      </div>
-    </section>
+          {/* ── CTA ─────────────────────────────────────────── */}
+          <AnimateIn animation="fade-up" delay={200}>
+            <div className="mt-10">
+              <Link
+                href="/shop"
+                className="group bg-primary-500 text-secondary-950 hover:bg-primary-400 inline-flex items-center gap-3 rounded-full px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+              >
+                Shop All Gear
+                <span className="bg-secondary-950/10 flex h-5 w-5 items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110">
+                  <svg
+                    className="h-2.5 w-2.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                    />
+                  </svg>
+                </span>
+              </Link>
+            </div>
+          </AnimateIn>
+        </div>
+      </section>
 
-    {quickAddProduct && (
-      <QuickAddModal product={quickAddProduct} onClose={() => setQuickAddProduct(null)} />
-    )}
-  </>
+      {quickAddProduct && (
+        <QuickAddModal
+          product={quickAddProduct}
+          onClose={() => setQuickAddProduct(null)}
+        />
+      )}
+    </>
   );
 }

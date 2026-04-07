@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import type { CategoryWithChildren } from '~/types';
-import ProductFilters from './ProductFilters';
+import { useEffect } from "react";
+import type { CategoryWithChildren } from "~/types";
+import ProductFilters from "./ProductFilters";
 
 interface MobileFilterDrawerProps {
   isOpen: boolean;
@@ -24,12 +24,12 @@ export default function MobileFilterDrawer({
   // Lock body scroll when open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 
@@ -37,10 +37,10 @@ export default function MobileFilterDrawer({
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -55,20 +55,32 @@ export default function MobileFilterDrawer({
       />
 
       {/* Drawer */}
-      <div className="absolute inset-x-0 bottom-0 max-h-[88vh] bg-white rounded-t-xl shadow-2xl animate-slide-up overflow-hidden flex flex-col">
+      <div className="animate-slide-up absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col overflow-hidden rounded-t-xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-secondary-100">
+        <div className="border-secondary-100 flex items-center justify-between border-b px-5 py-4">
           <div className="flex items-center gap-2">
-            <span className="w-4 h-px bg-primary-500" />
-            <h2 className="text-[11px] font-mono font-semibold text-secondary-600 uppercase tracking-widest">Filters</h2>
+            <span className="bg-primary-500 h-px w-4" />
+            <h2 className="text-secondary-600 font-mono text-[11px] font-semibold tracking-widest uppercase">
+              Filters
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 -mr-1 text-secondary-400 hover:text-secondary-700 transition-colors"
+            className="text-secondary-400 hover:text-secondary-700 -mr-1 p-2 transition-colors"
             aria-label="Close filters"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -83,14 +95,14 @@ export default function MobileFilterDrawer({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-secondary-100 bg-secondary-50">
+        <div className="border-secondary-100 bg-secondary-50 border-t px-5 py-4">
           <button
             onClick={onClose}
-            className="w-full py-3.5 bg-primary-500 text-secondary-900 font-mono font-semibold text-xs uppercase tracking-widest rounded-full hover:bg-primary-400 transition-colors active:scale-[0.98]"
+            className="bg-primary-500 text-secondary-900 hover:bg-primary-400 w-full rounded-full py-3.5 font-mono text-xs font-semibold tracking-widest uppercase transition-colors active:scale-[0.98]"
           >
             {resultCount !== undefined
-              ? `Show ${resultCount} Result${resultCount !== 1 ? 's' : ''}`
-              : 'Show Results'}
+              ? `Show ${resultCount} Result${resultCount !== 1 ? "s" : ""}`
+              : "Show Results"}
           </button>
         </div>
       </div>

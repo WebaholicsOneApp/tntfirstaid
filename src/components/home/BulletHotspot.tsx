@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export type TooltipDirection = 'left' | 'right' | 'above';
+export type TooltipDirection = "left" | "right" | "above";
 
 interface BulletHotspotProps {
   title: string;
@@ -16,9 +16,9 @@ interface BulletHotspotProps {
 }
 
 const directionClasses: Record<TooltipDirection, string> = {
-  right: 'left-full ml-4 top-1/2 -translate-y-1/2',
-  left: 'right-full mr-4 top-1/2 -translate-y-1/2',
-  above: 'bottom-full mb-4 left-1/2 -translate-x-1/2',
+  right: "left-full ml-4 top-1/2 -translate-y-1/2",
+  left: "right-full mr-4 top-1/2 -translate-y-1/2",
+  above: "bottom-full mb-4 left-1/2 -translate-x-1/2",
 };
 
 export default function BulletHotspot({
@@ -49,10 +49,10 @@ export default function BulletHotspot({
     if (!isActive) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onToggle();
+      if (e.key === "Escape") onToggle();
     };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [isActive, onToggle]);
 
   // Clean up timeout on unmount
@@ -64,11 +64,14 @@ export default function BulletHotspot({
 
   return (
     <div
-      className="absolute animate-hotspot-pop-in"
+      className="animate-hotspot-pop-in absolute"
       style={{ ...style, animationDelay: `${entranceDelay}ms` }}
     >
       {/* Pulsing ring */}
-      <span className="animate-hotspot-pulse absolute inset-0 rounded-full bg-primary-500" style={{ animationDelay: `${entranceDelay}ms` }} />
+      <span
+        className="animate-hotspot-pulse bg-primary-500 absolute inset-0 rounded-full"
+        style={{ animationDelay: `${entranceDelay}ms` }}
+      />
 
       {/* Hotspot button */}
       <button
@@ -76,7 +79,7 @@ export default function BulletHotspot({
         type="button"
         aria-label={`Learn about ${title}`}
         aria-expanded={showTooltip}
-        className="relative z-10 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-primary-500 text-secondary-900 font-bold text-lg shadow-lg cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        className="bg-primary-500 text-secondary-900 focus-visible:ring-primary-300 relative z-10 flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full text-lg font-bold shadow-lg transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         onClick={onToggle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -89,13 +92,13 @@ export default function BulletHotspot({
       {/* Tooltip — desktop only (hidden on mobile, content shown below image instead) */}
       <div
         role="tooltip"
-        className={`pointer-events-none absolute z-20 hidden w-[300px] lg:block transition-all duration-300 ${directionClasses[direction]} ${showTooltip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+        className={`pointer-events-none absolute z-20 hidden w-[300px] transition-all duration-300 lg:block ${directionClasses[direction]} ${showTooltip ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
       >
-        <div className="rounded-lg border-t-2 border-primary-500 bg-white p-5 shadow-xl">
-          <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-primary-700 mb-2">
+        <div className="border-primary-500 rounded-lg border-t-2 bg-white p-5 shadow-xl">
+          <h4 className="text-primary-700 mb-2 text-sm font-bold tracking-[0.15em] uppercase">
             {title}
           </h4>
-          <p className="text-sm leading-relaxed text-secondary-600">
+          <p className="text-secondary-600 text-sm leading-relaxed">
             {description}
           </p>
         </div>

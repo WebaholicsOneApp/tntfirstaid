@@ -32,7 +32,10 @@ interface OrderConfirmedTemplateData {
   siteUrl: string;
 }
 
-export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): { subject: string; html: string } {
+export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
+  subject: string;
+  html: string;
+} {
   const subject = `Order Confirmed - ${data.orderNumber} | ${data.storeName}`;
 
   const itemsHtml = data.items
@@ -40,22 +43,23 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): { subj
       (item) => `
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; width: 60px; vertical-align: middle;">
-          ${item.imageUrl
-            ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background-color: #f9fafb;" />`
-            : `<div style="width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 4px;"></div>`
+          ${
+            item.imageUrl
+              ? `<img src="${item.imageUrl}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background-color: #f9fafb;" />`
+              : `<div style="width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 4px;"></div>`
           }
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; vertical-align: middle;">
           ${item.name}
-          ${item.variationName ? `<br><span style="color: #6b7280; font-size: 13px;">${item.variationName}</span>` : ''}
-          ${item.sku ? `<br><span style="color: #9ca3af; font-size: 12px;">SKU: ${item.sku}</span>` : ''}
+          ${item.variationName ? `<br><span style="color: #6b7280; font-size: 13px;">${item.variationName}</span>` : ""}
+          ${item.sku ? `<br><span style="color: #9ca3af; font-size: 12px;">SKU: ${item.sku}</span>` : ""}
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: middle;">$${(item.price / 100).toFixed(2)}</td>
       </tr>
-    `
+    `,
     )
-    .join('');
+    .join("");
 
   const html = `
 <!DOCTYPE html>
@@ -131,7 +135,7 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): { subj
         <p style="margin: 0; color: #6b7280; line-height: 1.6;">
           ${data.shippingAddress.name}<br>
           ${data.shippingAddress.line1}<br>
-          ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ''}
+          ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ""}
           ${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.postalCode}<br>
           ${data.shippingAddress.country}
         </p>

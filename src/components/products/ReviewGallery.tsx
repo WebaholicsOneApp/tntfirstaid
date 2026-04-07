@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
-import StarRating from './StarRating';
-import type { Review } from '~/types/review';
+import { useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
+import StarRating from "./StarRating";
+import type { Review } from "~/types/review";
 
 export interface ImageWithReview {
   imageId: number;
@@ -48,27 +48,27 @@ export default function ReviewGallery({
     if (selectedIndex === null) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
         goToPrevious();
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         e.preventDefault();
         goToNext();
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         e.preventDefault();
         onClose();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedIndex, goToPrevious, goToNext, onClose]);
 
   // Lock body scroll when open
   useEffect(() => {
     if (selectedIndex !== null) {
       const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = originalOverflow;
       };
@@ -79,9 +79,9 @@ export default function ReviewGallery({
   useEffect(() => {
     if (activeThumbnailRef.current) {
       activeThumbnailRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest',
-        inline: 'center',
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
       });
     }
   }, [selectedIndex]);
@@ -91,18 +91,18 @@ export default function ReviewGallery({
     const date = new Date(dateString);
     const now = new Date();
     const diffInDays = Math.floor(
-      (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
     );
 
-    if (diffInDays === 0) return 'Today';
-    if (diffInDays === 1) return 'Yesterday';
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
     if (diffInDays < 7) return `${diffInDays} days ago`;
     if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
 
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -110,7 +110,7 @@ export default function ReviewGallery({
 
   // Find all images belonging to the currently selected review
   const currentReviewImages = images.filter(
-    (img) => img.review.id === selectedImage.review.id
+    (img) => img.review.id === selectedImage.review.id,
   );
 
   return (
@@ -121,13 +121,11 @@ export default function ReviewGallery({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10
-          hover:bg-white/20 flex items-center justify-center
-          transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+        className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/20"
         aria-label="Close gallery"
       >
         <svg
-          className="w-5 h-5 text-white"
+          className="h-5 w-5 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -143,12 +141,11 @@ export default function ReviewGallery({
 
       {/* Main content area */}
       <div
-        className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden
-          w-full max-w-6xl mt-14 mb-4 mx-4 lg:mx-auto"
+        className="mx-4 mt-14 mb-4 flex w-full max-w-6xl flex-1 flex-col gap-0 overflow-hidden lg:mx-auto lg:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Image viewer — dark area */}
-        <div className="flex-1 relative flex items-center justify-center bg-secondary-950 lg:rounded-l-2xl rounded-t-2xl lg:rounded-tr-none min-h-[40vh] lg:min-h-0">
+        <div className="bg-secondary-950 relative flex min-h-[40vh] flex-1 items-center justify-center rounded-t-2xl lg:min-h-0 lg:rounded-l-2xl lg:rounded-tr-none">
           {/* Previous arrow */}
           {images.length > 1 && (
             <button
@@ -156,13 +153,11 @@ export default function ReviewGallery({
                 e.stopPropagation();
                 goToPrevious();
               }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10
-                rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center
-                transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              className="absolute top-1/2 left-3 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/20"
               aria-label="Previous image"
             >
               <svg
-                className="w-5 h-5 text-white"
+                className="h-5 w-5 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,7 +177,7 @@ export default function ReviewGallery({
           <img
             src={selectedImage.imageUrl}
             alt={`Photo from ${selectedImage.review.customerName}'s review`}
-            className="max-w-full max-h-[45vh] lg:max-h-[65vh] object-contain px-14"
+            className="max-h-[45vh] max-w-full object-contain px-14 lg:max-h-[65vh]"
           />
 
           {/* Next arrow */}
@@ -192,13 +187,11 @@ export default function ReviewGallery({
                 e.stopPropagation();
                 goToNext();
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10
-                rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center
-                transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+              className="absolute top-1/2 right-3 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white/20"
               aria-label="Next image"
             >
               <svg
-                className="w-5 h-5 text-white"
+                className="h-5 w-5 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -215,23 +208,23 @@ export default function ReviewGallery({
 
           {/* Image counter pill */}
           {images.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/15 text-white px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
               {selectedIndex + 1} / {images.length}
             </div>
           )}
         </div>
 
         {/* Review details sidebar */}
-        <div className="lg:w-80 flex-shrink-0 bg-white lg:rounded-r-2xl rounded-b-2xl lg:rounded-bl-none overflow-y-auto max-h-[40vh] lg:max-h-none">
-          <div className="p-6 space-y-4">
+        <div className="max-h-[40vh] flex-shrink-0 overflow-y-auto rounded-b-2xl bg-white lg:max-h-none lg:w-80 lg:rounded-r-2xl lg:rounded-bl-none">
+          <div className="space-y-4 p-6">
             {/* Rating */}
             <StarRating rating={selectedImage.review.rating} size="md" />
 
             {/* Verified badge */}
             {selectedImage.review.verifiedPurchase && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
                 <svg
-                  className="w-3 h-3"
+                  className="h-3 w-3"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -247,7 +240,7 @@ export default function ReviewGallery({
 
             {/* Title */}
             {selectedImage.review.title && (
-              <h4 className="font-semibold text-secondary-900 text-base leading-snug">
+              <h4 className="text-secondary-900 text-base leading-snug font-semibold">
                 {selectedImage.review.title}
               </h4>
             )}
@@ -260,24 +253,23 @@ export default function ReviewGallery({
             {/* This review's photos */}
             {currentReviewImages.length > 1 && (
               <div>
-                <p className="text-xs text-secondary-400 mb-2">
+                <p className="text-secondary-400 mb-2 text-xs">
                   Photos from this review
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {currentReviewImages.map((img) => {
                     const globalIdx = images.findIndex(
-                      (i) => i.imageId === img.imageId
+                      (i) => i.imageId === img.imageId,
                     );
                     return (
                       <button
                         key={img.imageId}
                         onClick={() => onNavigate(globalIdx)}
-                        className={`relative w-12 h-12 rounded-lg overflow-hidden border-2
-                          transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-                            img.imageId === selectedImage.imageId
-                              ? 'border-primary-500 ring-1 ring-primary-500/30'
-                              : 'border-secondary-200 hover:border-secondary-300'
-                          }`}
+                        className={`relative h-12 w-12 overflow-hidden rounded-lg border-2 transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                          img.imageId === selectedImage.imageId
+                            ? "border-primary-500 ring-primary-500/30 ring-1"
+                            : "border-secondary-200 hover:border-secondary-300"
+                        }`}
                       >
                         <Image
                           src={img.thumbnailUrl || img.imageUrl}
@@ -293,17 +285,17 @@ export default function ReviewGallery({
             )}
 
             {/* Reviewer info + date */}
-            <div className="flex items-center gap-3 pt-4 border-t border-secondary-100">
-              <div className="w-8 h-8 rounded-full bg-secondary-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-semibold text-secondary-500">
+            <div className="border-secondary-100 flex items-center gap-3 border-t pt-4">
+              <div className="bg-secondary-100 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full">
+                <span className="text-secondary-500 text-xs font-semibold">
                   {selectedImage.review.customerName.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium text-secondary-900">
+                <p className="text-secondary-900 text-sm font-medium">
                   {selectedImage.review.customerName}
                 </p>
-                <p className="text-xs text-secondary-400">
+                <p className="text-secondary-400 text-xs">
                   {formatDate(selectedImage.review.createdAt)}
                 </p>
               </div>
@@ -316,21 +308,20 @@ export default function ReviewGallery({
       {images.length > 1 && (
         <div
           ref={thumbnailStripRef}
-          className="flex-shrink-0 px-4 pb-4 overflow-x-auto"
+          className="flex-shrink-0 overflow-x-auto px-4 pb-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex gap-2 justify-center mx-auto max-w-4xl">
+          <div className="mx-auto flex max-w-4xl justify-center gap-2">
             {images.map((img, index) => (
               <button
                 key={img.imageId}
                 ref={index === selectedIndex ? activeThumbnailRef : null}
                 onClick={() => onNavigate(index)}
-                className={`relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden
-                  transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-                    index === selectedIndex
-                      ? 'ring-2 ring-primary-500 ring-offset-2 ring-offset-black/85 opacity-100'
-                      : 'opacity-50 hover:opacity-80'
-                  }`}
+                className={`relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                  index === selectedIndex
+                    ? "ring-primary-500 opacity-100 ring-2 ring-offset-2 ring-offset-black/85"
+                    : "opacity-50 hover:opacity-80"
+                }`}
               >
                 <Image
                   src={img.thumbnailUrl || img.imageUrl}
