@@ -172,7 +172,7 @@ export default function Footer({
             {/* Social icons */}
             <div className="order-2 flex items-center gap-4 sm:order-1">
               <a
-                href="https://www.facebook.com/AlphaMunitions/"
+                href="https://www.facebook.com/alphamunitions/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-secondary-500 hover:text-primary-500 transition-colors"
@@ -187,7 +187,7 @@ export default function Footer({
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/alphamunitions/"
+                href="https://www.instagram.com/alpha_munitions/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-secondary-500 hover:text-primary-500 transition-colors"
