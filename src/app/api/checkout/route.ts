@@ -106,6 +106,19 @@ export async function POST(request: Request) {
       customer?.email ||
       undefined;
 
+    // Capture cart for abandoned cart reminder (fire-and-forget)
+    if (resolvedEmail) {
+      getApiClient()
+        .post("/checkout/capture-cart", {
+          items: validatedItems.map((item: CheckoutItem) => ({
+            variationId: item.variationId,
+            quantity: item.quantity,
+          })),
+          customerEmail: resolvedEmail,
+        })
+        .catch(() => {});
+    }
+
     const session = await getApiClient().post<{
       url?: string;
       checkoutUrl?: string;
