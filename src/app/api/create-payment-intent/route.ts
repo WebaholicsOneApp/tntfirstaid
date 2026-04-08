@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, shippingAddress } = body as Record<string, unknown>;
+    const { items, shippingAddress, shippingCostCents } = body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       amount: number;
       subtotal: number;
       tax: number;
+      shippingCost?: number;
       publishableKey?: string;
       stripeConnectAccountId?: string;
     }>("/checkout/payment-intent", {
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
         quantity: item.quantity,
       })),
       ...(shippingAddress ? { shippingAddress } : {}),
+      ...(typeof shippingCostCents === "number" ? { shippingCostCents } : {}),
     });
 
     return NextResponse.json({
@@ -69,6 +71,7 @@ export async function POST(request: Request) {
       amount: paymentIntent.amount,
       subtotal: paymentIntent.subtotal,
       tax: paymentIntent.tax,
+      shippingCost: paymentIntent.shippingCost ?? 0,
       publishableKey: paymentIntent.publishableKey || null,
       stripeConnectAccountId: paymentIntent.stripeConnectAccountId || null,
     });

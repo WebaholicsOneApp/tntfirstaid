@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       shippingAddress,
       customerEmail,
       phoneNumber,
+      shippingCostCents,
     } = body;
 
     // Dev bypass: skip PP API, create order directly with mock transaction ID
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
         })),
         shippingAddress,
         phoneNumber,
+        ...(shippingCostCents != null ? { shippingCostCents } : {}),
       });
 
       return NextResponse.json(orderResult, { status: 201 });
@@ -198,6 +200,7 @@ export async function POST(request: Request) {
       })),
       shippingAddress,
       phoneNumber,
+      ...(shippingCostCents != null ? { shippingCostCents } : {}),
     });
 
     return NextResponse.json(orderResult, { status: 201 });

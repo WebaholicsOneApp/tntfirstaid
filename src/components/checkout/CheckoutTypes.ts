@@ -2,6 +2,14 @@ export const SESSION_KEY = "alpha-checkout-data";
 
 export type PaymentMethod = "credit_card" | "precision_pay";
 
+export interface SelectedShippingRate {
+  serviceCode: string;
+  serviceName: string;
+  totalCents: number;
+  deliveryDays: number | null;
+  estimatedDelivery: string | null;
+}
+
 export interface CheckoutSessionData {
   shipping: {
     name: string;
@@ -14,7 +22,8 @@ export interface CheckoutSessionData {
     postalCode: string;
     country?: string;
   };
-  shippingMethod: "standard" | "express";
+  shippingMethod: string;
+  selectedShippingRate?: SelectedShippingRate;
   billing?: {
     name: string;
     line1: string;

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { customerEmail, phoneNumber, items, opaqueData, shippingAddress } =
+    const { customerEmail, phoneNumber, items, opaqueData, shippingAddress, shippingCostCents } =
       body;
 
     if (!customerEmail || !items?.length || !opaqueData || !shippingAddress) {
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         dataDescriptor: opaqueData.dataDescriptor,
         dataValue: opaqueData.dataValue,
       },
+      ...(shippingCostCents != null ? { shippingCostCents } : {}),
       shippingAddress: {
         name: shippingAddress.name,
         line1: shippingAddress.line1,
