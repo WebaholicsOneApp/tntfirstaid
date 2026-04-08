@@ -17,6 +17,8 @@ export interface CartItem {
   quantity: number;
   image?: string | null;
   maxQuantity?: number; // available stock
+  isDownloadable?: boolean;
+  downloadUrl?: string | null;
 }
 
 export interface Cart {

@@ -37,6 +37,8 @@ export interface OrderItem {
   quantity: number;
   price: number; // cents
   image?: string;
+  isDownloadable?: boolean;
+  downloadUrl?: string | null;
 }
 
 export interface Order {

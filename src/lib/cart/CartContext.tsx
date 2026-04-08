@@ -199,3 +199,12 @@ export function useCart(): CartContextType {
   }
   return context;
 }
+
+// Digital product helpers
+export function cartIsDigitalOnly(items: CartItem[]): boolean {
+  return items.length > 0 && items.every((i) => i.isDownloadable);
+}
+
+export function cartHasDigitalItems(items: CartItem[]): boolean {
+  return items.some((i) => i.isDownloadable);
+}

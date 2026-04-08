@@ -7,6 +7,7 @@
  * Adapter functions transform OneApp API responses into alphamunition types.
  */
 import { getApiClient } from "./api-client";
+import { getDownloadUrl, isKnownDownloadable } from "./downloads";
 import type {
   ProductListItem,
   ProductDetail,
@@ -170,6 +171,11 @@ function toProductListItem(card: any): ProductListItem {
     variationId: card.variationId ?? null,
     ...(card.averageRating != null && { averageRating: card.averageRating }),
     ...(card.totalReviews != null && { totalReviews: card.totalReviews }),
+    ...(card.metaData?.isDownloadable === true ||
+    card.isDownloadable === true ||
+    isKnownDownloadable(card.slug || slugify(card.name))
+      ? { isDownloadable: true }
+      : {}),
   };
 }
 
@@ -189,6 +195,9 @@ function toVariationDetail(v: any): VariationDetail {
     inStock: v.inStock ?? false,
     quantity: v.quantity ?? 0,
     packCount: v.packCount ?? null,
+    isDownloadable:
+      v.metaData?.isDownloadable === true || v.metaData?.downloadUrl != null,
+    downloadUrl: (v.metaData?.downloadUrl as string) ?? null,
   };
 }
 
@@ -197,12 +206,28 @@ function toProductDetail(
   relatedProducts: ProductListItem[] = [],
 ): ProductDetail {
   const base = toProductListItem(detail);
+  const variations: VariationDetail[] = (detail.variations ?? []).map(
+    toVariationDetail,
+  );
+  // Inject fallback download URL for known downloadable products
+  const slug = detail.slug || detail.urlSlug || "";
+  const fallbackUrl = getDownloadUrl(slug);
+  if (fallbackUrl) {
+    for (const v of variations) {
+      if (!v.downloadUrl) v.downloadUrl = fallbackUrl;
+      v.isDownloadable = true;
+    }
+  }
+
+  const isDownloadable =
+    base.isDownloadable || variations.some((v) => v.isDownloadable);
   return {
     ...base,
+    ...(isDownloadable ? { isDownloadable: true } : {}),
     bulletPoints: detail.bulletPoints ?? [],
     keywords: detail.keywords ?? null,
     images: detail.images ?? [],
-    variations: (detail.variations ?? []).map(toVariationDetail),
+    variations,
     relatedProducts,
   };
 }

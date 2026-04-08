@@ -125,6 +125,7 @@ export interface ProductListItem {
   variationId?: number | null;
   averageRating?: number;
   totalReviews?: number;
+  isDownloadable?: boolean;
 }
 
 // Full product detail
@@ -152,6 +153,8 @@ export interface VariationDetail {
   inStock: boolean;
   quantity: number;
   packCount: number | null;
+  isDownloadable?: boolean;
+  downloadUrl?: string | null;
 }
 
 // Category with hierarchy

@@ -87,16 +87,8 @@ export async function POST(request: Request) {
         ? session.payment_intent
         : session.payment_intent?.id || "";
 
-    if (!shippingDetails || !shippingDetails.address) {
-      console.error(`[SYNC] Missing shipping details`);
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Missing shipping details in session",
-        },
-        { status: 400 },
-      );
-    }
+    // Shipping details are required for physical orders but optional for digital-only
+    const hasShipping = shippingDetails && shippingDetails.address;
 
     // Extract line items
     const lineItems = session.line_items?.data || [];
@@ -156,6 +148,8 @@ export async function POST(request: Request) {
           quantity,
           price: unitPrice,
           tax: unitTax,
+          isDownloadable: metadata.isDownloadable === "true",
+          downloadUrl: metadata.downloadUrl || null,
         };
       }),
     );
@@ -180,15 +174,24 @@ export async function POST(request: Request) {
       shippingCost,
       tax,
       total,
-      shippingAddress: {
-        name: shippingDetails.name || "",
-        line1: shippingDetails.address.line1 || "",
-        line2: shippingDetails.address.line2 || null,
-        city: shippingDetails.address.city || "",
-        state: shippingDetails.address.state || "",
-        postalCode: shippingDetails.address.postal_code || "",
-        country: shippingDetails.address.country || "US",
-      },
+      shippingAddress: hasShipping
+        ? {
+            name: shippingDetails.name || "",
+            line1: shippingDetails.address.line1 || "",
+            line2: shippingDetails.address.line2 || null,
+            city: shippingDetails.address.city || "",
+            state: shippingDetails.address.state || "",
+            postalCode: shippingDetails.address.postal_code || "",
+            country: shippingDetails.address.country || "US",
+          }
+        : {
+            name: "",
+            line1: "",
+            city: "",
+            state: "",
+            postalCode: "",
+            country: "US",
+          },
       phoneNumber: session.customer_details?.phone || undefined,
     });
 
@@ -197,19 +200,22 @@ export async function POST(request: Request) {
 
       // Send confirmation email
       console.log(`[SYNC] Sending confirmation email...`);
+      const isDigitalOnly = orderItems.every((i) => i.isDownloadable);
       const emailResult = await sendOrderConfirmationEmail({
         customerEmail,
-        customerName: shippingDetails.name || "Valued Customer",
+        customerName: shippingDetails?.name || "Valued Customer",
         orderNumber: result.orderNumber,
-        shippingAddress: {
-          name: shippingDetails.name || "",
-          line1: shippingDetails.address.line1 || "",
-          line2: shippingDetails.address.line2 || null,
-          city: shippingDetails.address.city || "",
-          state: shippingDetails.address.state || "",
-          postalCode: shippingDetails.address.postal_code || "",
-          country: shippingDetails.address.country || "US",
-        },
+        shippingAddress: shippingDetails?.address
+          ? {
+              name: shippingDetails.name || "",
+              line1: shippingDetails.address.line1 || "",
+              line2: shippingDetails.address.line2 || null,
+              city: shippingDetails.address.city || "",
+              state: shippingDetails.address.state || "",
+              postalCode: shippingDetails.address.postal_code || "",
+              country: shippingDetails.address.country || "US",
+            }
+          : undefined,
         items: orderItems.map((item) => ({
           name: item.name,
           variationName: item.variation || undefined,
@@ -217,11 +223,13 @@ export async function POST(request: Request) {
           imageUrl: item.imageUrl || undefined,
           quantity: item.quantity,
           price: item.price,
+          downloadUrl: item.downloadUrl || undefined,
         })),
         subtotal,
         shippingCost,
         tax,
         total,
+        isDigitalOnly,
       });
 
       return NextResponse.json({

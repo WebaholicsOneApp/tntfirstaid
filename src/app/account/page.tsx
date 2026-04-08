@@ -392,6 +392,15 @@ export default function AccountPage() {
                 </div>
               </div>
 
+              <div className="flex justify-end">
+                <Link
+                  href="/account/forgot-password"
+                  className="text-primary-500 hover:text-primary-400 text-sm transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
               {formState === "error" && (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4">
                   <p className="text-sm font-medium text-red-600">

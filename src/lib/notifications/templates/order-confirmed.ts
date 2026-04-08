@@ -7,7 +7,7 @@ interface OrderConfirmedTemplateData {
   customerName: string;
   orderNumber: string;
   customerEmail: string;
-  shippingAddress: {
+  shippingAddress?: {
     name: string;
     line1: string;
     line2?: string;
@@ -23,11 +23,13 @@ interface OrderConfirmedTemplateData {
     imageUrl?: string;
     quantity: number;
     price: number; // in cents
+    downloadUrl?: string;
   }[];
   subtotal: number; // in cents
   shippingCost: number; // in cents
   tax: number; // in cents
   total: number; // in cents
+  isDigitalOnly?: boolean;
   storeName: string;
   siteUrl: string;
 }
@@ -53,6 +55,7 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
           ${item.name}
           ${item.variationName ? `<br><span style="color: #6b7280; font-size: 13px;">${item.variationName}</span>` : ""}
           ${item.sku ? `<br><span style="color: #9ca3af; font-size: 12px;">SKU: ${item.sku}</span>` : ""}
+          ${item.downloadUrl ? `<br><a href="${item.downloadUrl}" style="display: inline-block; margin-top: 6px; padding: 4px 12px; background-color: #C4A035; color: #ffffff; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 4px;">Download</a>` : ""}
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: middle;">${item.quantity}</td>
         <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: middle;">$${(item.price / 100).toFixed(2)}</td>
@@ -60,6 +63,21 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
     `,
     )
     .join("");
+
+  const addr = data.shippingAddress;
+  const shippingHtml =
+    !data.isDigitalOnly && addr
+      ? `<div style="margin: 24px 0;">
+        <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Shipping To</h3>
+        <p style="margin: 0; color: #6b7280; line-height: 1.6;">
+          ${addr.name}<br>
+          ${addr.line1}<br>
+          ${addr.line2 ? `${addr.line2}<br>` : ""}
+          ${addr.city}, ${addr.state} ${addr.postalCode}<br>
+          ${addr.country}
+        </p>
+      </div>`
+      : "";
 
   const html = `
 <!DOCTYPE html>
@@ -86,7 +104,7 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
 
       <p style="color: #6b7280; line-height: 1.6; margin: 0 0 24px 0;">
         Hi ${data.customerName},<br><br>
-        Thank you for your order! We've received your payment and are preparing your items for shipment. You'll receive another email with tracking information once your order ships.
+        ${data.isDigitalOnly ? "Thank you for your order! We've received your payment and your download is ready. You'll find the download link below in your order summary." : "Thank you for your order! We've received your payment and are preparing your items for shipment. You'll receive another email with tracking information once your order ships."}
       </p>
 
       <!-- Order Items -->
@@ -114,10 +132,14 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
             <td style="padding: 4px 0; color: #6b7280;">Subtotal</td>
             <td style="padding: 4px 0; text-align: right; color: #374151;">$${(data.subtotal / 100).toFixed(2)}</td>
           </tr>
-          <tr>
+          ${
+            !data.isDigitalOnly
+              ? `<tr>
             <td style="padding: 4px 0; color: #6b7280;">Shipping</td>
             <td style="padding: 4px 0; text-align: right; color: #374151;">$${(data.shippingCost / 100).toFixed(2)}</td>
-          </tr>
+          </tr>`
+              : ""
+          }
           <tr>
             <td style="padding: 4px 0; color: #6b7280;">Tax</td>
             <td style="padding: 4px 0; text-align: right; color: #374151;">$${(data.tax / 100).toFixed(2)}</td>
@@ -130,16 +152,7 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
       </div>
 
       <!-- Shipping Address -->
-      <div style="margin: 24px 0;">
-        <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 16px;">Shipping To</h3>
-        <p style="margin: 0; color: #6b7280; line-height: 1.6;">
-          ${data.shippingAddress.name}<br>
-          ${data.shippingAddress.line1}<br>
-          ${data.shippingAddress.line2 ? `${data.shippingAddress.line2}<br>` : ""}
-          ${data.shippingAddress.city}, ${data.shippingAddress.state} ${data.shippingAddress.postalCode}<br>
-          ${data.shippingAddress.country}
-        </p>
-      </div>
+      ${shippingHtml}
 
       <p style="color: #6b7280; line-height: 1.6; margin: 24px 0 0 0;">
         If you have any questions about your order, please don't hesitate to contact us.

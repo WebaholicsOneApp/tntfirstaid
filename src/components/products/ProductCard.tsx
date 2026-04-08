@@ -54,6 +54,11 @@ export default function ProductCard({
     }
 
     // Simple product — add directly
+    if (!product.variationId) {
+      console.warn(
+        `[ProductCard] Missing variationId for simple product "${product.name}" (id=${product.id}). Cart may use wrong ID.`,
+      );
+    }
     setAddPhase("adding");
     addItem({
       id: product.variationId ?? product.id,
@@ -62,6 +67,7 @@ export default function ProductCard({
       name: product.name,
       price: product.price ?? 0,
       image: product.primaryImage ?? product.fallbackImage,
+      isDownloadable: product.isDownloadable || undefined,
     });
     setAddPhase("added");
     setTimeout(() => setAddPhase("idle"), 1200);
@@ -100,6 +106,25 @@ export default function ProductCard({
               Sale
             </div>
           )}
+        {/* Digital download badge */}
+        {product.isDownloadable && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-sky-700">
+            <svg
+              className="h-3 w-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Digital
+          </div>
+        )}
         {imageSrc ? (
           <ProductImage
             src={imageSrc}

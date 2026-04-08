@@ -3,6 +3,7 @@ export const SESSION_KEY = "alpha-checkout-data";
 export type PaymentMethod = "credit_card" | "precision_pay";
 
 export interface CheckoutSessionData {
+  isDigitalOnly?: boolean;
   shipping: {
     name: string;
     email: string;

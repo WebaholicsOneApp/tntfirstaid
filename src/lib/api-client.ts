@@ -375,6 +375,11 @@ class StorefrontApiClient {
   // Orders
   // --------------------------------------------------------------------------
 
+  /** GET /orders/:orderId -- full order details */
+  getOrderById<T = unknown>(orderId: number) {
+    return this.get<T>(`/orders/${orderId}`);
+  }
+
   /** GET /orders/session/:sessionId */
   getOrderBySession<T = unknown>(sessionId: string) {
     return this.get<T>(`/orders/session/${encodeURIComponent(sessionId)}`);

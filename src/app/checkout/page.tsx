@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import RecommendationGrid from "~/components/products/RecommendationGrid";
 import { ProductImage } from "~/components/ui/ProductImage";
-import { useCart } from "~/lib/cart/CartContext";
+import { useCart, cartIsDigitalOnly } from "~/lib/cart/CartContext";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
 import type { ProductListItem } from "~/types";
 
@@ -54,6 +54,8 @@ export default function CheckoutProductReviewPage() {
       </div>
     );
   }
+
+  const isDigitalOnly = cartIsDigitalOnly(cart.items);
 
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
@@ -294,10 +296,12 @@ export default function CheckoutProductReviewPage() {
                         {formatCentsToDollars(cart.subtotal)}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-secondary-500">Shipping</span>
-                      <span className="text-secondary-400">&mdash;</span>
-                    </div>
+                    {!isDigitalOnly && (
+                      <div className="flex justify-between">
+                        <span className="text-secondary-500">Shipping</span>
+                        <span className="text-secondary-400">&mdash;</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-secondary-500">Est. Tax</span>
                       <span className="text-secondary-400">&mdash;</span>
@@ -317,7 +321,11 @@ export default function CheckoutProductReviewPage() {
 
                   <div className="mt-6">
                     <Link
-                      href="/checkout/shipping"
+                      href={
+                        isDigitalOnly
+                          ? "/checkout/payment"
+                          : "/checkout/shipping"
+                      }
                       className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98]"
                       style={{
                         transitionTimingFunction:

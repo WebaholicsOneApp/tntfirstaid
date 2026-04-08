@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getApiClient } from "~/lib/api-client";
 
 export async function GET(
   _request: Request,
@@ -15,16 +16,14 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      orderId: id,
-      orderNumber: null,
-      customerEmail: null,
-    });
-  } catch (error) {
+    const data = await getApiClient().get(`/orders/${id}`);
+    return NextResponse.json(data);
+  } catch (error: unknown) {
     console.error("Error fetching order by ID:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch order" },
-      { status: 500 },
-    );
+    const status =
+      error && typeof error === "object" && "status" in error
+        ? (error as { status: number }).status
+        : 500;
+    return NextResponse.json({ error: "Failed to fetch order" }, { status });
   }
 }

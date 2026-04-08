@@ -9,6 +9,7 @@ interface OrderSummaryProps {
   cart: { items: CartItem[]; subtotal: number; itemCount: number };
   showItemDetails?: boolean;
   shippingCost?: number | undefined;
+  isDigitalOnly?: boolean;
   ctaButton?: ReactNode;
 }
 
@@ -16,9 +17,11 @@ export default function OrderSummary({
   cart,
   showItemDetails = true,
   shippingCost,
+  isDigitalOnly,
   ctaButton,
 }: OrderSummaryProps) {
-  const estimatedTax = Math.round(cart.subtotal * 0.08);
+  const isFreeOrder = isDigitalOnly && cart.subtotal === 0;
+  const estimatedTax = isFreeOrder ? 0 : Math.round(cart.subtotal * 0.08);
   const resolvedShipping = shippingCost ?? 0;
   const total = cart.subtotal + resolvedShipping + estimatedTax;
 
@@ -92,24 +95,28 @@ export default function OrderSummary({
                   {formatCentsToDollars(cart.subtotal)}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-secondary-500">Shipping</span>
-                {shippingCost === undefined ? (
-                  <span className="text-secondary-400">&mdash;</span>
-                ) : shippingCost === 0 ? (
-                  <span className="text-green-600">FREE</span>
-                ) : (
-                  <span className="text-secondary-900 tabular-nums">
-                    {formatCentsToDollars(shippingCost)}
+              {!isDigitalOnly && (
+                <div className="flex justify-between">
+                  <span className="text-secondary-500">Shipping</span>
+                  {shippingCost === undefined ? (
+                    <span className="text-secondary-400">&mdash;</span>
+                  ) : shippingCost === 0 ? (
+                    <span className="text-green-600">FREE</span>
+                  ) : (
+                    <span className="text-secondary-900 tabular-nums">
+                      {formatCentsToDollars(shippingCost)}
+                    </span>
+                  )}
+                </div>
+              )}
+              {!isFreeOrder && (
+                <div className="flex justify-between">
+                  <span className="text-secondary-500">Est. Tax</span>
+                  <span className="text-secondary-900 font-mono tabular-nums">
+                    {formatCentsToDollars(estimatedTax)}
                   </span>
-                )}
-              </div>
-              <div className="flex justify-between">
-                <span className="text-secondary-500">Est. Tax</span>
-                <span className="text-secondary-900 font-mono tabular-nums">
-                  {formatCentsToDollars(estimatedTax)}
-                </span>
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="border-secondary-100 mt-4 border-t pt-4">
@@ -118,7 +125,7 @@ export default function OrderSummary({
                   Total
                 </span>
                 <span className="font-display text-secondary-900 text-2xl font-bold tracking-tight">
-                  {formatCentsToDollars(total)}
+                  {isFreeOrder ? "FREE" : formatCentsToDollars(total)}
                 </span>
               </div>
             </div>

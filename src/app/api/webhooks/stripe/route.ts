@@ -98,20 +98,18 @@ export async function POST(req: Request) {
       console.log(`[WEBHOOK] Customer Email: ${customerEmail}`);
       console.log(`[WEBHOOK] Payment Intent ID: ${paymentIntentId}`);
 
-      if (!shippingDetails || !shippingDetails.address) {
-        console.error(
-          "[WEBHOOK] Missing shipping details in session:",
-          session.id,
+      // Shipping details are required for physical orders but optional for digital-only
+      const hasShipping = shippingDetails && shippingDetails.address;
+
+      if (hasShipping) {
+        console.log(
+          `[WEBHOOK] Shipping to: ${shippingDetails.name}, ${shippingDetails.address.city}, ${shippingDetails.address.state}`,
         );
-        return NextResponse.json(
-          { error: "Missing shipping details" },
-          { status: 400 },
+      } else {
+        console.log(
+          `[WEBHOOK] No shipping details (likely digital-only order)`,
         );
       }
-
-      console.log(
-        `[WEBHOOK] Shipping to: ${shippingDetails.name}, ${shippingDetails.address.city}, ${shippingDetails.address.state}`,
-      );
 
       // Extract line items
       console.log("\n[WEBHOOK] Extracting line items...");
@@ -178,6 +176,8 @@ export async function POST(req: Request) {
             quantity,
             price: unitPrice, // Base price per unit (cents)
             tax: unitTax, // Tax per unit (cents)
+            isDownloadable: metadata.isDownloadable === "true",
+            downloadUrl: metadata.downloadUrl || null,
           };
 
           console.log(
@@ -214,15 +214,24 @@ export async function POST(req: Request) {
         shippingCost,
         tax,
         total,
-        shippingAddress: {
-          name: shippingDetails.name || "",
-          line1: shippingDetails.address.line1 || "",
-          line2: shippingDetails.address.line2 || null,
-          city: shippingDetails.address.city || "",
-          state: shippingDetails.address.state || "",
-          postalCode: shippingDetails.address.postal_code || "",
-          country: shippingDetails.address.country || "US",
-        },
+        shippingAddress: hasShipping
+          ? {
+              name: shippingDetails.name || "",
+              line1: shippingDetails.address.line1 || "",
+              line2: shippingDetails.address.line2 || null,
+              city: shippingDetails.address.city || "",
+              state: shippingDetails.address.state || "",
+              postalCode: shippingDetails.address.postal_code || "",
+              country: shippingDetails.address.country || "US",
+            }
+          : {
+              name: "",
+              line1: "",
+              city: "",
+              state: "",
+              postalCode: "",
+              country: "US",
+            },
         phoneNumber: fullSession.customer_details?.phone || undefined,
       });
 
@@ -235,19 +244,22 @@ export async function POST(req: Request) {
 
         // Send order confirmation email
         console.log(`[WEBHOOK] Sending order confirmation email...`);
+        const isDigitalOnly = orderItems.every((i) => i.isDownloadable);
         const emailResult = await sendOrderConfirmationEmail({
           customerEmail,
-          customerName: shippingDetails.name || "Valued Customer",
+          customerName: shippingDetails?.name || "Valued Customer",
           orderNumber: result.orderNumber,
-          shippingAddress: {
-            name: shippingDetails.name || "",
-            line1: shippingDetails.address.line1 || "",
-            line2: shippingDetails.address.line2 || null,
-            city: shippingDetails.address.city || "",
-            state: shippingDetails.address.state || "",
-            postalCode: shippingDetails.address.postal_code || "",
-            country: shippingDetails.address.country || "US",
-          },
+          shippingAddress: shippingDetails?.address
+            ? {
+                name: shippingDetails.name || "",
+                line1: shippingDetails.address.line1 || "",
+                line2: shippingDetails.address.line2 || null,
+                city: shippingDetails.address.city || "",
+                state: shippingDetails.address.state || "",
+                postalCode: shippingDetails.address.postal_code || "",
+                country: shippingDetails.address.country || "US",
+              }
+            : undefined,
           items: orderItems.map((item) => ({
             name: item.name,
             variationName: item.variation || undefined,
@@ -255,11 +267,13 @@ export async function POST(req: Request) {
             imageUrl: item.imageUrl || undefined,
             quantity: item.quantity,
             price: item.price,
+            downloadUrl: item.downloadUrl || undefined,
           })),
           subtotal,
           shippingCost,
           tax,
           total,
+          isDigitalOnly,
         });
 
         if (emailResult.success) {
