@@ -4,11 +4,13 @@ import type { ReactNode } from "react";
 import { ProductImage } from "~/components/ui/ProductImage";
 import type { CartItem } from "~/types/cart";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
+import { calculateTax } from "~/lib/tax";
 
 interface OrderSummaryProps {
   cart: { items: CartItem[]; subtotal: number; itemCount: number };
   showItemDetails?: boolean;
   shippingCost?: number | undefined;
+  shippingState?: string;
   ctaButton?: ReactNode;
 }
 
@@ -16,11 +18,12 @@ export default function OrderSummary({
   cart,
   showItemDetails = true,
   shippingCost,
+  shippingState,
   ctaButton,
 }: OrderSummaryProps) {
-  const estimatedTax = Math.round(cart.subtotal * 0.08);
+  const tax = calculateTax(cart.subtotal, shippingState);
   const resolvedShipping = shippingCost ?? 0;
-  const total = cart.subtotal + resolvedShipping + estimatedTax;
+  const total = cart.subtotal + resolvedShipping + tax;
 
   return (
     <div className="sticky top-8">
@@ -104,12 +107,14 @@ export default function OrderSummary({
                   </span>
                 )}
               </div>
-              <div className="flex justify-between">
-                <span className="text-secondary-500">Est. Tax</span>
-                <span className="text-secondary-900 font-mono tabular-nums">
-                  {formatCentsToDollars(estimatedTax)}
-                </span>
-              </div>
+              {tax > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-secondary-500">Tax</span>
+                  <span className="text-secondary-900 font-mono tabular-nums">
+                    {formatCentsToDollars(tax)}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="border-secondary-100 mt-4 border-t pt-4">

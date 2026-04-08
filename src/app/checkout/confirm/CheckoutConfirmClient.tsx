@@ -16,6 +16,7 @@ import {
   type CheckoutSessionData,
   type PaymentConfig,
 } from "~/components/checkout/CheckoutTypes";
+import { calculateTax } from "~/lib/tax";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -78,10 +79,10 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
-  // ---- Compute shipping cost from session ----
+  // ---- Compute shipping cost from selected rate in session ----
   const shippingCost = useMemo(() => {
     if (!checkoutData) return 0;
-    return checkoutData.shippingMethod === "standard" ? 0 : 0;
+    return checkoutData.selectedShippingRate?.totalCents ?? 0;
   }, [checkoutData]);
 
   // ---- Place Order: Credit Card (Authorize.net) ----
@@ -112,6 +113,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             quantity: item.quantity,
           })),
           opaqueData: checkoutData.opaqueData,
+          shippingCostCents: shippingCost,
           shippingAddress: {
             name: checkoutData.shipping.name,
             line1: checkoutData.shipping.line1,
@@ -177,6 +179,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
+      const tax = calculateTax(displayAmount, checkoutData.shipping.state);
 
       // Dev bypass: skip PP portal, go straight to order creation
       if (devBypass) {
@@ -185,13 +188,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             devBypass: true,
-            amount: displayAmount,
+            amount: displayAmount + shippingCost + tax,
             customerEmail: checkoutData.shipping.email,
             phoneNumber: checkoutData.shipping.phone || undefined,
             items: cart.items.map((item) => ({
               variationId: item.id,
               quantity: item.quantity,
             })),
+            shippingCostCents: shippingCost,
             shippingAddress: {
               name: checkoutData.shipping.name,
               line1: checkoutData.shipping.line1,
@@ -227,7 +231,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       const nonceData = await nonceRes.json();
 
       // Step 2: Open PP portal iframe
-      const amountDollars = (displayAmount / 100).toFixed(2);
+      const amountDollars = ((displayAmount + shippingCost + tax) / 100).toFixed(2);
 
       const result = await openPrecisionPayPortal({
         merchantNonce: nonceData.merchantNonce,
@@ -249,13 +253,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         body: JSON.stringify({
           precisionPayToken: result.precisionPayToken || undefined,
           plaidData: result.plaidData || undefined,
-          amount: displayAmount,
+          amount: displayAmount + shippingCost + tax,
           customerEmail: checkoutData.shipping.email,
           phoneNumber: checkoutData.shipping.phone || undefined,
           items: cart.items.map((item) => ({
             variationId: item.id,
             quantity: item.quantity,
           })),
+          shippingCostCents: shippingCost,
           shippingAddress: {
             name: checkoutData.shipping.name,
             line1: checkoutData.shipping.line1,
@@ -581,6 +586,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 cart={cart}
                 showItemDetails={false}
                 shippingCost={shippingCost}
+                shippingState={checkoutData?.shipping?.state}
                 ctaButton={payButton}
               />
             </div>
@@ -864,6 +870,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               cart={cart}
               showItemDetails={false}
               shippingCost={shippingCost}
+              shippingState={checkoutData?.shipping?.state}
               ctaButton={payButton}
             />
           </div>

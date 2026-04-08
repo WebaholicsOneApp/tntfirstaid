@@ -4,6 +4,7 @@ import {
   getClientIp,
   rateLimitResponse,
 } from "~/lib/ratelimit";
+import { calculateTax } from "~/lib/tax";
 
 /**
  * Dev-only checkout bypass — creates orders in OneApp without Stripe.
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
       (sum, item) => sum + item.price * item.quantity,
       0,
     );
-    const tax = Math.round(subtotal * 0.08);
+    const tax = calculateTax(subtotal, shippingAddress.state);
     const total = subtotal + tax;
 
     // Generate fake Stripe-like IDs
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
           imageUrl: item.imageUrl || null,
           quantity: item.quantity,
           price: item.price,
-          tax: Math.round(item.price * item.quantity * 0.08),
+          tax: calculateTax(item.price * item.quantity, shippingAddress.state),
         })),
         subtotal,
         shippingCost: 0,

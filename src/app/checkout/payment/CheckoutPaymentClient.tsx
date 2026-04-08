@@ -180,10 +180,10 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ---- Compute shipping cost from sessionStorage ----
+  // ---- Compute shipping cost from selected rate in sessionStorage ----
   const shippingCost = useMemo(() => {
     if (!sessionData) return 0;
-    return sessionData.shippingMethod === "standard" ? 0 : 0;
+    return sessionData.selectedShippingRate?.totalCents ?? 0;
   }, [sessionData]);
 
   // ---- Redirect to shop if cart is empty ----
@@ -1125,6 +1125,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               cart={cart}
               showItemDetails={false}
               shippingCost={shippingCost}
+              shippingState={sessionData?.shipping?.state}
               ctaButton={isPaymentReady ? ctaButton : undefined}
             />
           </div>
