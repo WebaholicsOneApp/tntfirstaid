@@ -229,7 +229,25 @@ export default function ProductCard({
 
         {/* Desktop: full-width hover button */}
         <div className="mt-2.5 hidden max-h-0 overflow-hidden opacity-0 transition-all duration-200 ease-out group-hover:max-h-20 group-hover:opacity-100 md:block">
-          {isVariable ? (
+          {product.isDownloadable &&
+          (product.price === 0 || product.price == null) ? (
+            <span className="bg-primary-500 text-secondary-950 hover:bg-primary-400 flex w-full items-center justify-center gap-1.5 rounded-full py-2 font-mono text-[11px] font-semibold tracking-wider uppercase transition-colors active:scale-[0.97]">
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download
+            </span>
+          ) : isVariable ? (
             <button
               onClick={handleSelectOptions}
               className="bg-primary-500 text-secondary-950 hover:bg-primary-400 w-full cursor-pointer rounded-full py-2 font-mono text-[11px] font-semibold tracking-wider uppercase transition-colors active:scale-[0.97]"

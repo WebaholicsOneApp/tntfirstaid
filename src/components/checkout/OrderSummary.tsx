@@ -20,8 +20,7 @@ export default function OrderSummary({
   isDigitalOnly,
   ctaButton,
 }: OrderSummaryProps) {
-  const isFreeOrder = isDigitalOnly && cart.subtotal === 0;
-  const estimatedTax = isFreeOrder ? 0 : Math.round(cart.subtotal * 0.08);
+  const estimatedTax = Math.round(cart.subtotal * 0.08);
   const resolvedShipping = shippingCost ?? 0;
   const total = cart.subtotal + resolvedShipping + estimatedTax;
 
@@ -109,14 +108,12 @@ export default function OrderSummary({
                   )}
                 </div>
               )}
-              {!isFreeOrder && (
-                <div className="flex justify-between">
-                  <span className="text-secondary-500">Est. Tax</span>
-                  <span className="text-secondary-900 font-mono tabular-nums">
-                    {formatCentsToDollars(estimatedTax)}
-                  </span>
-                </div>
-              )}
+              <div className="flex justify-between">
+                <span className="text-secondary-500">Est. Tax</span>
+                <span className="text-secondary-900 font-mono tabular-nums">
+                  {formatCentsToDollars(estimatedTax)}
+                </span>
+              </div>
             </div>
 
             <div className="border-secondary-100 mt-4 border-t pt-4">
@@ -125,7 +122,7 @@ export default function OrderSummary({
                   Total
                 </span>
                 <span className="font-display text-secondary-900 text-2xl font-bold tracking-tight">
-                  {isFreeOrder ? "FREE" : formatCentsToDollars(total)}
+                  {formatCentsToDollars(total)}
                 </span>
               </div>
             </div>

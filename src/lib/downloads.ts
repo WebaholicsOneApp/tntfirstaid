@@ -6,6 +6,8 @@
 const DOWNLOAD_MAP: Record<string, string> = {
   "alpha-munitions-reloading-card-download":
     "/downloads/alpha-munitions-reloading-card.pdf",
+  "alpha-munitions-reloading-card-download-190880":
+    "/downloads/alpha-munitions-reloading-card.pdf",
 };
 
 /** Known downloadable product names (for matching order items without slugs) */

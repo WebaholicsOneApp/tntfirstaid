@@ -109,7 +109,7 @@ type ScriptStatus = "idle" | "loading" | "ready" | "error";
 
 export default function CheckoutPaymentClient({ devBypass }: Props) {
   const router = useRouter();
-  const { cart, clearCart } = useCart();
+  const { cart } = useCart();
 
   // Payment config fetched client-side for instant page load
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(
@@ -197,7 +197,6 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
   // Digital-only contact info (used when shipping is skipped)
   const isDigitalOnly = cartIsDigitalOnly(cart.items);
-  const isFreeOrder = isDigitalOnly && cart.subtotal === 0;
   const [digitalName, setDigitalName] = useState("");
   const [digitalEmail, setDigitalEmail] = useState("");
   const [digitalContactErrors, setDigitalContactErrors] = useState<
@@ -525,97 +524,8 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     billing,
   ]);
 
-  // ---- Free order handler (digital-only, $0 total) ----
-  const handleFreeOrderSubmit = useCallback(async () => {
-    setError(null);
-
-    // Validate contact info
-    const dErrors = new Map<string, string>();
-    if (!digitalName.trim()) dErrors.set("digital_name", "Name is required");
-    if (!digitalEmail.trim()) dErrors.set("digital_email", "Email is required");
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(digitalEmail.trim()))
-      dErrors.set("digital_email", "Enter a valid email");
-    if (dErrors.size > 0) {
-      setDigitalContactErrors(dErrors);
-      return;
-    }
-    setDigitalContactErrors(new Map<string, string>());
-
-    setIsProcessing(true);
-    try {
-      const res = await fetch("/api/checkout/free-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerEmail: digitalEmail.trim(),
-          customerName: digitalName.trim(),
-          items: cart.items.map((item) => ({
-            variationId: item.id,
-            quantity: item.quantity,
-            name: item.name,
-          })),
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.orderId) {
-        throw new Error(data.error || "Failed to create order");
-      }
-
-      // Clear session + cart, redirect to success
-      try {
-        sessionStorage.removeItem(SESSION_KEY);
-      } catch {}
-      clearCart();
-
-      const params = new URLSearchParams({ order_id: String(data.orderId) });
-      if (data.orderNumber) params.set("order_number", data.orderNumber);
-      router.push(`/checkout/success?${params.toString()}`);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred.",
-      );
-      setIsProcessing(false);
-    }
-  }, [digitalName, digitalEmail, cart.items, clearCart, router]);
-
   // ---- CTA button for sidebar ----
-  const ctaButton = isFreeOrder ? (
-    <button
-      onClick={handleFreeOrderSubmit}
-      disabled={isProcessing}
-      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-      style={{
-        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-      }}
-    >
-      {isProcessing ? (
-        <>
-          <Spinner />
-          <span>Processing...</span>
-        </>
-      ) : (
-        <>
-          <span>Complete Order</span>
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </span>
-        </>
-      )}
-    </button>
-  ) : (
+  const ctaButton = (
     <button
       onClick={handleContinueToReview}
       disabled={
@@ -661,7 +571,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   if (
     cart.items.length === 0 ||
     !sessionData ||
-    (!isFreeOrder && !devBypass && !paymentConfig)
+    (!devBypass && !paymentConfig)
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAF8]">
@@ -673,17 +583,15 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     );
   }
 
-  // ---- Payment not configured (free orders always ready) ----
+  // ---- Payment not configured ----
   const isPaymentReady =
-    isFreeOrder ||
     paymentConfig?.devBypass ||
     (paymentConfig && paymentConfig.status === "ready");
 
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
-        {/* Step indicator — hidden for free digital orders */}
-        {!isFreeOrder && <CheckoutStepIndicator currentStep={2} />}
+        <CheckoutStepIndicator currentStep={2} />
 
         {/* Header */}
         <div className="mb-10 flex items-end justify-between">
@@ -695,7 +603,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               </span>
             </div>
             <h1 className="font-display text-secondary-900 text-4xl font-bold tracking-tight sm:text-5xl">
-              {isFreeOrder ? "Complete Your Order" : "Payment Method"}
+              Payment Method
             </h1>
           </div>
           <Link
@@ -754,13 +662,6 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               </div>
             ) : (
               <>
-                {/* Error banner for free orders (payment card is hidden so show here) */}
-                {isFreeOrder && error && (
-                  <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
-
                 {/* Contact Information Card — digital-only orders (no shipping step) */}
                 {isDigitalOnly && (
                   <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
@@ -825,9 +726,8 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                   </div>
                 )}
 
-                {/* Billing Address Card — hidden for free orders */}
-                {!isFreeOrder && (
-                  <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                {/* Billing Address Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                     <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                       <div className="mb-5 flex items-center gap-3">
                         <div className="bg-primary-500 h-px w-6" />
@@ -1060,12 +960,10 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                </div>
 
-                {/* Payment Method Selector Card — hidden for free orders */}
-                {!isFreeOrder && (
-                  <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                {/* Payment Method Selector Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                     <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                       <div className="mb-6 flex items-center gap-3">
                         <div className="bg-primary-500 h-px w-6" />
@@ -1325,8 +1223,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                </div>
 
                 {/* Dev bypass badge */}
                 {paymentConfig?.devBypass && (
