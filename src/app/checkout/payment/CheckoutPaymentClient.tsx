@@ -728,277 +728,32 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
 
                 {/* Billing Address Card */}
                 <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                    <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                      <div className="mb-5 flex items-center gap-3">
-                        <div className="bg-primary-500 h-px w-6" />
-                        <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                          Billing Address
-                        </span>
-                      </div>
-
-                      {/* Same as shipping toggle — hidden for digital-only */}
-                      {!isDigitalOnly && (
-                        <label className="flex cursor-pointer items-center gap-3">
-                          <div className="relative">
-                            <input
-                              type="checkbox"
-                              checked={sameAsShipping}
-                              onChange={(e) => {
-                                setSameAsShipping(e.target.checked);
-                                if (e.target.checked)
-                                  setBillingErrors(new Map<string, string>());
-                              }}
-                              className="peer sr-only"
-                            />
-                            <div className="border-secondary-300 peer-checked:border-primary-500 peer-checked:bg-primary-500 flex h-5 w-5 items-center justify-center rounded border-2 bg-white transition-colors">
-                              {sameAsShipping && (
-                                <svg
-                                  className="text-secondary-900 h-3 w-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={3}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              )}
-                            </div>
-                          </div>
-                          <span className="text-secondary-700 text-sm">
-                            Same as shipping address
-                          </span>
-                        </label>
-                      )}
-
-                      {/* Billing form — animated expand (always visible for digital-only) */}
-                      <div
-                        className={`grid transition-all duration-300 ease-out ${isDigitalOnly || !sameAsShipping ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-                      >
-                        <div className="overflow-hidden">
-                          <div className="space-y-4 pt-5">
-                            {/* Name */}
-                            <label className="block">
-                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                Full Name
-                              </span>
-                              <input
-                                type="text"
-                                autoComplete="billing name"
-                                value={billing.name}
-                                onChange={(e) => {
-                                  setBilling((p) => ({
-                                    ...p,
-                                    name: e.target.value,
-                                  }));
-                                  setBillingErrors((p) => {
-                                    const n = new Map(p);
-                                    n.delete("billing_name");
-                                    return n;
-                                  });
-                                }}
-                                className={`w-full rounded-xl border ${billingErrors.has("billing_name") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                placeholder="Jane Smith"
-                              />
-                              {billingErrors.has("billing_name") && (
-                                <p className="mt-1 text-sm text-red-500">
-                                  {billingErrors.get("billing_name")}
-                                </p>
-                              )}
-                            </label>
-
-                            {/* Address line 1 */}
-                            <label className="block">
-                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                Address
-                              </span>
-                              <input
-                                type="text"
-                                autoComplete="billing address-line1"
-                                value={billing.line1}
-                                onChange={(e) => {
-                                  setBilling((p) => ({
-                                    ...p,
-                                    line1: e.target.value,
-                                  }));
-                                  setBillingErrors((p) => {
-                                    const n = new Map(p);
-                                    n.delete("billing_line1");
-                                    return n;
-                                  });
-                                }}
-                                className={`w-full rounded-xl border ${billingErrors.has("billing_line1") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                placeholder="123 Main St"
-                              />
-                              {billingErrors.has("billing_line1") && (
-                                <p className="mt-1 text-sm text-red-500">
-                                  {billingErrors.get("billing_line1")}
-                                </p>
-                              )}
-                            </label>
-
-                            {/* Address line 2 */}
-                            <label className="block">
-                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                Apt, Suite, etc.{" "}
-                                <span className="text-secondary-400 tracking-normal normal-case">
-                                  (optional)
-                                </span>
-                              </span>
-                              <input
-                                type="text"
-                                autoComplete="billing address-line2"
-                                value={billing.line2}
-                                onChange={(e) =>
-                                  setBilling((p) => ({
-                                    ...p,
-                                    line2: e.target.value,
-                                  }))
-                                }
-                                className="border-secondary-200 text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 w-full rounded-xl border bg-white px-4 py-3 text-sm transition outline-none focus:ring-2"
-                                placeholder="Apt 4B"
-                              />
-                            </label>
-
-                            {/* City / State / ZIP */}
-                            <div className="grid grid-cols-3 gap-3">
-                              <label className="col-span-1 block">
-                                <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                  City
-                                </span>
-                                <input
-                                  type="text"
-                                  autoComplete="billing address-level2"
-                                  value={billing.city}
-                                  onChange={(e) => {
-                                    setBilling((p) => ({
-                                      ...p,
-                                      city: e.target.value,
-                                    }));
-                                    setBillingErrors((p) => {
-                                      const n = new Map(p);
-                                      n.delete("billing_city");
-                                      return n;
-                                    });
-                                  }}
-                                  className={`w-full rounded-xl border ${billingErrors.has("billing_city") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                  placeholder="Salt Lake City"
-                                />
-                                {billingErrors.has("billing_city") && (
-                                  <p className="mt-1 text-sm text-red-500">
-                                    {billingErrors.get("billing_city")}
-                                  </p>
-                                )}
-                              </label>
-                              <label className="col-span-1 block">
-                                <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                  State
-                                </span>
-                                <input
-                                  type="text"
-                                  autoComplete="billing address-level1"
-                                  value={billing.state}
-                                  onChange={(e) => {
-                                    setBilling((p) => ({
-                                      ...p,
-                                      state: e.target.value
-                                        .toUpperCase()
-                                        .slice(0, 2),
-                                    }));
-                                    setBillingErrors((p) => {
-                                      const n = new Map(p);
-                                      n.delete("billing_state");
-                                      return n;
-                                    });
-                                  }}
-                                  className={`w-full rounded-xl border ${billingErrors.has("billing_state") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                  placeholder="UT"
-                                  maxLength={2}
-                                />
-                                {billingErrors.has("billing_state") && (
-                                  <p className="mt-1 text-sm text-red-500">
-                                    {billingErrors.get("billing_state")}
-                                  </p>
-                                )}
-                              </label>
-                              <label className="col-span-1 block">
-                                <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                  ZIP
-                                </span>
-                                <input
-                                  type="text"
-                                  inputMode="numeric"
-                                  autoComplete="billing postal-code"
-                                  value={billing.postalCode}
-                                  onChange={(e) => {
-                                    setBilling((p) => ({
-                                      ...p,
-                                      postalCode: e.target.value
-                                        .replace(/\D/g, "")
-                                        .slice(0, 10),
-                                    }));
-                                    setBillingErrors((p) => {
-                                      const n = new Map(p);
-                                      n.delete("billing_postalCode");
-                                      return n;
-                                    });
-                                  }}
-                                  className={`w-full rounded-xl border ${billingErrors.has("billing_postalCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                  placeholder="84101"
-                                />
-                                {billingErrors.has("billing_postalCode") && (
-                                  <p className="mt-1 text-sm text-red-500">
-                                    {billingErrors.get("billing_postalCode")}
-                                  </p>
-                                )}
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Billing Address
+                      </span>
                     </div>
-                </div>
 
-                {/* Payment Method Selector Card */}
-                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                    <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                      <div className="mb-6 flex items-center gap-3">
-                        <div className="bg-primary-500 h-px w-6" />
-                        <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                          Select Payment Method
-                        </span>
-                      </div>
-
-                      {error && (
-                        <div className="mb-4 rounded-xl border border-red-200/80 bg-red-50 p-4">
-                          <p className="text-sm text-red-600">{error}</p>
-                        </div>
-                      )}
-
-                      <div className="space-y-3">
-                        {/* Credit Card option */}
-                        <label
-                          className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                            selectedMethod === "credit_card"
-                              ? "border-primary-500 bg-primary-50/30"
-                              : "border-secondary-200 hover:border-secondary-300"
-                          }`}
-                        >
+                    {/* Same as shipping toggle — hidden for digital-only */}
+                    {!isDigitalOnly && (
+                      <label className="flex cursor-pointer items-center gap-3">
+                        <div className="relative">
                           <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="credit_card"
-                            checked={selectedMethod === "credit_card"}
-                            onChange={() => setSelectedMethod("credit_card")}
-                            className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                            type="checkbox"
+                            checked={sameAsShipping}
+                            onChange={(e) => {
+                              setSameAsShipping(e.target.checked);
+                              if (e.target.checked)
+                                setBillingErrors(new Map<string, string>());
+                            }}
+                            className="peer sr-only"
                           />
-                          <div>
-                            <div className="flex items-center gap-3">
+                          <div className="border-secondary-300 peer-checked:border-primary-500 peer-checked:bg-primary-500 flex h-5 w-5 items-center justify-center rounded border-2 bg-white transition-colors">
+                            {sameAsShipping && (
                               <svg
-                                className="text-secondary-500 h-5 w-5"
+                                className="text-secondary-900 h-3 w-3"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -1006,216 +761,463 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                  strokeWidth={3}
+                                  d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                              <p className="text-secondary-900 text-sm font-medium">
-                                Credit Card
-                              </p>
-                            </div>
-                            <div className="mt-2 ml-8 flex items-center gap-2">
-                              <CardBrandIcon brand="visa" />
-                              <CardBrandIcon brand="mastercard" />
-                              <CardBrandIcon brand="amex" />
-                              <CardBrandIcon brand="discover" />
-                              <CardBrandIcon brand="diners" />
-                              <CardBrandIcon brand="jcb" />
-                            </div>
+                            )}
                           </div>
-                        </label>
+                        </div>
+                        <span className="text-secondary-700 text-sm">
+                          Same as shipping address
+                        </span>
+                      </label>
+                    )}
 
-                        {/* Credit Card Form (animated expand) */}
-                        <div
-                          className={`grid transition-all duration-300 ease-out ${
-                            selectedMethod === "credit_card"
-                              ? "grid-rows-[1fr] opacity-100"
-                              : "grid-rows-[0fr] opacity-0"
-                          }`}
-                        >
-                          <div className="overflow-hidden">
-                            <div className="pt-0.5">
-                              {scriptMessage && (
-                                <div
-                                  className={`mb-3 rounded-xl border p-3 text-sm ${
-                                    scriptStatus === "error"
-                                      ? "border-red-200 bg-red-50 text-red-700"
-                                      : "border-secondary-200 bg-secondary-50 text-secondary-500"
-                                  }`}
-                                >
-                                  {scriptMessage}
-                                </div>
+                    {/* Billing form — animated expand (always visible for digital-only) */}
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${isDigitalOnly || !sameAsShipping ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="space-y-4 pt-5">
+                          {/* Name */}
+                          <label className="block">
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Full Name
+                            </span>
+                            <input
+                              type="text"
+                              autoComplete="billing name"
+                              value={billing.name}
+                              onChange={(e) => {
+                                setBilling((p) => ({
+                                  ...p,
+                                  name: e.target.value,
+                                }));
+                                setBillingErrors((p) => {
+                                  const n = new Map(p);
+                                  n.delete("billing_name");
+                                  return n;
+                                });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has("billing_name") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                              placeholder="Jane Smith"
+                            />
+                            {billingErrors.has("billing_name") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                {billingErrors.get("billing_name")}
+                              </p>
+                            )}
+                          </label>
+
+                          {/* Address line 1 */}
+                          <label className="block">
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Address
+                            </span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line1"
+                              value={billing.line1}
+                              onChange={(e) => {
+                                setBilling((p) => ({
+                                  ...p,
+                                  line1: e.target.value,
+                                }));
+                                setBillingErrors((p) => {
+                                  const n = new Map(p);
+                                  n.delete("billing_line1");
+                                  return n;
+                                });
+                              }}
+                              className={`w-full rounded-xl border ${billingErrors.has("billing_line1") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                              placeholder="123 Main St"
+                            />
+                            {billingErrors.has("billing_line1") && (
+                              <p className="mt-1 text-sm text-red-500">
+                                {billingErrors.get("billing_line1")}
+                              </p>
+                            )}
+                          </label>
+
+                          {/* Address line 2 */}
+                          <label className="block">
+                            <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                              Apt, Suite, etc.{" "}
+                              <span className="text-secondary-400 tracking-normal normal-case">
+                                (optional)
+                              </span>
+                            </span>
+                            <input
+                              type="text"
+                              autoComplete="billing address-line2"
+                              value={billing.line2}
+                              onChange={(e) =>
+                                setBilling((p) => ({
+                                  ...p,
+                                  line2: e.target.value,
+                                }))
+                              }
+                              className="border-secondary-200 text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 w-full rounded-xl border bg-white px-4 py-3 text-sm transition outline-none focus:ring-2"
+                              placeholder="Apt 4B"
+                            />
+                          </label>
+
+                          {/* City / State / ZIP */}
+                          <div className="grid grid-cols-3 gap-3">
+                            <label className="col-span-1 block">
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                City
+                              </span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level2"
+                                value={billing.city}
+                                onChange={(e) => {
+                                  setBilling((p) => ({
+                                    ...p,
+                                    city: e.target.value,
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_city");
+                                    return n;
+                                  });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_city") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                placeholder="Salt Lake City"
+                              />
+                              {billingErrors.has("billing_city") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_city")}
+                                </p>
                               )}
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                State
+                              </span>
+                              <input
+                                type="text"
+                                autoComplete="billing address-level1"
+                                value={billing.state}
+                                onChange={(e) => {
+                                  setBilling((p) => ({
+                                    ...p,
+                                    state: e.target.value
+                                      .toUpperCase()
+                                      .slice(0, 2),
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_state");
+                                    return n;
+                                  });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_state") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                placeholder="UT"
+                                maxLength={2}
+                              />
+                              {billingErrors.has("billing_state") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_state")}
+                                </p>
+                              )}
+                            </label>
+                            <label className="col-span-1 block">
+                              <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                ZIP
+                              </span>
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                autoComplete="billing postal-code"
+                                value={billing.postalCode}
+                                onChange={(e) => {
+                                  setBilling((p) => ({
+                                    ...p,
+                                    postalCode: e.target.value
+                                      .replace(/\D/g, "")
+                                      .slice(0, 10),
+                                  }));
+                                  setBillingErrors((p) => {
+                                    const n = new Map(p);
+                                    n.delete("billing_postalCode");
+                                    return n;
+                                  });
+                                }}
+                                className={`w-full rounded-xl border ${billingErrors.has("billing_postalCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                placeholder="84101"
+                              />
+                              {billingErrors.has("billing_postalCode") && (
+                                <p className="mt-1 text-sm text-red-500">
+                                  {billingErrors.get("billing_postalCode")}
+                                </p>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                              <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
-                                <div className="mb-4">
-                                  <p className="font-display text-secondary-900 text-lg font-semibold">
-                                    Card Details
-                                  </p>
-                                  <p className="text-secondary-500 text-xs">
-                                    Card details are tokenized by Authorize.net
-                                    before anything is sent to the server.
-                                  </p>
-                                </div>
+                {/* Payment Method Selector Card */}
+                <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                  <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+                    <div className="mb-6 flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Select Payment Method
+                      </span>
+                    </div>
 
-                                <div className="space-y-4">
+                    {error && (
+                      <div className="mb-4 rounded-xl border border-red-200/80 bg-red-50 p-4">
+                        <p className="text-sm text-red-600">{error}</p>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      {/* Credit Card option */}
+                      <label
+                        className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                          selectedMethod === "credit_card"
+                            ? "border-primary-500 bg-primary-50/30"
+                            : "border-secondary-200 hover:border-secondary-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="credit_card"
+                          checked={selectedMethod === "credit_card"}
+                          onChange={() => setSelectedMethod("credit_card")}
+                          className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                        />
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <svg
+                              className="text-secondary-500 h-5 w-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={1.5}
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                              />
+                            </svg>
+                            <p className="text-secondary-900 text-sm font-medium">
+                              Credit Card
+                            </p>
+                          </div>
+                          <div className="mt-2 ml-8 flex items-center gap-2">
+                            <CardBrandIcon brand="visa" />
+                            <CardBrandIcon brand="mastercard" />
+                            <CardBrandIcon brand="amex" />
+                            <CardBrandIcon brand="discover" />
+                            <CardBrandIcon brand="diners" />
+                            <CardBrandIcon brand="jcb" />
+                          </div>
+                        </div>
+                      </label>
+
+                      {/* Credit Card Form (animated expand) */}
+                      <div
+                        className={`grid transition-all duration-300 ease-out ${
+                          selectedMethod === "credit_card"
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="pt-0.5">
+                            {scriptMessage && (
+                              <div
+                                className={`mb-3 rounded-xl border p-3 text-sm ${
+                                  scriptStatus === "error"
+                                    ? "border-red-200 bg-red-50 text-red-700"
+                                    : "border-secondary-200 bg-secondary-50 text-secondary-500"
+                                }`}
+                              >
+                                {scriptMessage}
+                              </div>
+                            )}
+
+                            <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
+                              <div className="mb-4">
+                                <p className="font-display text-secondary-900 text-lg font-semibold">
+                                  Card Details
+                                </p>
+                                <p className="text-secondary-500 text-xs">
+                                  Card details are tokenized by Authorize.net
+                                  before anything is sent to the server.
+                                </p>
+                              </div>
+
+                              <div className="space-y-4">
+                                <label className="block">
+                                  <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                    Card Number
+                                  </span>
+                                  <input
+                                    inputMode="numeric"
+                                    autoComplete="cc-number"
+                                    value={cardNumber}
+                                    onChange={(event) => {
+                                      setCardNumber(
+                                        formatCardNumber(event.target.value),
+                                      );
+                                      if (cardFieldErrors.size) {
+                                        setCardFieldErrors((prev) => {
+                                          const n = new Map(prev);
+                                          n.delete("cardNumber");
+                                          return n;
+                                        });
+                                      }
+                                    }}
+                                    className={`w-full rounded-xl border ${cardFieldErrors.has("cardNumber") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                    placeholder="4111 1111 1111 1111"
+                                  />
+                                  {cardFieldErrors.has("cardNumber") && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {cardFieldErrors.get("cardNumber")}
+                                    </p>
+                                  )}
+                                </label>
+
+                                <div className="grid gap-4 md:grid-cols-2">
                                   <label className="block">
                                     <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                      Card Number
+                                      Expiration
                                     </span>
                                     <input
                                       inputMode="numeric"
-                                      autoComplete="cc-number"
-                                      value={cardNumber}
+                                      autoComplete="cc-exp"
+                                      value={expiry}
                                       onChange={(event) => {
-                                        setCardNumber(
-                                          formatCardNumber(event.target.value),
+                                        setExpiry(
+                                          formatExpiry(event.target.value),
                                         );
                                         if (cardFieldErrors.size) {
                                           setCardFieldErrors((prev) => {
                                             const n = new Map(prev);
-                                            n.delete("cardNumber");
+                                            n.delete("expiry");
                                             return n;
                                           });
                                         }
                                       }}
-                                      className={`w-full rounded-xl border ${cardFieldErrors.has("cardNumber") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                      placeholder="4111 1111 1111 1111"
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has("expiry") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                      placeholder="MM/YY"
                                     />
-                                    {cardFieldErrors.has("cardNumber") && (
+                                    {cardFieldErrors.has("expiry") && (
                                       <p className="mt-1 text-sm text-red-500">
-                                        {cardFieldErrors.get("cardNumber")}
+                                        {cardFieldErrors.get("expiry")}
                                       </p>
                                     )}
                                   </label>
-
-                                  <div className="grid gap-4 md:grid-cols-2">
-                                    <label className="block">
-                                      <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                        Expiration
-                                      </span>
-                                      <input
-                                        inputMode="numeric"
-                                        autoComplete="cc-exp"
-                                        value={expiry}
-                                        onChange={(event) => {
-                                          setExpiry(
-                                            formatExpiry(event.target.value),
-                                          );
-                                          if (cardFieldErrors.size) {
-                                            setCardFieldErrors((prev) => {
-                                              const n = new Map(prev);
-                                              n.delete("expiry");
-                                              return n;
-                                            });
-                                          }
-                                        }}
-                                        className={`w-full rounded-xl border ${cardFieldErrors.has("expiry") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                        placeholder="MM/YY"
-                                      />
-                                      {cardFieldErrors.has("expiry") && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                          {cardFieldErrors.get("expiry")}
-                                        </p>
-                                      )}
-                                    </label>
-                                    <label className="block">
-                                      <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
-                                        Security Code
-                                      </span>
-                                      <input
-                                        inputMode="numeric"
-                                        autoComplete="cc-csc"
-                                        value={cardCode}
-                                        onChange={(event) => {
-                                          setCardCode(
-                                            event.target.value
-                                              .replace(/\D/g, "")
-                                              .slice(0, 4),
-                                          );
-                                          if (cardFieldErrors.size) {
-                                            setCardFieldErrors((prev) => {
-                                              const n = new Map(prev);
-                                              n.delete("cardCode");
-                                              return n;
-                                            });
-                                          }
-                                        }}
-                                        className={`w-full rounded-xl border ${cardFieldErrors.has("cardCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
-                                        placeholder="CVV"
-                                      />
-                                      {cardFieldErrors.has("cardCode") && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                          {cardFieldErrors.get("cardCode")}
-                                        </p>
-                                      )}
-                                    </label>
-                                  </div>
+                                  <label className="block">
+                                    <span className="text-secondary-400 mb-1 block text-xs font-medium tracking-[0.12em] uppercase">
+                                      Security Code
+                                    </span>
+                                    <input
+                                      inputMode="numeric"
+                                      autoComplete="cc-csc"
+                                      value={cardCode}
+                                      onChange={(event) => {
+                                        setCardCode(
+                                          event.target.value
+                                            .replace(/\D/g, "")
+                                            .slice(0, 4),
+                                        );
+                                        if (cardFieldErrors.size) {
+                                          setCardFieldErrors((prev) => {
+                                            const n = new Map(prev);
+                                            n.delete("cardCode");
+                                            return n;
+                                          });
+                                        }
+                                      }}
+                                      className={`w-full rounded-xl border ${cardFieldErrors.has("cardCode") ? "border-red-400" : "border-secondary-200"} text-secondary-900 focus:border-primary-500 focus:ring-primary-500/20 bg-white px-4 py-3 text-sm transition outline-none focus:ring-2`}
+                                      placeholder="CVV"
+                                    />
+                                    {cardFieldErrors.has("cardCode") && (
+                                      <p className="mt-1 text-sm text-red-500">
+                                        {cardFieldErrors.get("cardCode")}
+                                      </p>
+                                    )}
+                                  </label>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
+                      </div>
 
-                        {/* PrecisionPay option */}
-                        <label
-                          className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                            selectedMethod === "precision_pay"
-                              ? "border-primary-500 bg-primary-50/30"
-                              : "border-secondary-200 hover:border-secondary-300"
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="precision_pay"
-                            checked={selectedMethod === "precision_pay"}
-                            onChange={() => setSelectedMethod("precision_pay")}
-                            className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
-                          />
-                          <img
-                            src="/images/payment/precisionpay.png"
-                            alt="PrecisionPay"
-                            className="h-7"
-                          />
-                        </label>
+                      {/* PrecisionPay option */}
+                      <label
+                        className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                          selectedMethod === "precision_pay"
+                            ? "border-primary-500 bg-primary-50/30"
+                            : "border-secondary-200 hover:border-secondary-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="precision_pay"
+                          checked={selectedMethod === "precision_pay"}
+                          onChange={() => setSelectedMethod("precision_pay")}
+                          className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                        />
+                        <span className="text-secondary-700 text-sm font-medium">
+                          Pay once with:
+                        </span>
+                        <img
+                          src="/images/payment/precisionpay.png"
+                          alt="PrecisionPay"
+                          className="h-7"
+                        />
+                      </label>
 
-                        {/* PrecisionPay description (animated expand) */}
-                        <div
-                          className={`grid transition-all duration-300 ease-out ${
-                            selectedMethod === "precision_pay"
-                              ? "grid-rows-[1fr] opacity-100"
-                              : "grid-rows-[0fr] opacity-0"
-                          }`}
-                        >
-                          <div className="overflow-hidden">
-                            <div className="pt-0.5">
-                              <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
-                                <div className="flex items-start gap-3">
-                                  <svg
-                                    className="text-primary-500 mt-0.5 h-5 w-5 flex-shrink-0"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={1.5}
-                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                  </svg>
-                                  <div>
-                                    <p className="text-secondary-900 text-sm font-medium">
-                                      About PrecisionPay
-                                    </p>
-                                    <p className="text-secondary-600 mt-1 text-sm">
-                                      Pay directly from your bank account with
-                                      PrecisionPay. Lower fees, no credit card
-                                      needed. You&apos;ll complete the bank
-                                      transfer on the next step.
-                                    </p>
-                                  </div>
+                      {/* PrecisionPay description (animated expand) */}
+                      <div
+                        className={`grid transition-all duration-300 ease-out ${
+                          selectedMethod === "precision_pay"
+                            ? "grid-rows-[1fr] opacity-100"
+                            : "grid-rows-[0fr] opacity-0"
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <div className="pt-0.5">
+                            <div className="border-secondary-100 bg-secondary-50/80 rounded-2xl border p-4">
+                              <div className="flex items-start gap-3">
+                                <svg
+                                  className="text-primary-500 mt-0.5 h-5 w-5 flex-shrink-0"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                                <div>
+                                  <p className="text-secondary-900 text-sm font-medium">
+                                    About PrecisionPay
+                                  </p>
+                                  <p className="text-secondary-600 mt-1 text-sm">
+                                    Pay directly from your bank account with
+                                    PrecisionPay and avoid being tracked by your
+                                    credit card company. You&apos;ll complete
+                                    your transaction on the next step.
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -1223,6 +1225,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                         </div>
                       </div>
                     </div>
+                  </div>
                 </div>
 
                 {/* Dev bypass badge */}
