@@ -152,6 +152,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         // Ignore
       }
 
+      try {
+        const ids = cart.items.map((i) => i.productId).filter(Boolean);
+        if (ids.length > 0)
+          sessionStorage.setItem(
+            "alpha-checkout-product-ids",
+            JSON.stringify(ids),
+          );
+      } catch {}
       clearCart();
 
       const params = new URLSearchParams({ order_id: String(data.orderId) });
@@ -218,6 +226,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         try {
           sessionStorage.removeItem(SESSION_KEY);
         } catch {}
+        try {
+          const ids = cart.items.map((i) => i.productId).filter(Boolean);
+          if (ids.length > 0)
+            sessionStorage.setItem(
+              "alpha-checkout-product-ids",
+              JSON.stringify(ids),
+            );
+        } catch {}
         clearCart();
         const params = new URLSearchParams({ order_id: String(data.orderId) });
         if (data.orderNumber) params.set("order_number", data.orderNumber);
@@ -281,6 +297,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
       try {
         sessionStorage.removeItem(SESSION_KEY);
+      } catch {}
+      try {
+        const ids = cart.items.map((i) => i.productId).filter(Boolean);
+        if (ids.length > 0)
+          sessionStorage.setItem(
+            "alpha-checkout-product-ids",
+            JSON.stringify(ids),
+          );
       } catch {}
       clearCart();
       const params = new URLSearchParams({ order_id: String(data.orderId) });

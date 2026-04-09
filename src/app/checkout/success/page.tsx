@@ -600,25 +600,6 @@ function SuccessContent() {
   const [recommendations, setRecommendations] = useState<ProductListItem[]>([]);
 
   useEffect(() => {
-    // Save product IDs for recommendations before clearing cart
-    try {
-      const cartStr = localStorage.getItem("alpha-munitions-cart");
-      if (cartStr) {
-        const parsed = JSON.parse(cartStr);
-        const ids = (parsed?.items || [])
-          .map((i: { productId?: number }) => i.productId)
-          .filter(Boolean);
-        if (ids.length > 0) {
-          sessionStorage.setItem(
-            "alpha-checkout-product-ids",
-            JSON.stringify(ids),
-          );
-        }
-      }
-    } catch {
-      /* ignore parse errors */
-    }
-
     clearCart();
 
     const fetchOrderInfo = async () => {
