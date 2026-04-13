@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CheckoutStepIndicator from "~/components/checkout/CheckoutStepIndicator";
@@ -147,9 +147,8 @@ export default function CheckoutShippingClient() {
     return true;
   }, [shipping]);
 
-  const handleFetchRates = useCallback(async () => {
-    if (!validateAddress()) return;
-
+  // ---- Fetch shipping rates from UPS via API ----
+  const fetchRates = useCallback(async () => {
     setRatesLoading(true);
     setRatesError(null);
     setRates([]);
@@ -192,8 +191,9 @@ export default function CheckoutShippingClient() {
         );
       } else {
         setRates(fetchedRates);
-        // Auto-select the cheapest option
-        setSelectedRate(fetchedRates[0] ?? null);
+        // Auto-select UPS Ground (code '03') or fall back to cheapest
+        const ground = fetchedRates.find((r) => r.serviceCode === "03");
+        setSelectedRate(ground ?? fetchedRates[0] ?? null);
       }
       setRatesFetched(true);
     } catch {
@@ -201,7 +201,35 @@ export default function CheckoutShippingClient() {
     } finally {
       setRatesLoading(false);
     }
-  }, [shipping, cart.items, validateAddress]);
+  }, [shipping, cart.items]);
+
+  // ---- Auto-fetch rates when address is sufficiently complete (debounced) ----
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const hasAddress =
+      shipping.city.trim().length > 1 &&
+      shipping.state.trim().length >= 2 &&
+      shipping.postalCode.trim().length >= 5;
+
+    if (!hasAddress || cart.items.length === 0) return;
+
+    debounceRef.current = setTimeout(() => {
+      fetchRates();
+    }, 600);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [
+    shipping.city,
+    shipping.state,
+    shipping.postalCode,
+    shipping.line1,
+    fetchRates,
+    cart.items.length,
+  ]);
 
   const handleContinueToPayment = useCallback(() => {
     if (!validateAddress()) return;
@@ -371,7 +399,7 @@ export default function CheckoutShippingClient() {
                 <div className="mt-6">
                   <button
                     type="button"
-                    onClick={handleFetchRates}
+                    onClick={fetchRates}
                     disabled={ratesLoading}
                     className="border-secondary-900 text-secondary-900 hover:bg-secondary-900 flex w-full items-center justify-center gap-2 rounded-full border py-3 px-6 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-200 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
@@ -391,7 +419,7 @@ export default function CheckoutShippingClient() {
             </div>
 
             {/* Shipping Rate Selection Card */}
-            {(ratesFetched || ratesError) && (
+            {(ratesLoading || ratesFetched || ratesError) && (
               <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                 <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                   <div className="mb-6 flex items-center gap-3">
@@ -401,7 +429,29 @@ export default function CheckoutShippingClient() {
                     </span>
                   </div>
 
-                  {ratesError && (
+                  {ratesLoading && rates.length === 0 && (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <div
+                          key={i}
+                          className="border-secondary-100 animate-pulse rounded-2xl border-2 p-4"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="bg-secondary-100 h-4 w-4 rounded-full" />
+                            <div className="flex flex-1 items-center justify-between">
+                              <div className="space-y-1.5">
+                                <div className="bg-secondary-100 h-4 w-28 rounded" />
+                                <div className="bg-secondary-50 h-3 w-20 rounded" />
+                              </div>
+                              <div className="bg-secondary-100 h-4 w-16 rounded" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {ratesError && !ratesLoading && (
                     <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
                       <p className="text-sm text-red-600">{ratesError}</p>
                     </div>
@@ -422,7 +472,9 @@ export default function CheckoutShippingClient() {
                             type="radio"
                             name="shippingRate"
                             value={rate.serviceCode}
-                            checked={selectedRate?.serviceCode === rate.serviceCode}
+                            checked={
+                              selectedRate?.serviceCode === rate.serviceCode
+                            }
                             onChange={() => setSelectedRate(rate)}
                             className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
                           />
@@ -433,11 +485,12 @@ export default function CheckoutShippingClient() {
                               </p>
                               {rate.deliveryDays !== null ? (
                                 <p className="text-secondary-500 text-xs">
-                                  {rate.deliveryDays} business day{rate.deliveryDays !== 1 ? "s" : ""}
+                                  {rate.deliveryDays} business day
+                                  {rate.deliveryDays !== 1 ? "s" : ""}
                                 </p>
                               ) : null}
                             </div>
-                            <span className="font-mono text-sm font-semibold text-secondary-900">
+                            <span className="text-secondary-900 font-mono text-sm font-semibold">
                               {formatCentsToDollars(rate.totalCents)}
                             </span>
                           </div>
@@ -446,13 +499,6 @@ export default function CheckoutShippingClient() {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
-
-            {/* General error */}
-            {error && (
-              <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
-                <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
           </div>
