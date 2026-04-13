@@ -1,4 +1,8 @@
 export const SESSION_KEY = "alpha-checkout-data";
+// Separate key for the applied discount. Kept independent of the main
+// session record so a partially-filled checkout (e.g. email only) can
+// still hold a valid promo code across page loads.
+export const DISCOUNT_SESSION_KEY = "alpha-checkout-discount";
 
 export type PaymentMethod = "credit_card" | "precision_pay";
 
@@ -10,7 +14,15 @@ export interface SelectedShippingRate {
   estimatedDelivery: string | null;
 }
 
+export interface AppliedDiscountSession {
+  code: string;
+  discountCents: number;
+  discountType: "p" | "f";
+  discountAmount: number;
+}
+
 export interface CheckoutSessionData {
+  isDigitalOnly?: boolean;
   shipping: {
     name: string;
     email: string;

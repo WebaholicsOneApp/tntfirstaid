@@ -4,6 +4,7 @@ import { type JSX, useState } from "react";
 import Link from "next/link";
 import { ProductImage } from "~/components/ui/ProductImage";
 import type { Order, OrdersResponse } from "~/types/auth";
+import { getDownloadUrlByName } from "~/lib/downloads";
 import { formatCentsToDollars } from "~/lib/utils";
 
 // --- Status mapping: internal → customer-friendly ---
@@ -315,6 +316,20 @@ export default function OrdersClient({
                           <span>{formatCentsToDollars(order.subtotal)}</span>
                         </div>
                       )}
+                      {order.discountCents != null &&
+                        order.discountCents > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>
+                              Discount
+                              {order.discountCode
+                                ? ` (${order.discountCode})`
+                                : ""}
+                            </span>
+                            <span>
+                              −{formatCentsToDollars(order.discountCents)}
+                            </span>
+                          </div>
+                        )}
                       {order.shipping != null && order.shipping > 0 && (
                         <div className="text-secondary-500 flex justify-between">
                           <span>Shipping</span>
@@ -368,6 +383,74 @@ export default function OrdersClient({
                             {order.tracking.trackingNumber}
                           </span>
                         )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Downloads */}
+                  {order.items.some(
+                    (item) =>
+                      item.downloadUrl || getDownloadUrlByName(item.name),
+                  ) && (
+                    <div className="border-secondary-100 mt-4 border-t pt-4">
+                      <p className="text-secondary-400 mb-2 font-mono text-[0.55rem] tracking-[0.3em] uppercase">
+                        Downloads
+                      </p>
+                      <div className="space-y-2">
+                        {order.items
+                          .filter(
+                            (item) =>
+                              item.downloadUrl ||
+                              getDownloadUrlByName(item.name),
+                          )
+                          .map((item) => (
+                            <a
+                              key={item.id}
+                              href={
+                                item.downloadUrl ||
+                                getDownloadUrlByName(item.name)!
+                              }
+                              download
+                              className="group flex items-center gap-3 rounded-lg border border-sky-200 bg-sky-50/50 px-3 py-2.5 transition-colors hover:border-sky-300 hover:bg-sky-50"
+                            >
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-600">
+                                <svg
+                                  className="h-4 w-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-secondary-900 truncate text-sm font-medium">
+                                  {item.name}
+                                </p>
+                                <p className="text-[0.65rem] text-sky-600">
+                                  PDF Download
+                                </p>
+                              </div>
+                              <svg
+                                className="h-4 w-4 shrink-0 text-sky-500 transition-transform group-hover:translate-y-0.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                />
+                              </svg>
+                            </a>
+                          ))}
                       </div>
                     </div>
                   )}

@@ -112,7 +112,7 @@ export default function OcdTechnologySection() {
             {/* Eyebrow */}
             <div className="mb-7 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
                 OCD Technology
               </span>
             </div>

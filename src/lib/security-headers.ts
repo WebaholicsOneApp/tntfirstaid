@@ -133,6 +133,7 @@ export function getDefaultCSPDirectives(): CSPDirectives {
       // Authorize.net
       "https://api.authorize.net",
       "https://apitest.authorize.net",
+      "https://jstest.authorize.net",
       "https://maps.googleapis.com",
       // Allow localhost in development
       ...(isProduction ? [] : ["http://localhost:*", "ws://localhost:*"]),
@@ -143,6 +144,9 @@ export function getDefaultCSPDirectives(): CSPDirectives {
       "https://hooks.stripe.com",
       "https://accept.authorize.net",
       "https://test.authorize.net",
+      // PrecisionPay checkout portal (iframe from PrecisionPayPopup.tsx)
+      "https://checkout.myprecisionpay.com",
+      "https://sandbox-checkout.myprecisionpay.com",
     ],
     "frame-ancestors": ["'self'"],
     "form-action": ["'self'"],

@@ -244,13 +244,6 @@ export default async function ShippingReturnsPage() {
                       >
                         {storeConfig.supportEmail}
                       </a>{" "}
-                      or call{" "}
-                      <a
-                        href={storeConfig.phoneHref}
-                        className="text-primary-600 font-semibold hover:underline"
-                      >
-                        {storeConfig.phone}
-                      </a>{" "}
                       to request a Return Authorization.
                     </p>
                   </div>
@@ -485,13 +478,6 @@ export default async function ShippingReturnsPage() {
                         className="text-primary-600 font-semibold hover:underline"
                       >
                         {storeConfig.supportEmail}
-                      </a>{" "}
-                      or call{" "}
-                      <a
-                        href={storeConfig.phoneHref}
-                        className="text-primary-600 font-semibold hover:underline"
-                      >
-                        {storeConfig.phone}
                       </a>{" "}
                       and we will work with the carrier to resolve the issue.
                     </p>

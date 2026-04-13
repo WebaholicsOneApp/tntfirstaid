@@ -10,9 +10,10 @@ import { ProductImage } from "~/components/ui/ProductImage";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
 import PlaceOrderPanel from "~/components/checkout/PlaceOrderPanel";
 import { openPrecisionPayPortal } from "~/components/checkout/PrecisionPayPopup";
-import { useCart } from "~/lib/cart/CartContext";
+import { useCart, cartIsDigitalOnly } from "~/lib/cart/CartContext";
 import {
   SESSION_KEY,
+  DISCOUNT_SESSION_KEY,
   type CheckoutSessionData,
   type PaymentConfig,
 } from "~/components/checkout/CheckoutTypes";
@@ -41,6 +42,41 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ---- Persisted discount (for dev bypass path) ----
+  // The non-bypass flows read DISCOUNT_SESSION_KEY inline inside their submit
+  // handlers. The dev-bypass flow uses PlaceOrderPanel which needs the
+  // discount supplied as props, so we hydrate it into state on mount and
+  // keep it in sync if OrderSummary revalidates/clears it.
+  const [persistedDiscount, setPersistedDiscount] = useState<{
+    code: string;
+    discountCents: number;
+  } | null>(null);
+  useEffect(() => {
+    const read = (): { code: string; discountCents: number } | null => {
+      try {
+        const raw = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (
+          parsed &&
+          typeof parsed.code === "string" &&
+          /^[A-Z0-9_-]{3,32}$/.test(parsed.code) &&
+          typeof parsed.discountCents === "number" &&
+          parsed.discountCents > 0
+        ) {
+          return { code: parsed.code, discountCents: parsed.discountCents };
+        }
+      } catch {
+        // malformed — treat as no discount
+      }
+      return null;
+    };
+    setPersistedDiscount(read());
+    const handler = () => setPersistedDiscount(read());
+    window.addEventListener("alpha:discount-changed", handler);
+    return () => window.removeEventListener("alpha:discount-changed", handler);
+  }, []);
+
   // ---- Read checkout data from sessionStorage ----
   useEffect(() => {
     try {
@@ -48,8 +84,11 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       if (saved) {
         const data = JSON.parse(saved) as CheckoutSessionData;
 
-        // Must have shipping data
-        if (!data.shipping?.name || !data.shipping?.email) {
+        // Must have shipping data (unless digital-only)
+        if (
+          !data.isDigitalOnly &&
+          (!data.shipping?.name || !data.shipping?.email)
+        ) {
           router.replace("/checkout/shipping");
           return;
         }
@@ -102,6 +141,25 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     setError(null);
 
     try {
+      // Read any persisted discount from sessionStorage — OrderSummary is the
+      // single source of truth for applied promo codes during checkout.
+      let discountCode: string | undefined;
+      try {
+        const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (rawDiscount) {
+          const parsed = JSON.parse(rawDiscount);
+          if (
+            parsed &&
+            typeof parsed.code === "string" &&
+            /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
+          ) {
+            discountCode = parsed.code;
+          }
+        }
+      } catch {
+        // Malformed or unavailable — proceed without discount.
+      }
+
       const res = await fetch("/api/authorize-net/charge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -114,15 +172,19 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           })),
           opaqueData: checkoutData.opaqueData,
           shippingCostCents: shippingCost,
-          shippingAddress: {
-            name: checkoutData.shipping.name,
-            line1: checkoutData.shipping.line1,
-            line2: checkoutData.shipping.line2,
-            city: checkoutData.shipping.city,
-            state: checkoutData.shipping.state,
-            postalCode: checkoutData.shipping.postalCode,
-            country: checkoutData.shipping.country,
-          },
+          isDigitalOnly: checkoutData.isDigitalOnly || undefined,
+          shippingAddress: checkoutData.isDigitalOnly
+            ? undefined
+            : {
+                name: checkoutData.shipping.name,
+                line1: checkoutData.shipping.line1,
+                line2: checkoutData.shipping.line2,
+                city: checkoutData.shipping.city,
+                state: checkoutData.shipping.state,
+                postalCode: checkoutData.shipping.postalCode,
+                country: checkoutData.shipping.country,
+              },
+          ...(discountCode ? { discountCode } : {}),
         }),
       });
 
@@ -144,10 +206,19 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       // Success — clear session + cart, navigate to success page
       try {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
       } catch {
         // Ignore
       }
 
+      try {
+        const ids = cart.items.map((i) => i.productId).filter(Boolean);
+        if (ids.length > 0)
+          sessionStorage.setItem(
+            "alpha-checkout-product-ids",
+            JSON.stringify(ids),
+          );
+      } catch {}
       clearCart();
 
       const params = new URLSearchParams({ order_id: String(data.orderId) });
@@ -215,6 +286,15 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
         try {
           sessionStorage.removeItem(SESSION_KEY);
+          sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
+        } catch {}
+        try {
+          const ids = cart.items.map((i) => i.productId).filter(Boolean);
+          if (ids.length > 0)
+            sessionStorage.setItem(
+              "alpha-checkout-product-ids",
+              JSON.stringify(ids),
+            );
         } catch {}
         clearCart();
         const params = new URLSearchParams({ order_id: String(data.orderId) });
@@ -231,7 +311,10 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       const nonceData = await nonceRes.json();
 
       // Step 2: Open PP portal iframe
-      const amountDollars = ((displayAmount + shippingCost + tax) / 100).toFixed(2);
+      const amountDollars = (
+        (displayAmount + shippingCost + tax) /
+        100
+      ).toFixed(2);
 
       const result = await openPrecisionPayPortal({
         merchantNonce: nonceData.merchantNonce,
@@ -280,6 +363,15 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
       try {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
+      } catch {}
+      try {
+        const ids = cart.items.map((i) => i.productId).filter(Boolean);
+        if (ids.length > 0)
+          sessionStorage.setItem(
+            "alpha-checkout-product-ids",
+            JSON.stringify(ids),
+          );
       } catch {}
       clearCart();
       const params = new URLSearchParams({ order_id: String(data.orderId) });
@@ -486,9 +578,12 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                       postalCode: checkoutData.shipping.postalCode,
                       country: checkoutData.shipping.country,
                     }}
+                    discountCode={persistedDiscount?.code}
+                    discountCents={persistedDiscount?.discountCents}
                     onSuccess={({ orderId, orderNumber }) => {
                       try {
                         sessionStorage.removeItem(SESSION_KEY);
+                        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
                       } catch {
                         // Ignore
                       }
@@ -587,6 +682,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 showItemDetails={false}
                 shippingCost={shippingCost}
                 shippingState={checkoutData?.shipping?.state}
+                isDigitalOnly={checkoutData?.isDigitalOnly}
                 ctaButton={payButton}
               />
             </div>
@@ -667,89 +763,94 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               </div>
             )}
 
-            {/* Shipping Address card (read-only) */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Shipping Address
-                    </span>
+            {/* Shipping Address card (read-only) — hidden for digital-only */}
+            {!checkoutData.isDigitalOnly && (
+              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Shipping Address
+                      </span>
+                    </div>
+                    <Link
+                      href="/checkout/shipping"
+                      className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
+                    >
+                      Edit
+                    </Link>
                   </div>
-                  <Link
-                    href="/checkout/shipping"
-                    className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
-                  >
-                    Edit
-                  </Link>
-                </div>
-                <div className="text-secondary-700 space-y-1 text-sm">
-                  <p className="text-secondary-900 font-medium">
-                    {checkoutData.shipping.name}
-                  </p>
-                  <p>{checkoutData.shipping.line1}</p>
-                  {checkoutData.shipping.line2 && (
-                    <p>{checkoutData.shipping.line2}</p>
-                  )}
-                  <p>
-                    {checkoutData.shipping.city}, {checkoutData.shipping.state}{" "}
-                    {checkoutData.shipping.postalCode}
-                    {checkoutData.shipping.country &&
-                      checkoutData.shipping.country !== "US" && (
-                        <>, {checkoutData.shipping.country}</>
-                      )}
-                  </p>
-                  <p className="text-secondary-500">
-                    {checkoutData.shipping.email}
-                  </p>
-                  {checkoutData.shipping.phone && (
-                    <p className="text-secondary-500">
-                      {checkoutData.shipping.phone}
+                  <div className="text-secondary-700 space-y-1 text-sm">
+                    <p className="text-secondary-900 font-medium">
+                      {checkoutData.shipping.name}
                     </p>
-                  )}
+                    <p>{checkoutData.shipping.line1}</p>
+                    {checkoutData.shipping.line2 && (
+                      <p>{checkoutData.shipping.line2}</p>
+                    )}
+                    <p>
+                      {checkoutData.shipping.city},{" "}
+                      {checkoutData.shipping.state}{" "}
+                      {checkoutData.shipping.postalCode}
+                      {checkoutData.shipping.country &&
+                        checkoutData.shipping.country !== "US" && (
+                          <>, {checkoutData.shipping.country}</>
+                        )}
+                    </p>
+                    <p className="text-secondary-500">
+                      {checkoutData.shipping.email}
+                    </p>
+                    {checkoutData.shipping.phone && (
+                      <p className="text-secondary-500">
+                        {checkoutData.shipping.phone}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Shipping Method card (read-only) */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Shipping Method
-                    </span>
+            {/* Shipping Method card (read-only) — hidden for digital-only */}
+            {!checkoutData.isDigitalOnly && (
+              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Shipping Method
+                      </span>
+                    </div>
+                    <Link
+                      href="/checkout/shipping"
+                      className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
+                    >
+                      Edit
+                    </Link>
                   </div>
-                  <Link
-                    href="/checkout/shipping"
-                    className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
-                  >
-                    Edit
-                  </Link>
-                </div>
-                <div className="text-secondary-700 flex items-center gap-3 text-sm">
-                  <svg
-                    className="text-secondary-400 h-5 w-5 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                    />
-                  </svg>
-                  <div>
-                    <p className="text-secondary-900 font-medium">Standard</p>
-                    <p className="text-green-600">FREE</p>
+                  <div className="text-secondary-700 flex items-center gap-3 text-sm">
+                    <svg
+                      className="text-secondary-400 h-5 w-5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-secondary-900 font-medium">Standard</p>
+                      <p className="text-green-600">FREE</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Payment Method card (read-only) */}
             <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">

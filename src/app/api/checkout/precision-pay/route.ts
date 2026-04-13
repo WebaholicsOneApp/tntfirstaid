@@ -4,7 +4,7 @@ import {
   getClientIp,
   rateLimitResponse,
 } from "~/lib/ratelimit";
-import { getApiClient } from "~/lib/api-client";
+import { getApiClient, ApiClientError } from "~/lib/api-client";
 
 export async function POST(request: Request) {
   const clientIp = getClientIp(request);
@@ -104,6 +104,23 @@ export async function POST(request: Request) {
     }
     const amountDollars = (amount / 100).toFixed(2);
 
+    // Pre-validate item availability before charging
+    try {
+      await getApiClient().post("/checkout/validate-items", {
+        items: items.map((item: { variationId: number; quantity: number }) => ({
+          variationId: item.variationId,
+          quantity: item.quantity,
+        })),
+      });
+    } catch (validationError) {
+      // Items unavailable — return before charging customer
+      const message =
+        validationError instanceof ApiClientError
+          ? validationError.message
+          : "Item validation failed";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
     let paymentResponse;
     let transactionId: string;
 
@@ -128,6 +145,18 @@ export async function POST(request: Request) {
       const nameParts = (shippingAddress.name || "").split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
+
+      console.log("[PrecisionPay] one-time-payment request:", {
+        amount,
+        amountDollars,
+        env: envValue,
+        hasPublicToken: !!plaidData.public_token,
+        accountId: plaidData.accountId,
+        oneTimeUserId: plaidData.precisionPayPlaidUserId || "(empty)",
+        firstName,
+        lastName,
+        email: customerEmail,
+      });
 
       paymentResponse = await fetch(`${PP_API_URL}/checkout/one-time-payment`, {
         method: "POST",
@@ -161,23 +190,32 @@ export async function POST(request: Request) {
     }
 
     if (!paymentResponse.ok) {
-      const errorText = await paymentResponse.text().catch(() => "");
-      console.error(
-        "[PrecisionPay] Payment failed:",
-        paymentResponse.status,
-        errorText,
-      );
-      return NextResponse.json(
-        { error: "Payment processing failed. Please try again." },
-        { status: 400 },
-      );
+      let errorDetail = "Payment processing failed. Please try again.";
+      try {
+        const errorData = await paymentResponse.json();
+        errorDetail = errorData.detail || errorData.message || errorDetail;
+        console.error(
+          "[PrecisionPay] Payment failed:",
+          paymentResponse.status,
+          errorData,
+        );
+      } catch {
+        const errorText = await paymentResponse.text().catch(() => "");
+        console.error(
+          "[PrecisionPay] Payment failed:",
+          paymentResponse.status,
+          errorText,
+        );
+      }
+      return NextResponse.json({ error: errorDetail }, { status: 400 });
     }
 
     const paymentResult = await paymentResponse.json();
-    transactionId =
+    transactionId = String(
       paymentResult.transactionId ||
-      paymentResult.transaction_id ||
-      `pp-${Date.now()}`;
+        paymentResult.transaction_id ||
+        `pp-${Date.now()}`,
+    );
 
     console.log(
       `[PrecisionPay] Payment completed: ${transactionId} (env: ${envValue})`,
@@ -206,9 +244,10 @@ export async function POST(request: Request) {
     return NextResponse.json(orderResult, { status: 201 });
   } catch (error) {
     console.error("[PrecisionPay] Error:", error);
-    return NextResponse.json(
-      { error: "Payment processing failed. Please try again." },
-      { status: 400 },
-    );
+    const message =
+      error instanceof ApiClientError
+        ? error.message
+        : "Payment processing failed. Please try again.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

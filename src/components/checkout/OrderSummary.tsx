@@ -1,29 +1,106 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ProductImage } from "~/components/ui/ProductImage";
 import type { CartItem } from "~/types/cart";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
 import { calculateTax } from "~/lib/tax";
+import PromoCodeInput, {
+  type AppliedDiscount,
+} from "~/components/checkout/PromoCodeInput";
+import { DISCOUNT_SESSION_KEY } from "~/components/checkout/CheckoutTypes";
 
 interface OrderSummaryProps {
   cart: { items: CartItem[]; subtotal: number; itemCount: number };
   showItemDetails?: boolean;
   shippingCost?: number | undefined;
   shippingState?: string;
+  isDigitalOnly?: boolean;
   ctaButton?: ReactNode;
+  /** Hide the promo code input — used on the success page where editing is inappropriate. */
+  hidePromoCode?: boolean;
 }
+
+/** Load the persisted applied discount from sessionStorage, if any. */
+function loadDiscount(): AppliedDiscount | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed.code === "string" &&
+      typeof parsed.discountCents === "number" &&
+      (parsed.discountType === "p" || parsed.discountType === "f")
+    ) {
+      return parsed as AppliedDiscount;
+    }
+  } catch {
+    // Ignore malformed payloads.
+  }
+  return null;
+}
+
+const DISCOUNT_EVENT = "alpha:discount-changed";
 
 export default function OrderSummary({
   cart,
   showItemDetails = true,
   shippingCost,
   shippingState,
+  isDigitalOnly,
   ctaButton,
+  hidePromoCode,
 }: OrderSummaryProps) {
-  const tax = calculateTax(cart.subtotal, shippingState);
+  const [discount, setDiscount] = useState<AppliedDiscount | null>(null);
+
+  const handleDiscountChange = useCallback((next: AppliedDiscount | null) => {
+    try {
+      if (next) {
+        sessionStorage.setItem(DISCOUNT_SESSION_KEY, JSON.stringify(next));
+      } else {
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
+      }
+    } catch {
+      // Storage unavailable — fall through, the in-memory state is still updated.
+    }
+    setDiscount(next);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(DISCOUNT_EVENT));
+    }
+  }, []);
+
+  // Hydrate from sessionStorage on mount so the discount line persists when
+  // a shopper moves between checkout pages in a single session. Also listen
+  // for updates dispatched by sibling instances of this component on other
+  // checkout pages. Cross-order carry-over is prevented by clearing
+  // DISCOUNT_SESSION_KEY on every order success path and on success-page
+  // mount — NOT by re-validating the stale amount here.
+  useEffect(() => {
+    setDiscount(loadDiscount());
+    const handler = () => setDiscount(loadDiscount());
+    window.addEventListener(DISCOUNT_EVENT, handler);
+    return () => window.removeEventListener(DISCOUNT_EVENT, handler);
+  }, []);
+
+  // Auto-invalidate a persisted discount if the cart is emptied out entirely.
+  useEffect(() => {
+    if (cart.items.length === 0 && discount != null) {
+      try {
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
+      } catch {}
+      setDiscount(null);
+    }
+  }, [cart.items.length, discount]);
+
+  const discountCents = discount
+    ? Math.min(discount.discountCents, cart.subtotal)
+    : 0;
+  const discountedSubtotal = Math.max(0, cart.subtotal - discountCents);
+  const estimatedTax = calculateTax(discountedSubtotal, shippingState);
   const resolvedShipping = shippingCost ?? 0;
-  const total = cart.subtotal + resolvedShipping + tax;
+  const total = discountedSubtotal + resolvedShipping + estimatedTax;
 
   return (
     <div className="sticky top-8">
@@ -88,6 +165,15 @@ export default function OrderSummary({
               showItemDetails ? "border-secondary-100 border-t pt-4" : ""
             }
           >
+            {!hidePromoCode && cart.items.length > 0 && (
+              <div className="mb-4">
+                <PromoCodeInput
+                  cartItems={cart.items}
+                  applied={discount}
+                  onChange={handleDiscountChange}
+                />
+              </div>
+            )}
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-secondary-500">Subtotal</span>
@@ -95,26 +181,39 @@ export default function OrderSummary({
                   {formatCentsToDollars(cart.subtotal)}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-secondary-500">Shipping</span>
-                {shippingCost === undefined ? (
-                  <span className="text-secondary-400">&mdash;</span>
-                ) : shippingCost === 0 ? (
-                  <span className="text-green-600">FREE</span>
-                ) : (
-                  <span className="text-secondary-900 tabular-nums">
-                    {formatCentsToDollars(shippingCost)}
-                  </span>
-                )}
-              </div>
-              {tax > 0 && (
+              {discountCents > 0 && discount && (
                 <div className="flex justify-between">
-                  <span className="text-secondary-500">Tax</span>
-                  <span className="text-secondary-900 font-mono tabular-nums">
-                    {formatCentsToDollars(tax)}
+                  <span className="text-secondary-500">
+                    Discount{" "}
+                    <span className="text-secondary-400 font-mono text-[0.65rem]">
+                      ({discount.code})
+                    </span>
+                  </span>
+                  <span className="text-green-600 tabular-nums">
+                    −{formatCentsToDollars(discountCents)}
                   </span>
                 </div>
               )}
+              {!isDigitalOnly && (
+                <div className="flex justify-between">
+                  <span className="text-secondary-500">Shipping</span>
+                  {shippingCost === undefined ? (
+                    <span className="text-secondary-400">&mdash;</span>
+                  ) : shippingCost === 0 ? (
+                    <span className="text-green-600">FREE</span>
+                  ) : (
+                    <span className="text-secondary-900 tabular-nums">
+                      {formatCentsToDollars(shippingCost)}
+                    </span>
+                  )}
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-secondary-500">Est. Tax</span>
+                <span className="text-secondary-900 font-mono tabular-nums">
+                  {formatCentsToDollars(estimatedTax)}
+                </span>
+              </div>
             </div>
 
             <div className="border-secondary-100 mt-4 border-t pt-4">

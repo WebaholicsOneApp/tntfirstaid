@@ -34,7 +34,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, shippingAddress, shippingCostCents } = body as Record<string, unknown>;
+    const { items, shippingAddress, shippingCostCents, discountCode } =
+      body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -47,11 +48,18 @@ export async function POST(request: Request) {
 
     const validatedItems = items as CheckoutItem[];
 
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
+
     const paymentIntent = await getApiClient().post<{
       clientSecret: string;
       paymentIntentId: string;
       amount: number;
       subtotal: number;
+      discountCents?: number;
       tax: number;
       shippingCost?: number;
       publishableKey?: string;
@@ -63,6 +71,9 @@ export async function POST(request: Request) {
       })),
       ...(shippingAddress ? { shippingAddress } : {}),
       ...(typeof shippingCostCents === "number" ? { shippingCostCents } : {}),
+      ...(normalizedDiscountCode
+        ? { discountCode: normalizedDiscountCode }
+        : {}),
     });
 
     return NextResponse.json({
@@ -70,6 +81,7 @@ export async function POST(request: Request) {
       paymentIntentId: paymentIntent.paymentIntentId,
       amount: paymentIntent.amount,
       subtotal: paymentIntent.subtotal,
+      discountCents: paymentIntent.discountCents ?? 0,
       tax: paymentIntent.tax,
       shippingCost: paymentIntent.shippingCost ?? 0,
       publishableKey: paymentIntent.publishableKey || null,

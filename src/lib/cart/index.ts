@@ -1,1 +1,6 @@
-export { CartProvider, useCart } from "./CartContext";
+export {
+  CartProvider,
+  useCart,
+  cartIsDigitalOnly,
+  cartHasDigitalItems,
+} from "./CartContext";

@@ -401,7 +401,7 @@ export default function CheckoutShippingClient() {
                     type="button"
                     onClick={fetchRates}
                     disabled={ratesLoading}
-                    className="border-secondary-900 text-secondary-900 hover:bg-secondary-900 flex w-full items-center justify-center gap-2 rounded-full border py-3 px-6 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-200 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="border-secondary-900 text-secondary-900 hover:bg-secondary-900 flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-200 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {ratesLoading ? (
                       <>
@@ -410,7 +410,9 @@ export default function CheckoutShippingClient() {
                       </>
                     ) : (
                       <span>
-                        {ratesFetched ? "Refresh Shipping Rates" : "Get Shipping Rates"}
+                        {ratesFetched
+                          ? "Refresh Shipping Rates"
+                          : "Get Shipping Rates"}
                       </span>
                     )}
                   </button>

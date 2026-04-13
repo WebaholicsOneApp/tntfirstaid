@@ -13,7 +13,7 @@ import {
   type PaymentMethod,
 } from "~/components/checkout/CheckoutTypes";
 import { Spinner } from "~/components/ui/Spinner";
-import { useCart } from "~/lib/cart/CartContext";
+import { useCart, cartIsDigitalOnly } from "~/lib/cart/CartContext";
 
 // Re-export PaymentConfig so page.tsx can import from here during transition
 export type { PaymentConfig };
@@ -195,18 +195,54 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
+  // Digital-only contact info (used when shipping is skipped)
+  const isDigitalOnly = cartIsDigitalOnly(cart.items);
+  const [digitalName, setDigitalName] = useState("");
+  const [digitalEmail, setDigitalEmail] = useState("");
+  const [digitalContactErrors, setDigitalContactErrors] = useState<
+    Map<string, string>
+  >(new Map());
+
   // ---- Read sessionStorage on mount; redirect to /checkout/shipping if no shipping data ----
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (!saved) {
+        if (isDigitalOnly) {
+          // Digital-only: create a minimal session — contact info collected on this page
+          const minimalSession: CheckoutSessionData = {
+            isDigitalOnly: true,
+            shipping: {
+              name: "",
+              email: "",
+              line1: "",
+              city: "",
+              state: "",
+              postalCode: "",
+            },
+            shippingMethod: "standard",
+            sendEmail: true,
+            paymentMethod: "credit_card",
+          };
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(minimalSession));
+          setSessionData(minimalSession);
+          return;
+        }
         router.push("/checkout/shipping");
         return;
       }
       const data = JSON.parse(saved) as CheckoutSessionData;
-      if (!data.shipping || !data.shipping.name || !data.shipping.email) {
+      if (
+        !data.isDigitalOnly &&
+        (!data.shipping || !data.shipping.name || !data.shipping.email)
+      ) {
         router.push("/checkout/shipping");
         return;
+      }
+      // Restore digital contact fields if previously entered
+      if (data.isDigitalOnly && data.shipping) {
+        setDigitalName(data.shipping.name || "");
+        setDigitalEmail(data.shipping.email || "");
       }
       setSessionData(data);
 
@@ -231,7 +267,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     } catch {
       router.push("/checkout/shipping");
     }
-  }, [router]);
+  }, [router, isDigitalOnly]);
 
   // ---- Load Accept.js when credit card is selected ----
   useEffect(() => {
@@ -347,6 +383,24 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
     if (!sessionData) {
       setError("Session data missing. Please go back to shipping.");
       return;
+    }
+
+    // Validate digital contact info if shipping was skipped
+    if (isDigitalOnly) {
+      const dErrors = new Map<string, string>();
+      if (!digitalName.trim()) dErrors.set("digital_name", "Name is required");
+      if (!digitalEmail.trim())
+        dErrors.set("digital_email", "Email is required");
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(digitalEmail.trim()))
+        dErrors.set("digital_email", "Enter a valid email");
+      if (dErrors.size > 0) {
+        setDigitalContactErrors(dErrors);
+        return;
+      }
+      setDigitalContactErrors(new Map<string, string>());
+      // Update session with contact info
+      sessionData.shipping.name = digitalName.trim();
+      sessionData.shipping.email = digitalEmail.trim();
     }
 
     // Validate billing address if not same as shipping
@@ -537,7 +591,6 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
-        {/* Step indicator */}
         <CheckoutStepIndicator currentStep={2} />
 
         {/* Header */}
@@ -554,7 +607,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
             </h1>
           </div>
           <Link
-            href="/checkout/shipping"
+            href={isDigitalOnly ? "/checkout" : "/checkout/shipping"}
             className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
           >
             <svg
@@ -570,7 +623,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            Back to Shipping
+            {isDigitalOnly ? "Back to Cart" : "Back to Shipping"}
           </Link>
         </div>
 
@@ -579,7 +632,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
           <div className="space-y-6 lg:col-span-2">
             {/* Back link mobile */}
             <Link
-              href="/checkout/shipping"
+              href={isDigitalOnly ? "/checkout" : "/checkout/shipping"}
               className="text-secondary-400 hover:text-primary-600 flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:hidden"
             >
               <svg
@@ -595,7 +648,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              Back to Shipping
+              {isDigitalOnly ? "Back to Cart" : "Back to Shipping"}
             </Link>
 
             {!isPaymentReady ? (
@@ -609,6 +662,70 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               </div>
             ) : (
               <>
+                {/* Contact Information Card — digital-only orders (no shipping step) */}
+                {isDigitalOnly && (
+                  <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
+                    <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+                      <div className="mb-5 flex items-center gap-3">
+                        <div className="bg-primary-500 h-px w-6" />
+                        <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          Contact Information
+                        </span>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-secondary-600 mb-1 block text-xs font-medium tracking-wider uppercase">
+                            Full Name
+                          </label>
+                          <input
+                            type="text"
+                            value={digitalName}
+                            onChange={(e) => {
+                              setDigitalName(e.target.value);
+                              setDigitalContactErrors((prev) => {
+                                const n = new Map(prev);
+                                n.delete("digital_name");
+                                return n;
+                              });
+                            }}
+                            className={`border-secondary-200 text-secondary-900 placeholder:text-secondary-300 focus:border-primary-400 focus:ring-primary-400 w-full rounded-xl border bg-white px-4 py-3 text-sm transition-colors focus:ring-1 focus:outline-none ${digitalContactErrors.has("digital_name") ? "border-red-400 ring-1 ring-red-400" : ""}`}
+                            placeholder="Your name"
+                          />
+                          {digitalContactErrors.has("digital_name") && (
+                            <p className="mt-1 text-xs text-red-500">
+                              {digitalContactErrors.get("digital_name")}
+                            </p>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-secondary-600 mb-1 block text-xs font-medium tracking-wider uppercase">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            value={digitalEmail}
+                            onChange={(e) => {
+                              setDigitalEmail(e.target.value);
+                              setDigitalContactErrors((prev) => {
+                                const n = new Map(prev);
+                                n.delete("digital_email");
+                                return n;
+                              });
+                            }}
+                            className={`border-secondary-200 text-secondary-900 placeholder:text-secondary-300 focus:border-primary-400 focus:ring-primary-400 w-full rounded-xl border bg-white px-4 py-3 text-sm transition-colors focus:ring-1 focus:outline-none ${digitalContactErrors.has("digital_email") ? "border-red-400 ring-1 ring-red-400" : ""}`}
+                            placeholder="you@example.com"
+                          />
+                          {digitalContactErrors.has("digital_email") && (
+                            <p className="mt-1 text-xs text-red-500">
+                              {digitalContactErrors.get("digital_email")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Billing Address Card */}
                 <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
                   <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
@@ -619,45 +736,47 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                       </span>
                     </div>
 
-                    {/* Same as shipping toggle */}
-                    <label className="flex cursor-pointer items-center gap-3">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={sameAsShipping}
-                          onChange={(e) => {
-                            setSameAsShipping(e.target.checked);
-                            if (e.target.checked)
-                              setBillingErrors(new Map<string, string>());
-                          }}
-                          className="peer sr-only"
-                        />
-                        <div className="border-secondary-300 peer-checked:border-primary-500 peer-checked:bg-primary-500 flex h-5 w-5 items-center justify-center rounded border-2 bg-white transition-colors">
-                          {sameAsShipping && (
-                            <svg
-                              className="text-secondary-900 h-3 w-3"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={3}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          )}
+                    {/* Same as shipping toggle — hidden for digital-only */}
+                    {!isDigitalOnly && (
+                      <label className="flex cursor-pointer items-center gap-3">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={sameAsShipping}
+                            onChange={(e) => {
+                              setSameAsShipping(e.target.checked);
+                              if (e.target.checked)
+                                setBillingErrors(new Map<string, string>());
+                            }}
+                            className="peer sr-only"
+                          />
+                          <div className="border-secondary-300 peer-checked:border-primary-500 peer-checked:bg-primary-500 flex h-5 w-5 items-center justify-center rounded border-2 bg-white transition-colors">
+                            {sameAsShipping && (
+                              <svg
+                                className="text-secondary-900 h-3 w-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={3}
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <span className="text-secondary-700 text-sm">
-                        Same as shipping address
-                      </span>
-                    </label>
+                        <span className="text-secondary-700 text-sm">
+                          Same as shipping address
+                        </span>
+                      </label>
+                    )}
 
-                    {/* Billing form — animated expand */}
+                    {/* Billing form — animated expand (always visible for digital-only) */}
                     <div
-                      className={`grid transition-all duration-300 ease-out ${!sameAsShipping ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                      className={`grid transition-all duration-300 ease-out ${isDigitalOnly || !sameAsShipping ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
                     >
                       <div className="overflow-hidden">
                         <div className="space-y-4 pt-5">
@@ -1054,6 +1173,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                           onChange={() => setSelectedMethod("precision_pay")}
                           className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
                         />
+                        <span className="text-secondary-700 text-sm font-medium">
+                          Pay once with:
+                        </span>
                         <img
                           src="/images/payment/precisionpay.png"
                           alt="PrecisionPay"
@@ -1092,9 +1214,9 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                                   </p>
                                   <p className="text-secondary-600 mt-1 text-sm">
                                     Pay directly from your bank account with
-                                    PrecisionPay. Lower fees, no credit card
-                                    needed. You&apos;ll complete the bank
-                                    transfer on the next step.
+                                    PrecisionPay and avoid being tracked by your
+                                    credit card company. You&apos;ll complete
+                                    your transaction on the next step.
                                   </p>
                                 </div>
                               </div>
@@ -1127,6 +1249,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               shippingCost={shippingCost}
               shippingState={sessionData?.shipping?.state}
               ctaButton={isPaymentReady ? ctaButton : undefined}
+              isDigitalOnly={isDigitalOnly}
             />
           </div>
         </div>

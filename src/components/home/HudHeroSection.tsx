@@ -362,7 +362,10 @@ export default function HudHeroSection() {
         <div data-hud="hero-text">
           <div className="mb-4 flex items-center gap-3 md:mb-6">
             <div className="bg-primary-500/60 h-px w-6" />
-            <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+            <span
+              className="font-avenir text-sm font-medium tracking-[0.3em] uppercase md:text-base"
+              style={{ color: "#e9c25f" }}
+            >
               Alpha Munitions
             </span>
           </div>
@@ -371,7 +374,7 @@ export default function HudHeroSection() {
         {/* Heading */}
         <div data-hud="hero-text">
           <h1
-            className="font-display text-primary-500 text-5xl leading-[0.88] font-extrabold tracking-[0.06em] uppercase md:text-7xl lg:text-8xl xl:text-9xl"
+            className="font-avenir text-primary-500 text-5xl leading-[0.88] font-black tracking-[0.06em] uppercase md:text-7xl lg:text-8xl xl:text-9xl"
             style={{
               textShadow:
                 "0 0 40px rgba(233,195,96,0.25), 0 0 80px rgba(233,195,96,0.1)",
@@ -385,7 +388,7 @@ export default function HudHeroSection() {
         {/* Secondary headline */}
         <div data-hud="american-made" className="mt-3">
           <p
-            className="font-display text-2xl font-extrabold tracking-[0.35em] uppercase md:text-3xl lg:text-4xl xl:text-5xl"
+            className="font-avenir text-2xl font-black tracking-[0.35em] uppercase md:text-3xl lg:text-4xl xl:text-5xl"
             style={{
               WebkitTextStroke: "1px rgba(233,195,96,0.45)",
               color: "transparent",
@@ -410,7 +413,7 @@ export default function HudHeroSection() {
           data-hud="tagline"
           className="text-primary-400/60 font-mono text-xs tracking-[0.25em] uppercase md:text-sm"
         >
-          {"Precision \u00B7 Performance \u00B7 Perfection"}
+          {"Strength \u00B7 Stability \u00B7 Consistency"}
         </p>
 
         {/* CTA — HUD corner frame button */}

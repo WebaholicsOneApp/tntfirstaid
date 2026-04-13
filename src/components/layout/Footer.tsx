@@ -32,9 +32,6 @@ export default function Footer({
               className="mx-auto h-12 w-auto"
             />
           </Link>
-          <p className="text-primary-500/40 font-mono text-[0.6rem] tracking-[0.25em] uppercase">
-            Precision &middot; Performance &middot; Perfection
-          </p>
         </div>
 
         {/* Centered gold divider */}
@@ -138,28 +135,14 @@ export default function Footer({
               Contact &amp; Support
             </h3>
             <ul className="text-secondary-400 space-y-2.5 text-sm">
-              {storeConfig?.phone && (
-                <li>
-                  <a
-                    href={storeConfig.phoneHref}
-                    className="hover:text-primary-500 transition-colors"
-                  >
-                    {storeConfig.phone}
-                  </a>
-                </li>
-              )}
-              {storeConfig?.email && (
-                <li>
-                  <a
-                    href={`mailto:${storeConfig.email}`}
-                    className="hover:text-primary-500 transition-colors"
-                  >
-                    {storeConfig.email}
-                  </a>
-                </li>
-              )}
-              {storeConfig?.hours && <li>{storeConfig.hours}</li>}
-              <li>American Fork, UT</li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="hover:text-primary-500 transition-colors"
+                >
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

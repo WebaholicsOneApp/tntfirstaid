@@ -140,7 +140,7 @@ export interface OrderConfirmationEmailData {
   customerEmail: string;
   customerName: string;
   orderNumber: string;
-  shippingAddress: {
+  shippingAddress?: {
     name: string;
     line1: string;
     line2?: string | null;
@@ -156,11 +156,13 @@ export interface OrderConfirmationEmailData {
     imageUrl?: string;
     quantity: number;
     price: number; // in cents
+    downloadUrl?: string;
   }[];
   subtotal: number; // in cents
   shippingCost: number; // in cents
   tax: number; // in cents
   total: number; // in cents
+  isDigitalOnly?: boolean;
 }
 
 /**
@@ -179,20 +181,23 @@ export async function sendOrderConfirmationEmail(
       customerName: data.customerName,
       orderNumber: data.orderNumber,
       customerEmail: data.customerEmail,
-      shippingAddress: {
-        name: data.shippingAddress.name,
-        line1: data.shippingAddress.line1,
-        line2: data.shippingAddress.line2 || undefined,
-        city: data.shippingAddress.city,
-        state: data.shippingAddress.state,
-        postalCode: data.shippingAddress.postalCode,
-        country: data.shippingAddress.country,
-      },
+      shippingAddress: data.shippingAddress
+        ? {
+            name: data.shippingAddress.name,
+            line1: data.shippingAddress.line1,
+            line2: data.shippingAddress.line2 || undefined,
+            city: data.shippingAddress.city,
+            state: data.shippingAddress.state,
+            postalCode: data.shippingAddress.postalCode,
+            country: data.shippingAddress.country,
+          }
+        : undefined,
       items: data.items,
       subtotal: data.subtotal,
       shippingCost: data.shippingCost,
       tax: data.tax,
       total: data.total,
+      isDigitalOnly: data.isDigitalOnly,
       storeName,
       siteUrl,
     });

@@ -154,11 +154,30 @@ export default function ProductDetailClient({
           )}
         </div>
 
-        {/* Stock status */}
-        <StockBadge
-          inStock={selectedVariation?.inStock ?? product.inStock}
-          quantity={selectedVariation?.quantity}
-        />
+        {/* Stock / download status */}
+        {product.isDownloadable ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700">
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Digital Download
+          </span>
+        ) : (
+          <StockBadge
+            inStock={selectedVariation?.inStock ?? product.inStock}
+            quantity={selectedVariation?.quantity}
+          />
+        )}
 
         {/* Variant selector */}
         {product.variations.length > 1 && (

@@ -37,6 +37,8 @@ export interface OrderItem {
   quantity: number;
   price: number; // cents
   image?: string;
+  isDownloadable?: boolean;
+  downloadUrl?: string | null;
 }
 
 export interface Order {
@@ -48,6 +50,9 @@ export interface Order {
   subtotal?: number;
   shipping?: number;
   tax?: number;
+  /** Snapshot of storefront discount applied at checkout; 0 / null = none. */
+  discountCents?: number;
+  discountCode?: string | null;
   items: OrderItem[];
   paymentMethod?: {
     type: string;

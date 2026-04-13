@@ -46,7 +46,7 @@ export default function FooterCtaBanner() {
             </div>
 
             {/* Headline */}
-            <h2 className="text-primary-400 font-serif text-4xl leading-tight font-bold italic sm:text-5xl lg:text-6xl">
+            <h2 className="text-primary-400 font-avenir text-4xl leading-tight font-black sm:text-5xl lg:text-6xl">
               American Made
               <br />
               Alpha Grade
