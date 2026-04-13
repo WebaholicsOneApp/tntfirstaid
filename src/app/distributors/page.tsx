@@ -463,10 +463,10 @@ export default async function DistributorsPage() {
                   </span>
                 </Link>
                 <a
-                  href={storeConfig.phoneHref}
+                  href={`mailto:${storeConfig.email}`}
                   className="border-primary-500/40 text-primary-400/80 hover:border-primary-500 hover:text-primary-400 inline-flex items-center rounded-full border px-8 py-3.5 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
                 >
-                  Call Us
+                  Email Us
                 </a>
               </div>
             </div>

@@ -29,6 +29,9 @@ interface OrderConfirmedTemplateData {
   shippingCost: number; // in cents
   tax: number; // in cents
   total: number; // in cents
+  /** Applied storefront discount snapshot; 0 / undefined = none. */
+  discountCents?: number;
+  discountCode?: string | null;
   isDigitalOnly?: boolean;
   storeName: string;
   siteUrl: string;
@@ -132,6 +135,14 @@ export function orderConfirmedTemplate(data: OrderConfirmedTemplateData): {
             <td style="padding: 4px 0; color: #6b7280;">Subtotal</td>
             <td style="padding: 4px 0; text-align: right; color: #374151;">$${(data.subtotal / 100).toFixed(2)}</td>
           </tr>
+          ${
+            data.discountCents && data.discountCents > 0
+              ? `<tr>
+            <td style="padding: 4px 0; color: #059669;">Discount${data.discountCode ? ` (${data.discountCode})` : ""}</td>
+            <td style="padding: 4px 0; text-align: right; color: #059669;">−$${(data.discountCents / 100).toFixed(2)}</td>
+          </tr>`
+              : ""
+          }
           ${
             !data.isDigitalOnly
               ? `<tr>

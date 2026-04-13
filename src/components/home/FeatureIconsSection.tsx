@@ -17,7 +17,7 @@ export default function FeatureIconsSection() {
         >
           <div className="mb-7 flex items-center gap-3">
             <div className="bg-primary-500 h-px w-6" />
-            <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+            <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
               Why Alpha
             </span>
           </div>
@@ -98,22 +98,19 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-[0.6rem] tracking-[0.2em] select-none">
+            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
               01
             </span>
-            <p className="text-secondary-300 mb-4 font-mono text-[0.58rem] tracking-[0.22em] uppercase">
+            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
               Technology
             </p>
             <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
-              Tightest Tolerances.
-              <br />
-              Full Stop.
+              Constant Innovation
             </h3>
             <p className="text-secondary-400 text-sm leading-relaxed">
-              Alpha Munitions develops cutting-edge manufacturing processes that
-              deliver the tightest tolerances in the industry. Our engineering
-              team continuously refines our methods to push the boundaries of
-              brass case performance.
+              Alpha Munitions pushes the boundaries of brass manufacturing. Our
+              relentless pursuit of innovation results in cutting-edge processes
+              that deliver the highest-performing brass cases ever produced.
             </p>
           </div>
 
@@ -142,22 +139,21 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-[0.6rem] tracking-[0.2em] select-none">
+            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
               02
             </span>
-            <p className="text-secondary-300 mb-4 font-mono text-[0.58rem] tracking-[0.22em] uppercase">
+            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
               Quality
             </p>
             <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
-              Zero Compromise
-              <br />
-              in Quality Control.
+              Uncompromised Quality Control and Inspection
             </h3>
             <p className="text-secondary-400 text-sm leading-relaxed">
-              Every lot of Alpha brass is weight sorted, inspected, and tested
-              before it ships. We reject what others accept because our
-              reputation is built on consistency you can verify at the reloading
-              bench.
+              Every piece of brass we produce is inspected on the most advanced
+              inspection system in the industry — designed and built in-house at
+              Alpha. We don&apos;t make different grades of brass. If it
+              doesn&apos;t meet Alpha Grade standards, it doesn&apos;t leave our
+              facility.
             </p>
           </div>
 
@@ -210,21 +206,18 @@ export default function FeatureIconsSection() {
                 <circle cx="26" cy="48" r="2.5" fill="#C9A84C" />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-[0.6rem] tracking-[0.2em] select-none">
+            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
               03
             </span>
-            <p className="text-secondary-300 mb-4 font-mono text-[0.58rem] tracking-[0.22em] uppercase">
+            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
               Support
             </p>
             <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
-              Expert Support.
-              <br />
-              Always Here.
+              Expert Customer Support
             </h3>
             <p className="text-secondary-400 mb-8 text-sm leading-relaxed">
-              Our team of experienced shooters and reloaders is here to help.
-              Whether you need load data recommendations, technical support, or
-              just want to talk brass, we are always available to assist.
+              Our team of experienced shooters and reloaders takes pride in
+              delivering world-class customer support.
             </p>
             <div className="mt-auto">
               <Link

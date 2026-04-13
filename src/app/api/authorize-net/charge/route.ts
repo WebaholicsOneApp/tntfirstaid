@@ -16,8 +16,14 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { customerEmail, phoneNumber, items, opaqueData, shippingAddress } =
-      body;
+    const {
+      customerEmail,
+      phoneNumber,
+      items,
+      opaqueData,
+      shippingAddress,
+      discountCode,
+    } = body;
 
     if (!customerEmail || !items?.length || !opaqueData || !shippingAddress) {
       return NextResponse.json(
@@ -25,6 +31,14 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    // Validate discountCode shape before forwarding — the upstream will also
+    // re-validate via validateAndComputeDiscount regardless.
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
 
     const result = await getApiClient().post<{
       success: boolean;
@@ -53,6 +67,9 @@ export async function POST(request: Request) {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country || "US",
       },
+      ...(normalizedDiscountCode
+        ? { discountCode: normalizedDiscountCode }
+        : {}),
     });
 
     return NextResponse.json(result);

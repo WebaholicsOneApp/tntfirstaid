@@ -1,4 +1,3 @@
-const phone = process.env.NEXT_PUBLIC_STORE_PHONE || "(801) 555-0123";
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
 
@@ -8,10 +7,8 @@ export const storeConfig = {
   siteDomain: siteUrl.replace(/^https?:\/\//, "").replace(/\/$/, ""),
   address:
     process.env.NEXT_PUBLIC_STORE_ADDRESS ||
-    "1234 Alpha Way\nAmerican Fork, UT 84003",
-  phone,
-  phoneHref: `tel:${phone.replace(/[\s()-]/g, "")}`,
-  email: process.env.NEXT_PUBLIC_STORE_EMAIL || "info@alphamunitions.com",
+    "268 W Paramount Ave, Salt Lake City, UT 84115",
+  email: process.env.NEXT_PUBLIC_STORE_EMAIL || "support@alphamunitions.com",
   supportEmail:
     process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@alphamunitions.com",
   hours: process.env.NEXT_PUBLIC_STORE_HOURS || "Mon-Fri 9AM-5PM MST",

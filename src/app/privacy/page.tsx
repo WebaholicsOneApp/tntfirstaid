@@ -28,7 +28,6 @@ export default async function PrivacyPolicyPage() {
     siteName,
     siteDomain: storeConfig.siteDomain,
     supportEmail: storeConfig.supportEmail,
-    phone: storeConfig.phone,
   };
   const overviewText = resolveTemplate(config.overviewText, vars);
 

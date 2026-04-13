@@ -44,8 +44,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, successUrl, cancelUrl, customerEmail, shippingAddress } =
-      body as Record<string, unknown>;
+    const {
+      items,
+      successUrl,
+      cancelUrl,
+      customerEmail,
+      shippingAddress,
+      discountCode,
+    } = body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -119,6 +125,12 @@ export async function POST(request: Request) {
         .catch(() => {});
     }
 
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
+
     const session = await getApiClient().post<{
       url?: string;
       checkoutUrl?: string;
@@ -134,6 +146,9 @@ export async function POST(request: Request) {
       typeof shippingAddress === "object" &&
       !Array.isArray(shippingAddress)
         ? { shippingAddress }
+        : {}),
+      ...(normalizedDiscountCode
+        ? { discountCode: normalizedDiscountCode }
         : {}),
     });
 

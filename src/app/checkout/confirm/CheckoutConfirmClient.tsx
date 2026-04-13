@@ -13,6 +13,7 @@ import { openPrecisionPayPortal } from "~/components/checkout/PrecisionPayPopup"
 import { useCart, cartIsDigitalOnly } from "~/lib/cart/CartContext";
 import {
   SESSION_KEY,
+  DISCOUNT_SESSION_KEY,
   type CheckoutSessionData,
   type PaymentConfig,
 } from "~/components/checkout/CheckoutTypes";
@@ -39,6 +40,41 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ---- Persisted discount (for dev bypass path) ----
+  // The non-bypass flows read DISCOUNT_SESSION_KEY inline inside their submit
+  // handlers. The dev-bypass flow uses PlaceOrderPanel which needs the
+  // discount supplied as props, so we hydrate it into state on mount and
+  // keep it in sync if OrderSummary revalidates/clears it.
+  const [persistedDiscount, setPersistedDiscount] = useState<{
+    code: string;
+    discountCents: number;
+  } | null>(null);
+  useEffect(() => {
+    const read = (): { code: string; discountCents: number } | null => {
+      try {
+        const raw = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (
+          parsed &&
+          typeof parsed.code === "string" &&
+          /^[A-Z0-9_-]{3,32}$/.test(parsed.code) &&
+          typeof parsed.discountCents === "number" &&
+          parsed.discountCents > 0
+        ) {
+          return { code: parsed.code, discountCents: parsed.discountCents };
+        }
+      } catch {
+        // malformed — treat as no discount
+      }
+      return null;
+    };
+    setPersistedDiscount(read());
+    const handler = () => setPersistedDiscount(read());
+    window.addEventListener("alpha:discount-changed", handler);
+    return () => window.removeEventListener("alpha:discount-changed", handler);
+  }, []);
 
   // ---- Read checkout data from sessionStorage ----
   useEffect(() => {
@@ -104,6 +140,25 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     setError(null);
 
     try {
+      // Read any persisted discount from sessionStorage — OrderSummary is the
+      // single source of truth for applied promo codes during checkout.
+      let discountCode: string | undefined;
+      try {
+        const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (rawDiscount) {
+          const parsed = JSON.parse(rawDiscount);
+          if (
+            parsed &&
+            typeof parsed.code === "string" &&
+            /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
+          ) {
+            discountCode = parsed.code;
+          }
+        }
+      } catch {
+        // Malformed or unavailable — proceed without discount.
+      }
+
       const res = await fetch("/api/authorize-net/charge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,6 +182,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 postalCode: checkoutData.shipping.postalCode,
                 country: checkoutData.shipping.country,
               },
+          ...(discountCode ? { discountCode } : {}),
         }),
       });
 
@@ -148,6 +204,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       // Success — clear session + cart, navigate to success page
       try {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
       } catch {
         // Ignore
       }
@@ -225,6 +282,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
         try {
           sessionStorage.removeItem(SESSION_KEY);
+          sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
         } catch {}
         try {
           const ids = cart.items.map((i) => i.productId).filter(Boolean);
@@ -297,6 +355,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
       try {
         sessionStorage.removeItem(SESSION_KEY);
+        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
       } catch {}
       try {
         const ids = cart.items.map((i) => i.productId).filter(Boolean);
@@ -511,9 +570,12 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                       postalCode: checkoutData.shipping.postalCode,
                       country: checkoutData.shipping.country,
                     }}
+                    discountCode={persistedDiscount?.code}
+                    discountCents={persistedDiscount?.discountCents}
                     onSuccess={({ orderId, orderNumber }) => {
                       try {
                         sessionStorage.removeItem(SESSION_KEY);
+                        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
                       } catch {
                         // Ignore
                       }

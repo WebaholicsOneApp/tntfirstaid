@@ -17,7 +17,6 @@ export const getStoreConfig = cache(async (): Promise<StoreConfig> => {
   } catch {
     branding = {};
   }
-  const phone = branding.storePhone || storeConfig.phone;
   return {
     ...storeConfig,
     // Logo: only override when toggle is ON
@@ -33,11 +32,6 @@ export const getStoreConfig = cache(async (): Promise<StoreConfig> => {
       branding.siteName && { siteName: branding.siteName }),
     ...(branding.overrideStoreInfo &&
       branding.storeAddress && { address: branding.storeAddress }),
-    ...(branding.overrideStoreInfo &&
-      branding.storePhone && {
-        phone,
-        phoneHref: `tel:${phone.replace(/[\s()-]/g, "")}`,
-      }),
     ...(branding.overrideStoreInfo &&
       branding.storeEmail && { email: branding.storeEmail }),
     ...(branding.overrideStoreInfo &&

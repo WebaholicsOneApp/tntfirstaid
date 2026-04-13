@@ -9,6 +9,7 @@ import {
   Cardo,
   JetBrains_Mono,
 } from "next/font/google";
+import localFont from "next/font/local";
 import NextTopLoader from "nextjs-toploader";
 import { getNonce } from "~/lib/get-nonce";
 import { NonceProvider } from "~/lib/nonce-context";
@@ -46,6 +47,17 @@ const cardo = Cardo({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-jetbrains",
+  display: "swap",
+});
+
+const avenir = localFont({
+  src: [
+    { path: "../fonts/AvenirLTProRoman.otf", weight: "400", style: "normal" },
+    { path: "../fonts/AvenirLTProMedium.otf", weight: "500", style: "normal" },
+    { path: "../fonts/AvenirLTProHeavy.otf", weight: "800", style: "normal" },
+    { path: "../fonts/AvenirLTProBlack.otf", weight: "900", style: "normal" },
+  ],
+  variable: "--font-avenir",
   display: "swap",
 });
 
@@ -87,7 +99,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${inter.variable} ${cardo.variable} ${jetbrainsMono.variable}`}
+      className={`${playfair.variable} ${inter.variable} ${cardo.variable} ${jetbrainsMono.variable} ${avenir.variable}`}
     >
       <body
         className="text-secondary-800 flex min-h-screen flex-col bg-white font-sans antialiased"

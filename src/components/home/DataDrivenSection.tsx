@@ -33,7 +33,7 @@ export default function DataDrivenSection() {
             {/* Eyebrow */}
             <div className="mb-6 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6 shrink-0" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
                 Performance
               </span>
             </div>
@@ -69,8 +69,8 @@ export default function DataDrivenSection() {
                 At Alpha Munitions, engineering, technology, and innovation are
                 the cornerstones of everything we do. Our commitment to
                 precision begins with advanced manufacturing processes and
-                extends through rigorous quality control testing on every lot
-                we produce.
+                extends through rigorous quality control testing on every lot we
+                produce.
               </p>
               <p>
                 We leverage data from thousands of rounds tested through

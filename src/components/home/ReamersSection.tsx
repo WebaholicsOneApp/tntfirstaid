@@ -107,7 +107,7 @@ export default function ReamersSection({ products }: ReamersSectionProps) {
               <div>
                 <div className="mb-5 flex items-center gap-3">
                   <div className="bg-primary-500 h-px w-6 shrink-0" />
-                  <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                  <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
                     Tools &amp; Accessories
                   </span>
                 </div>

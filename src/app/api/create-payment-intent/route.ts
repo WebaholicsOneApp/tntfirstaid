@@ -34,7 +34,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, shippingAddress } = body as Record<string, unknown>;
+    const { items, shippingAddress, discountCode } = body as Record<
+      string,
+      unknown
+    >;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -47,11 +50,18 @@ export async function POST(request: Request) {
 
     const validatedItems = items as CheckoutItem[];
 
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
+
     const paymentIntent = await getApiClient().post<{
       clientSecret: string;
       paymentIntentId: string;
       amount: number;
       subtotal: number;
+      discountCents?: number;
       tax: number;
       publishableKey?: string;
       stripeConnectAccountId?: string;
@@ -61,6 +71,9 @@ export async function POST(request: Request) {
         quantity: item.quantity,
       })),
       ...(shippingAddress ? { shippingAddress } : {}),
+      ...(normalizedDiscountCode
+        ? { discountCode: normalizedDiscountCode }
+        : {}),
     });
 
     return NextResponse.json({
@@ -68,6 +81,7 @@ export async function POST(request: Request) {
       paymentIntentId: paymentIntent.paymentIntentId,
       amount: paymentIntent.amount,
       subtotal: paymentIntent.subtotal,
+      discountCents: paymentIntent.discountCents ?? 0,
       tax: paymentIntent.tax,
       publishableKey: paymentIntent.publishableKey || null,
       stripeConnectAccountId: paymentIntent.stripeConnectAccountId || null,

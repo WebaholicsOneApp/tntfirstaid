@@ -316,6 +316,20 @@ export default function OrdersClient({
                           <span>{formatCentsToDollars(order.subtotal)}</span>
                         </div>
                       )}
+                      {order.discountCents != null &&
+                        order.discountCents > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>
+                              Discount
+                              {order.discountCode
+                                ? ` (${order.discountCode})`
+                                : ""}
+                            </span>
+                            <span>
+                              −{formatCentsToDollars(order.discountCents)}
+                            </span>
+                          </div>
+                        )}
                       {order.shipping != null && order.shipping > 0 && (
                         <div className="text-secondary-500 flex justify-between">
                           <span>Shipping</span>

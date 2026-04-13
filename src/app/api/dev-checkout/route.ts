@@ -51,6 +51,12 @@ interface DevCheckoutBody {
     postalCode: string;
     country: string;
   };
+  /** Optional promo code already validated client-side via
+   * /api/checkout/apply-discount. Dev bypass trusts the client — production
+   * paths (Stripe / authorize-net) still re-validate upstream. */
+  discountCode?: string;
+  /** Absolute discount in cents matching discountCode. Capped to subtotal. */
+  discountCents?: number;
   sendEmail?: boolean;
 }
 
@@ -81,8 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { customerEmail, items, shippingAddress, sendEmail } =
-      body as DevCheckoutBody;
+    const {
+      customerEmail,
+      items,
+      shippingAddress,
+      sendEmail,
+      discountCode,
+      discountCents: rawDiscountCents,
+    } = body as DevCheckoutBody;
 
     if (!customerEmail || typeof customerEmail !== "string") {
       return NextResponse.json(
@@ -118,8 +130,26 @@ export async function POST(request: NextRequest) {
       (sum, item) => sum + item.price * item.quantity,
       0,
     );
-    const tax = Math.round(subtotal * 0.08);
-    const total = subtotal + tax;
+
+    // --- Discount ---
+    // Dev bypass trusts the client-supplied discount (already validated by
+    // /api/checkout/apply-discount). Production paths re-validate upstream.
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
+    const normalizedDiscountCents =
+      normalizedDiscountCode &&
+      typeof rawDiscountCents === "number" &&
+      Number.isFinite(rawDiscountCents) &&
+      rawDiscountCents > 0
+        ? Math.min(Math.floor(rawDiscountCents), subtotal)
+        : 0;
+
+    const discountedSubtotal = Math.max(0, subtotal - normalizedDiscountCents);
+    const tax = Math.round(discountedSubtotal * 0.08);
+    const total = discountedSubtotal + tax;
 
     // Generate fake Stripe-like IDs
     const fakeSessionId = `test_session_${Date.now()}`;
@@ -130,6 +160,36 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
 
+    // Spread the order-level tax across line items so per-line tax sums to
+    // `tax`. When a discount is present, each line's share of the discounted
+    // subtotal is used. Rounding delta goes on the first line to keep the
+    // sum exact (mirrors how shippingCost is attached to the first line in
+    // oneapp's storefrontCreate handler).
+    const ratio = subtotal > 0 ? discountedSubtotal / subtotal : 1;
+    let distributedTax = 0;
+    const lineItems = items.map((item, idx) => {
+      const lineSub = item.price * item.quantity;
+      const lineDiscounted = Math.round(lineSub * ratio);
+      let lineTax = Math.round(lineDiscounted * 0.08);
+      distributedTax += lineTax;
+      // On the last line, absorb any rounding delta.
+      if (idx === items.length - 1) {
+        const delta = tax - distributedTax;
+        lineTax += delta;
+      }
+      return {
+        variationId: item.variationId,
+        productId: item.productId,
+        name: item.name,
+        variation: item.variation || null,
+        manufacturerNo: item.manufacturerNo || null,
+        imageUrl: item.imageUrl || null,
+        quantity: item.quantity,
+        price: item.price,
+        tax: lineTax,
+      };
+    });
+
     const response = await fetch(oneappUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -139,17 +199,7 @@ export async function POST(request: NextRequest) {
         stripePaymentIntentId: fakePaymentIntentId,
         customerEmail,
         paymentMethod: "dev_bypass",
-        items: items.map((item) => ({
-          variationId: item.variationId,
-          productId: item.productId,
-          name: item.name,
-          variation: item.variation || null,
-          manufacturerNo: item.manufacturerNo || null,
-          imageUrl: item.imageUrl || null,
-          quantity: item.quantity,
-          price: item.price,
-          tax: Math.round(item.price * item.quantity * 0.08),
-        })),
+        items: lineItems,
         subtotal,
         shippingCost: 0,
         tax,
@@ -158,6 +208,12 @@ export async function POST(request: NextRequest) {
         storeId: STOREFRONT_STORE_ID,
         companyId: STOREFRONT_COMPANY_ID,
         sendEmail: sendEmail ?? false,
+        ...(normalizedDiscountCode && normalizedDiscountCents > 0
+          ? {
+              discountCode: normalizedDiscountCode,
+              discountCents: normalizedDiscountCents,
+            }
+          : {}),
       }),
     });
 

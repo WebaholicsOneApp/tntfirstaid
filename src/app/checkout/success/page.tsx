@@ -8,6 +8,7 @@ import { useAuth } from "~/lib/auth";
 import RecommendationGrid from "~/components/products/RecommendationGrid";
 import { Spinner } from "~/components/ui/Spinner";
 import { getDownloadUrlByName } from "~/lib/downloads";
+import { DISCOUNT_SESSION_KEY } from "~/components/checkout/CheckoutTypes";
 import type { ProductListItem } from "~/types";
 
 // ---------------------------------------------------------------------------
@@ -45,6 +46,8 @@ interface OrderInfo {
   shippingCost?: number;
   tax?: number;
   total?: number;
+  discountCents?: number;
+  discountCode?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -197,6 +200,15 @@ function OrderSummary({ orderInfo }: { orderInfo: OrderInfo }) {
             <span>Subtotal</span>
             <span>{formatCents(orderInfo.subtotal)}</span>
           </div>
+          {orderInfo.discountCents != null && orderInfo.discountCents > 0 && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>
+                Discount
+                {orderInfo.discountCode ? ` (${orderInfo.discountCode})` : ""}
+              </span>
+              <span>−{formatCents(orderInfo.discountCents)}</span>
+            </div>
+          )}
           <div className="text-secondary-500 flex justify-between text-sm">
             <span>Shipping</span>
             <span
@@ -601,6 +613,12 @@ function SuccessContent() {
 
   useEffect(() => {
     clearCart();
+    // Belt-and-braces: ensure the applied promo code does not carry over to
+    // the next order, even if the path that landed us here bypassed
+    // CheckoutConfirmClient's onSuccess cleanup.
+    try {
+      sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
+    } catch {}
 
     const fetchOrderInfo = async () => {
       try {

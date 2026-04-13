@@ -27,6 +27,14 @@ interface PlaceOrderPanelProps {
     postalCode: string;
     country?: string;
   };
+  /** Applied promo code string (e.g. "TEST15"). Forwarded to /api/dev-checkout
+   * when set so the dev bypass path persists the discount on the created
+   * order. Only supplied when the shopper has an active discount in session
+   * storage. */
+  discountCode?: string;
+  /** Absolute discount amount in cents, already validated server-side by
+   * /api/checkout/apply-discount. */
+  discountCents?: number;
   onSuccess: (data: { orderId: number; orderNumber: string | null }) => void;
   onError: (message: string) => void;
 }
@@ -36,6 +44,8 @@ export default function PlaceOrderPanel({
   email,
   phone,
   shippingAddress,
+  discountCode,
+  discountCents,
   onSuccess,
   onError,
 }: PlaceOrderPanelProps) {
@@ -83,6 +93,11 @@ export default function PlaceOrderPanel({
             postalCode: shippingAddress.postalCode,
             country: shippingAddress.country || "US",
           },
+          ...(discountCode &&
+          typeof discountCents === "number" &&
+          discountCents > 0
+            ? { discountCode, discountCents }
+            : {}),
           sendEmail,
         }),
       });
