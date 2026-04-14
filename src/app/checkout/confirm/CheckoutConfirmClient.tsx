@@ -249,6 +249,24 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         0,
       );
 
+      // Read any persisted discount from sessionStorage
+      let discountCode: string | undefined;
+      let discountCents = 0;
+      try {
+        const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (rawDiscount) {
+          const parsed = JSON.parse(rawDiscount);
+          if (
+            parsed &&
+            typeof parsed.code === "string" &&
+            /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
+          ) {
+            discountCode = parsed.code;
+            discountCents = parsed.discountCents || 0;
+          }
+        }
+      } catch { /* malformed */ }
+
       // Dev bypass: skip PP portal, go straight to order creation
       if (devBypass) {
         const res = await fetch("/api/checkout/precision-pay", {
@@ -256,7 +274,11 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             devBypass: true,
+<<<<<<< Updated upstream
             amount: displayAmount,
+=======
+            amount: displayAmount - discountCents + shippingCost + tax,
+>>>>>>> Stashed changes
             customerEmail: checkoutData.shipping.email,
             phoneNumber: checkoutData.shipping.phone || undefined,
             items: cart.items.map((item) => ({
@@ -272,6 +294,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               postalCode: checkoutData.shipping.postalCode,
               country: checkoutData.shipping.country || "US",
             },
+            ...(discountCode ? { discountCode } : {}),
           }),
         });
 
@@ -307,7 +330,14 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       const nonceData = await nonceRes.json();
 
       // Step 2: Open PP portal iframe
+<<<<<<< Updated upstream
       const amountDollars = (displayAmount / 100).toFixed(2);
+=======
+      const amountDollars = (
+        (displayAmount - discountCents + shippingCost + tax) /
+        100
+      ).toFixed(2);
+>>>>>>> Stashed changes
 
       const result = await openPrecisionPayPortal({
         merchantNonce: nonceData.merchantNonce,
@@ -329,7 +359,11 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         body: JSON.stringify({
           precisionPayToken: result.precisionPayToken || undefined,
           plaidData: result.plaidData || undefined,
+<<<<<<< Updated upstream
           amount: displayAmount,
+=======
+          amount: displayAmount - discountCents + shippingCost + tax,
+>>>>>>> Stashed changes
           customerEmail: checkoutData.shipping.email,
           phoneNumber: checkoutData.shipping.phone || undefined,
           items: cart.items.map((item) => ({
@@ -345,6 +379,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             postalCode: checkoutData.shipping.postalCode,
             country: checkoutData.shipping.country || "US",
           },
+          ...(discountCode ? { discountCode } : {}),
         }),
       });
 
