@@ -27,6 +27,7 @@ export async function POST(request: Request) {
       discountCode,
       shippingServiceName,
       shippingServiceCode,
+      taxCents,
     } = body;
 
     // Validate discountCode shape before forwarding — the upstream will also
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
         ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
         ...(shippingServiceName ? { shippingServiceName } : {}),
         ...(shippingServiceCode ? { shippingServiceCode } : {}),
+        ...(taxCents != null ? { taxCents } : {}),
       });
 
       return NextResponse.json(orderResult, { status: 201 });

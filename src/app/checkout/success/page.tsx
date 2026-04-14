@@ -125,7 +125,7 @@ function OrderSummary({ orderInfo }: { orderInfo: OrderInfo }) {
                 x{item.quantity}
               </p>
               <p className="text-secondary-900 text-sm font-semibold">
-                {formatCents(item.price * item.quantity)}
+                {formatCents(item.price)}
               </p>
             </div>
           </div>

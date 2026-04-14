@@ -252,8 +252,6 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
-      const tax = calculateTax(displayAmount, checkoutData.shipping.state);
-
       // Read any persisted discount from sessionStorage
       let discountCode: string | undefined;
       let discountCents = 0;
@@ -272,6 +270,9 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         }
       } catch { /* malformed */ }
 
+      // Tax on discounted subtotal to match OrderSummary
+      const tax = calculateTax(displayAmount - discountCents, checkoutData.shipping.state);
+
       // Dev bypass: skip PP portal, go straight to order creation
       if (devBypass) {
         const res = await fetch("/api/checkout/precision-pay", {
@@ -289,6 +290,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             shippingCostCents: shippingCost,
             shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
             shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
+            taxCents: tax,
             shippingAddress: {
               name: checkoutData.shipping.name,
               line1: checkoutData.shipping.line1,
@@ -369,6 +371,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           shippingCostCents: shippingCost,
           shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
           shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
+          taxCents: tax,
           shippingAddress: {
             name: checkoutData.shipping.name,
             line1: checkoutData.shipping.line1,
