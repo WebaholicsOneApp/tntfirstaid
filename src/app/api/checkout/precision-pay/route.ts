@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       customerEmail,
       phoneNumber,
       shippingCostCents,
+      discountCode,
     } = body;
 
     // Dev bypass: skip PP API, create order directly with mock transaction ID
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
         shippingAddress,
         phoneNumber,
         ...(shippingCostCents != null ? { shippingCostCents } : {}),
+        ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
       });
 
       return NextResponse.json(orderResult, { status: 201 });
@@ -239,6 +241,7 @@ export async function POST(request: Request) {
       shippingAddress,
       phoneNumber,
       ...(shippingCostCents != null ? { shippingCostCents } : {}),
+      ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
     });
 
     return NextResponse.json(orderResult, { status: 201 });

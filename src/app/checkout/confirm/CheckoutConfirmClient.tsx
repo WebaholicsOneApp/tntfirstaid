@@ -252,6 +252,24 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       );
       const tax = calculateTax(displayAmount, checkoutData.shipping.state);
 
+      // Read any persisted discount from sessionStorage
+      let discountCode: string | undefined;
+      let discountCents = 0;
+      try {
+        const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
+        if (rawDiscount) {
+          const parsed = JSON.parse(rawDiscount);
+          if (
+            parsed &&
+            typeof parsed.code === "string" &&
+            /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
+          ) {
+            discountCode = parsed.code;
+            discountCents = parsed.discountCents || 0;
+          }
+        }
+      } catch { /* malformed */ }
+
       // Dev bypass: skip PP portal, go straight to order creation
       if (devBypass) {
         const res = await fetch("/api/checkout/precision-pay", {
@@ -259,7 +277,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             devBypass: true,
-            amount: displayAmount + shippingCost + tax,
+            amount: displayAmount - discountCents + shippingCost + tax,
             customerEmail: checkoutData.shipping.email,
             phoneNumber: checkoutData.shipping.phone || undefined,
             items: cart.items.map((item) => ({
@@ -336,7 +354,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         body: JSON.stringify({
           precisionPayToken: result.precisionPayToken || undefined,
           plaidData: result.plaidData || undefined,
-          amount: displayAmount + shippingCost + tax,
+          amount: displayAmount - discountCents + shippingCost + tax,
           customerEmail: checkoutData.shipping.email,
           phoneNumber: checkoutData.shipping.phone || undefined,
           items: cart.items.map((item) => ({
