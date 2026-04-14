@@ -1247,6 +1247,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
               cart={cart}
               showItemDetails={false}
               shippingCost={shippingCost}
+              shippingLabel={sessionData?.selectedShippingRate?.serviceName}
               shippingState={sessionData?.shipping?.state}
               ctaButton={isPaymentReady ? ctaButton : undefined}
               isDigitalOnly={isDigitalOnly}

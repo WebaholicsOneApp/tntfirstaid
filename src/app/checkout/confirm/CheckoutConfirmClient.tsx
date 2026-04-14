@@ -172,6 +172,8 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           })),
           opaqueData: checkoutData.opaqueData,
           shippingCostCents: shippingCost,
+          shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
+          shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
           isDigitalOnly: checkoutData.isDigitalOnly || undefined,
           shippingAddress: checkoutData.isDigitalOnly
             ? undefined
@@ -285,6 +287,8 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               quantity: item.quantity,
             })),
             shippingCostCents: shippingCost,
+            shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
+            shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
             shippingAddress: {
               name: checkoutData.shipping.name,
               line1: checkoutData.shipping.line1,
@@ -294,6 +298,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               postalCode: checkoutData.shipping.postalCode,
               country: checkoutData.shipping.country || "US",
             },
+            ...(discountCode ? { discountCode } : {}),
           }),
         });
 
@@ -330,7 +335,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
       // Step 2: Open PP portal iframe
       const amountDollars = (
-        (displayAmount + shippingCost + tax) /
+        (displayAmount - discountCents + shippingCost + tax) /
         100
       ).toFixed(2);
 
@@ -362,6 +367,8 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             quantity: item.quantity,
           })),
           shippingCostCents: shippingCost,
+          shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
+          shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
           shippingAddress: {
             name: checkoutData.shipping.name,
             line1: checkoutData.shipping.line1,
@@ -371,6 +378,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             postalCode: checkoutData.shipping.postalCode,
             country: checkoutData.shipping.country || "US",
           },
+          ...(discountCode ? { discountCode } : {}),
         }),
       });
 
@@ -493,6 +501,9 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                 className="h-4 brightness-0 invert"
               />
               <span>Checkout</span>
+              {devBypass && (
+                <span className="ml-1 rounded bg-white/20 px-1.5 py-0.5 text-[0.5rem]">TEST</span>
+              )}
             </span>
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
               <svg
@@ -513,202 +524,6 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
         )}
       </button>
     );
-
-  // ---- devBypass: fall back to the legacy PlaceOrderPanel ----
-  if (devBypass) {
-    return (
-      <div className="min-h-screen bg-[#FAFAF8]">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-24">
-          <CheckoutStepIndicator currentStep={3} />
-
-          {/* Header */}
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <div className="mb-3 flex items-center gap-3">
-                <div className="bg-primary-500 h-px w-8" />
-                <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                  Checkout
-                </span>
-              </div>
-              <h1 className="font-display text-secondary-900 text-4xl font-bold tracking-tight sm:text-5xl">
-                Review Order
-              </h1>
-            </div>
-            <Link
-              href="/checkout/payment"
-              className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
-            >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                />
-              </svg>
-              Back to Payment
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-              {/* Dev bypass: legacy PlaceOrderPanel */}
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Place Order (Dev Bypass)
-                    </span>
-                  </div>
-
-                  <div className="mb-4 flex items-center gap-2">
-                    <span className="border-secondary-200 text-secondary-400 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[0.6rem] font-medium tracking-[0.15em] uppercase">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Test Mode
-                    </span>
-                    <span className="text-secondary-500 text-sm">
-                      No payment will be processed
-                    </span>
-                  </div>
-
-                  {error && (
-                    <div className="mb-6 rounded-xl border border-red-200/80 bg-red-50 p-4">
-                      <p className="text-sm text-red-600">{error}</p>
-                    </div>
-                  )}
-
-                  <PlaceOrderPanel
-                    items={cart.items}
-                    email={checkoutData.shipping.email}
-                    phone={checkoutData.shipping.phone}
-                    shippingAddress={{
-                      name: checkoutData.shipping.name,
-                      line1: checkoutData.shipping.line1,
-                      line2: checkoutData.shipping.line2,
-                      city: checkoutData.shipping.city,
-                      state: checkoutData.shipping.state,
-                      postalCode: checkoutData.shipping.postalCode,
-                      country: checkoutData.shipping.country,
-                    }}
-                    discountCode={persistedDiscount?.code}
-                    discountCents={persistedDiscount?.discountCents}
-                    onSuccess={({ orderId, orderNumber }) => {
-                      try {
-                        sessionStorage.removeItem(SESSION_KEY);
-                        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
-                      } catch {
-                        // Ignore
-                      }
-                      clearCart();
-                      const params = new URLSearchParams({
-                        order_id: String(orderId),
-                      });
-                      if (orderNumber) params.set("order_number", orderNumber);
-                      router.push(`/checkout/success?${params.toString()}`);
-                    }}
-                    onError={(message) => setError(message)}
-                  />
-                </div>
-              </div>
-
-              {/* Order Items card */}
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Order Items
-                    </span>
-                  </div>
-                  <ul className="space-y-3">
-                    {cart.items.map((item) => (
-                      <li key={item.id} className="flex items-center gap-3">
-                        <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-black/[0.04]">
-                          {item.image ? (
-                            <ProductImage
-                              src={getImageUrl(item.image)}
-                              alt={item.name}
-                              fill
-                              className="object-contain p-1"
-                              sizes="48px"
-                            />
-                          ) : (
-                            <div className="text-secondary-200 flex h-full w-full items-center justify-center">
-                              <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1}
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-secondary-900 truncate text-[0.8rem] leading-tight font-medium">
-                            {item.name}
-                          </p>
-                          {item.packCount && (
-                            <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                              Quantity: {item.packCount}
-                            </p>
-                          )}
-                          {item.variation && !item.packCount && (
-                            <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                              {item.variantType ? `${item.variantType}: ` : ""}
-                              {item.variation}
-                            </p>
-                          )}
-                          {item.variationTwo && (
-                            <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                              {item.variantTypeTwo
-                                ? `${item.variantTypeTwo}: `
-                                : ""}
-                              {item.variationTwo}
-                            </p>
-                          )}
-                          <p className="text-secondary-400 font-mono text-[0.6rem]">
-                            Qty {item.quantity}
-                          </p>
-                        </div>
-                        <span className="text-secondary-700 flex-shrink-0 text-[0.8rem] font-medium tabular-nums">
-                          {formatCentsToDollars(item.price * item.quantity)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Right column — Order summary */}
-            <div className="lg:col-span-1">
-              <OrderSummary
-                cart={cart}
-                showItemDetails={false}
-                shippingCost={shippingCost}
-                shippingState={checkoutData?.shipping?.state}
-                isDigitalOnly={checkoutData?.isDigitalOnly}
-                ctaButton={payButton}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // ---- Main render (production / non-bypass) ----
   return (
@@ -989,6 +804,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
               cart={cart}
               showItemDetails={false}
               shippingCost={shippingCost}
+              shippingLabel={checkoutData?.selectedShippingRate?.serviceName}
               shippingState={checkoutData?.shipping?.state}
               ctaButton={payButton}
             />

@@ -332,7 +332,14 @@ export default function OrdersClient({
                         )}
                       {order.shipping != null && order.shipping > 0 && (
                         <div className="text-secondary-500 flex justify-between">
-                          <span>Shipping</span>
+                          <span>
+                            Shipping
+                            {order.shippingServiceName && (
+                              <span className="text-secondary-400 ml-1 text-xs">
+                                ({order.shippingServiceName})
+                              </span>
+                            )}
+                          </span>
                           <span>{formatCentsToDollars(order.shipping)}</span>
                         </div>
                       )}

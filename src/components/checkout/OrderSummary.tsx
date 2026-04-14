@@ -14,6 +14,7 @@ interface OrderSummaryProps {
   cart: { items: CartItem[]; subtotal: number; itemCount: number };
   showItemDetails?: boolean;
   shippingCost?: number | undefined;
+  shippingLabel?: string;
   shippingState?: string;
   isDigitalOnly?: boolean;
   ctaButton?: ReactNode;
@@ -48,6 +49,7 @@ export default function OrderSummary({
   cart,
   showItemDetails = true,
   shippingCost,
+  shippingLabel,
   shippingState,
   isDigitalOnly,
   ctaButton,
@@ -196,7 +198,14 @@ export default function OrderSummary({
               )}
               {!isDigitalOnly && (
                 <div className="flex justify-between">
-                  <span className="text-secondary-500">Shipping</span>
+                  <div>
+                    <span className="text-secondary-500">Shipping</span>
+                    {shippingLabel && (
+                      <p className="text-secondary-400 text-xs">
+                        {shippingLabel}
+                      </p>
+                    )}
+                  </div>
                   {shippingCost === undefined ? (
                     <span className="text-secondary-400">&mdash;</span>
                   ) : shippingCost === 0 ? (

@@ -53,6 +53,8 @@ export interface Order {
   /** Snapshot of storefront discount applied at checkout; 0 / null = none. */
   discountCents?: number;
   discountCode?: string | null;
+  shippingServiceName?: string | null;
+  shippingServiceCode?: string | null;
   items: OrderItem[];
   paymentMethod?: {
     type: string;

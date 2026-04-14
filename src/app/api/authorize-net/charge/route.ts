@@ -23,6 +23,8 @@ export async function POST(request: Request) {
       opaqueData,
       shippingAddress,
       shippingCostCents,
+      shippingServiceName,
+      shippingServiceCode,
       discountCode,
     } = body;
 
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
         dataValue: opaqueData.dataValue,
       },
       ...(shippingCostCents != null ? { shippingCostCents } : {}),
+      ...(shippingServiceName ? { shippingServiceName } : {}),
+      ...(shippingServiceCode ? { shippingServiceCode } : {}),
       shippingAddress: {
         name: shippingAddress.name,
         line1: shippingAddress.line1,

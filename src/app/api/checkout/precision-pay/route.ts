@@ -25,7 +25,17 @@ export async function POST(request: Request) {
       phoneNumber,
       shippingCostCents,
       discountCode,
+      shippingServiceName,
+      shippingServiceCode,
     } = body;
+
+    // Validate discountCode shape before forwarding — the upstream will also
+    // re-validate via validateAndComputeDiscount regardless.
+    const normalizedDiscountCode =
+      typeof discountCode === "string" &&
+      /^[A-Za-z0-9_-]{3,32}$/.test(discountCode)
+        ? discountCode.toUpperCase()
+        : undefined;
 
     // Dev bypass: skip PP API, create order directly with mock transaction ID
     if (body.devBypass === true && process.env.NODE_ENV === "development") {
@@ -61,6 +71,8 @@ export async function POST(request: Request) {
         phoneNumber,
         ...(shippingCostCents != null ? { shippingCostCents } : {}),
         ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
+        ...(shippingServiceName ? { shippingServiceName } : {}),
+        ...(shippingServiceCode ? { shippingServiceCode } : {}),
       });
 
       return NextResponse.json(orderResult, { status: 201 });
@@ -242,6 +254,8 @@ export async function POST(request: Request) {
       phoneNumber,
       ...(shippingCostCents != null ? { shippingCostCents } : {}),
       ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
+      ...(shippingServiceName ? { shippingServiceName } : {}),
+      ...(shippingServiceCode ? { shippingServiceCode } : {}),
     });
 
     return NextResponse.json(orderResult, { status: 201 });

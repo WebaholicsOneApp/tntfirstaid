@@ -395,114 +395,90 @@ export default function CheckoutShippingClient() {
                   fieldErrors={shippingFieldErrors}
                 />
 
-                {/* Get Rates button */}
-                <div className="mt-6">
-                  <button
-                    type="button"
-                    onClick={fetchRates}
-                    disabled={ratesLoading}
-                    className="border-secondary-900 text-secondary-900 hover:bg-secondary-900 flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-200 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {ratesLoading ? (
-                      <>
-                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        <span>Getting Rates...</span>
-                      </>
-                    ) : (
-                      <span>
-                        {ratesFetched
-                          ? "Refresh Shipping Rates"
-                          : "Get Shipping Rates"}
+                {/* Shipping Method — inline after address fields */}
+                {(ratesLoading || ratesFetched || ratesError) && (
+                  <div className="mt-6">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Shipping Method
                       </span>
+                    </div>
+
+                    {ratesLoading && rates.length === 0 && (
+                      <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="border-secondary-100 animate-pulse rounded-2xl border-2 p-4"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="bg-secondary-100 h-4 w-4 rounded-full" />
+                              <div className="flex flex-1 items-center justify-between">
+                                <div className="space-y-1.5">
+                                  <div className="bg-secondary-100 h-4 w-28 rounded" />
+                                  <div className="bg-secondary-50 h-3 w-20 rounded" />
+                                </div>
+                                <div className="bg-secondary-100 h-4 w-16 rounded" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
-                  </button>
-                </div>
+
+                    {ratesError && !ratesLoading && (
+                      <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
+                        <p className="text-sm text-red-600">{ratesError}</p>
+                      </div>
+                    )}
+
+                    {rates.length > 0 && (
+                      <div className="space-y-3">
+                        {rates.map((rate) => (
+                          <label
+                            key={rate.serviceCode}
+                            className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                              selectedRate?.serviceCode === rate.serviceCode
+                                ? "border-primary-500 bg-primary-50/30"
+                                : "border-secondary-200 hover:border-secondary-300"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="shippingRate"
+                              value={rate.serviceCode}
+                              checked={
+                                selectedRate?.serviceCode === rate.serviceCode
+                              }
+                              onChange={() => setSelectedRate(rate)}
+                              className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                            />
+                            <div className="flex flex-1 items-center justify-between">
+                              <div>
+                                <p className="text-secondary-900 text-sm font-medium">
+                                  {rate.serviceName}
+                                </p>
+                                {rate.deliveryDays !== null ? (
+                                  <p className="text-secondary-500 text-xs">
+                                    {rate.deliveryDays} business day
+                                    {rate.deliveryDays !== 1 ? "s" : ""}
+                                  </p>
+                                ) : null}
+                              </div>
+                              <span className="text-secondary-900 font-mono text-sm font-semibold">
+                                {formatCentsToDollars(rate.totalCents)}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
               </div>
             </div>
-
-            {/* Shipping Rate Selection Card */}
-            {(ratesLoading || ratesFetched || ratesError) && (
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Shipping Method
-                    </span>
-                  </div>
-
-                  {ratesLoading && rates.length === 0 && (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          className="border-secondary-100 animate-pulse rounded-2xl border-2 p-4"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="bg-secondary-100 h-4 w-4 rounded-full" />
-                            <div className="flex flex-1 items-center justify-between">
-                              <div className="space-y-1.5">
-                                <div className="bg-secondary-100 h-4 w-28 rounded" />
-                                <div className="bg-secondary-50 h-3 w-20 rounded" />
-                              </div>
-                              <div className="bg-secondary-100 h-4 w-16 rounded" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {ratesError && !ratesLoading && (
-                    <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
-                      <p className="text-sm text-red-600">{ratesError}</p>
-                    </div>
-                  )}
-
-                  {rates.length > 0 && (
-                    <div className="space-y-3">
-                      {rates.map((rate) => (
-                        <label
-                          key={rate.serviceCode}
-                          className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                            selectedRate?.serviceCode === rate.serviceCode
-                              ? "border-primary-500 bg-primary-50/30"
-                              : "border-secondary-200 hover:border-secondary-300"
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="shippingRate"
-                            value={rate.serviceCode}
-                            checked={
-                              selectedRate?.serviceCode === rate.serviceCode
-                            }
-                            onChange={() => setSelectedRate(rate)}
-                            className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
-                          />
-                          <div className="flex flex-1 items-center justify-between">
-                            <div>
-                              <p className="text-secondary-900 text-sm font-medium">
-                                {rate.serviceName}
-                              </p>
-                              {rate.deliveryDays !== null ? (
-                                <p className="text-secondary-500 text-xs">
-                                  {rate.deliveryDays} business day
-                                  {rate.deliveryDays !== 1 ? "s" : ""}
-                                </p>
-                              ) : null}
-                            </div>
-                            <span className="text-secondary-900 font-mono text-sm font-semibold">
-                              {formatCentsToDollars(rate.totalCents)}
-                            </span>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right column — Order Summary */}
@@ -511,6 +487,7 @@ export default function CheckoutShippingClient() {
               cart={cart}
               showItemDetails={false}
               shippingCost={selectedRate?.totalCents}
+              shippingLabel={selectedRate?.serviceName}
               shippingState={shipping.state}
               ctaButton={ctaButton}
             />
