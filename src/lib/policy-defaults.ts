@@ -70,7 +70,7 @@ export interface PrivacyPolicyConfig {
 
 export const SHIPPING_RETURNS_DEFAULTS: ShippingReturnsConfig = {
   heroSubtitle:
-    "Fast shipping on ammunition and reloading supplies with clear return and exchange policies.",
+    "Fast shipping on first aid kits and medical supplies with clear return and exchange policies.",
   contactCtaText:
     "Our support team is ready to help you with any shipping or return concerns.",
   returnWindowDays: 30,
@@ -91,7 +91,7 @@ export const SHIPPING_RETURNS_DEFAULTS: ShippingReturnsConfig = {
   showPackaging: true,
   showShippingPolicy: true,
   showContactCta: true,
-  showAmmoRestrictions: true,
+  showAmmoRestrictions: false,
 };
 
 export const TERMS_OF_SERVICE_DEFAULTS: TermsOfServiceConfig = {

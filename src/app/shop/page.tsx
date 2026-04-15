@@ -16,7 +16,7 @@ export const revalidate = 900;
 export const metadata: Metadata = {
   title: "Shop",
   description:
-    "Browse our selection of premium ammunition and reloading supplies.",
+    "Browse our selection of first aid kits, medical supplies, AEDs, and training gear.",
 };
 
 interface ShopPageProps {

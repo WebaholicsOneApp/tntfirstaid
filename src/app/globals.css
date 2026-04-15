@@ -6,17 +6,17 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "Courier New", monospace;
   --font-avenir: var(--font-avenir), "Avenir", ui-sans-serif, sans-serif;
-  --color-primary-50: var(--primary-50, #fdf8eb);
-  --color-primary-100: var(--primary-100, #faefc5);
-  --color-primary-200: var(--primary-200, #f5df8f);
-  --color-primary-300: var(--primary-300, #f0d06a);
-  --color-primary-400: var(--primary-400, #ecc84e);
-  --color-primary-500: var(--primary-500, #e9c360);
-  --color-primary-600: var(--primary-600, #c9a23c);
-  --color-primary-700: var(--primary-700, #a07d2a);
-  --color-primary-800: var(--primary-800, #7a5f20);
-  --color-primary-900: var(--primary-900, #5a451a);
-  --color-primary-950: var(--primary-950, #33260f);
+  --color-primary-50: var(--primary-50, #fdecee);
+  --color-primary-100: var(--primary-100, #fbd5da);
+  --color-primary-200: var(--primary-200, #f6acb4);
+  --color-primary-300: var(--primary-300, #f0828f);
+  --color-primary-400: var(--primary-400, #e95a6d);
+  --color-primary-500: var(--primary-500, #e31837);
+  --color-primary-600: var(--primary-600, #c01330);
+  --color-primary-700: var(--primary-700, #9c0f28);
+  --color-primary-800: var(--primary-800, #77091f);
+  --color-primary-900: var(--primary-900, #530516);
+  --color-primary-950: var(--primary-950, #2d020a);
   --color-secondary-50: var(--secondary-50, #f5f5f5);
   --color-secondary-100: var(--secondary-100, #e5e5e5);
   --color-secondary-200: var(--secondary-200, #cccccc);
@@ -85,7 +85,7 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
 }
 .animate-hotspot-pop-in { animation: hotspot-pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-/* Hero gold shimmer — light glints across text like polished brass */
+/* Hero shimmer — light glints across text */
 @keyframes shimmer {
   from { background-position: 100% center; }
   to { background-position: 0% center; }
@@ -122,7 +122,7 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
   animation: marquee-scroll 35s linear infinite;
 }
 
-/* Skeleton shimmer — warm gold-tinted loading sweep */
+/* Skeleton shimmer — brand-tinted loading sweep */
 @keyframes skeleton-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }

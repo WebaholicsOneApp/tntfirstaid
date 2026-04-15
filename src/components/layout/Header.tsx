@@ -18,24 +18,16 @@ interface HeaderProps {
 
 const navLinks = [
   { href: "/shop", label: "Shop" },
-  { href: "/team", label: "Team" },
+  { href: "/services", label: "Services" },
+  { href: "/training-videos", label: "Training Videos" },
   { href: "/about", label: "About Us" },
-  { href: "/distributors", label: "Distributors" },
-  { href: "/news", label: "News and Data" },
-  { href: "/calculator", label: "Kauber's Wind Constant Calculator" },
-  {
-    href: "/contact",
-    label: "Contact",
-    children: [
-      { href: "/contact", label: "Contact Us" },
-      { href: "/dealer-sign-up", label: "Dealer Sign Up" },
-    ],
-  },
+  { href: "/news", label: "News" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Header({
   siteName = "TNT First Aid",
-  logoUrl = "/images/alpha-logo-wide.png",
+  logoUrl = "/images/tnt-logo-wide.png",
   categories,
 }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -97,7 +89,7 @@ export default function Header({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="text-primary-400 p-2 transition-colors hover:text-white lg:hidden"
+              className="text-white/80 p-2 transition-colors hover:text-white lg:hidden"
               aria-label="Open navigation menu"
             >
               <svg
@@ -128,7 +120,7 @@ export default function Header({
           </div>
 
           {/* Center: Desktop navigation */}
-          <nav className="hidden items-center gap-0 lg:flex">
+          <nav className="hidden items-center gap-8 lg:flex xl:gap-12">
             {navLinks.map((link) => {
               if (link.href === "/shop") {
                 return (
@@ -140,10 +132,10 @@ export default function Header({
                   >
                     <Link
                       href={link.href}
-                      className={`relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em] ${
+                      className={`relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px] ${
                         megaMenuOpen
                           ? "text-white"
-                          : "text-primary-400 hover:text-white"
+                          : "text-white/85 hover:text-white"
                       }`}
                     >
                       {link.label}
@@ -156,62 +148,11 @@ export default function Header({
                   </div>
                 );
               }
-              if (link.children) {
-                return (
-                  <div
-                    key={link.href}
-                    className="group relative"
-                    onMouseEnter={() => {
-                      if (contactDropdownTimeoutRef.current)
-                        clearTimeout(contactDropdownTimeoutRef.current);
-                      setContactDropdownOpen(true);
-                    }}
-                    onMouseLeave={() => {
-                      contactDropdownTimeoutRef.current = setTimeout(
-                        () => setContactDropdownOpen(false),
-                        150,
-                      );
-                    }}
-                  >
-                    <Link
-                      href={link.href}
-                      className={`relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em] ${
-                        contactDropdownOpen
-                          ? "text-white"
-                          : "text-primary-400 hover:text-white"
-                      }`}
-                    >
-                      {link.label}
-                      <span
-                        className={`bg-primary-500 absolute bottom-0 left-0 h-[2px] transition-[width] duration-300 ${
-                          contactDropdownOpen
-                            ? "w-full"
-                            : "w-0 group-hover:w-full"
-                        }`}
-                      />
-                    </Link>
-                    {contactDropdownOpen && (
-                      <div className="bg-secondary-800 border-secondary-700 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border py-1 shadow-xl">
-                        {link.children.map((child) => (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className="text-primary-400 hover:bg-secondary-700 block px-4 py-2.5 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors hover:text-white"
-                            onClick={() => setContactDropdownOpen(false)}
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
               return (
                 <div key={link.href} className="group relative">
                   <Link
                     href={link.href}
-                    className="text-primary-400 relative px-1.5 py-2 text-[9px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-colors hover:text-white xl:px-2.5 xl:text-[11px] xl:tracking-[0.12em]"
+                    className="relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap text-white/85 uppercase transition-colors hover:text-white xl:text-[13px]"
                   >
                     {link.label}
                     <span className="bg-primary-500 absolute bottom-0 left-0 h-[2px] w-0 transition-[width] duration-300 group-hover:w-full" />
@@ -226,7 +167,7 @@ export default function Header({
             {/* Search icon */}
             <button
               onClick={() => setSearchOverlayOpen(!searchOverlayOpen)}
-              className="text-primary-400 p-2 transition-colors hover:text-white"
+              className="text-white/80 p-2 transition-colors hover:text-white"
               aria-label="Open search"
             >
               <svg
@@ -248,7 +189,7 @@ export default function Header({
             {customerAuthEnabled && !isAuthenticated && (
               <Link
                 href="/account"
-                className="text-primary-400 p-2 transition-colors hover:text-white"
+                className="text-white/80 p-2 transition-colors hover:text-white"
                 aria-label="Sign in"
               >
                 <svg
@@ -283,7 +224,7 @@ export default function Header({
               >
                 <Link
                   href="/account/dashboard"
-                  className="text-primary-400 block p-2 transition-colors hover:text-white"
+                  className="text-white/80 block p-2 transition-colors hover:text-white"
                   aria-label="My account"
                 >
                   <svg
@@ -298,28 +239,28 @@ export default function Header({
                   <div className="bg-secondary-800 border-secondary-700 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border py-1 shadow-xl">
                     <Link
                       href="/account/dashboard"
-                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       My Account
                     </Link>
                     <Link
                       href="/account/profile"
-                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
                       href="/account/orders"
-                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Orders
                     </Link>
                     <Link
                       href="/account/security"
-                      className="text-primary-400 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Security
@@ -342,7 +283,7 @@ export default function Header({
             {/* Cart icon */}
             <button
               onClick={openCart}
-              className="text-primary-400 relative p-2 transition-colors hover:text-white"
+              className="text-white/80 relative p-2 transition-colors hover:text-white"
               aria-label="Open cart"
               suppressHydrationWarning
             >

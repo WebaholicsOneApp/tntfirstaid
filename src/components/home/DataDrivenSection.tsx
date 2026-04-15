@@ -4,9 +4,9 @@ import Image from "next/image";
 import AnimateIn from "~/components/ui/AnimateIn";
 
 const stats = [
-  { value: "10+", label: "Years" },
-  { value: "47+", label: "Calibers" },
-  { value: "100%", label: "Lot Tested" },
+  { value: "25+", label: "Years Serving" },
+  { value: "10k+", label: "People Trained" },
+  { value: "100%", label: "OSHA Aligned" },
 ];
 
 export default function DataDrivenSection() {
@@ -14,38 +14,53 @@ export default function DataDrivenSection() {
     <section className="bg-white py-16 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-20">
-          {/* ── Left: constrained square image card ───────── */}
+          {/* Left: brand panel */}
           <AnimateIn
             animation="slide-right"
-            className="ring-secondary-100 relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full"
+            className="ring-secondary-100 bg-secondary-950 relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full"
           >
-            <Image
-              src="/images/hero-homepage.jpg"
-              alt="Shooter at range — Data driven performance"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 600px"
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse at 30% 30%, rgba(227,24,55,0.28) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+              }}
             />
+            <div
+              className="absolute inset-0 opacity-[0.07]"
+              style={{
+                backgroundImage: `
+                  repeating-linear-gradient(0deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px),
+                  repeating-linear-gradient(90deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px)
+                `,
+              }}
+            />
+            <div className="relative flex h-full items-center justify-center p-10">
+              <Image
+                src="/images/tnt-logo.png"
+                alt="TNT First Aid"
+                width={320}
+                height={320}
+                className="h-auto w-[180px] drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)] sm:w-[240px] md:w-[280px]"
+              />
+            </div>
           </AnimateIn>
 
-          {/* ── Right: content ───────────────────────────── */}
+          {/* Right: content */}
           <AnimateIn animation="fade-up" delay={150} className="w-full">
-            {/* Eyebrow */}
             <div className="mb-6 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6 shrink-0" />
               <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
-                Performance
+                Proven Track Record
               </span>
             </div>
 
             <h2 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">
-              Data Driven Performance
+              Training &amp; Supply You Can Count On
             </h2>
 
-            {/* Gold divider */}
             <div className="from-primary-500 mt-5 h-px w-14 bg-gradient-to-r to-transparent" />
 
-            {/* Stats */}
             <div className="mt-8 mb-8 grid grid-cols-3">
               {stats.map(({ value, label }, i) => (
                 <div
@@ -63,20 +78,19 @@ export default function DataDrivenSection() {
               ))}
             </div>
 
-            {/* Body */}
             <div className="text-secondary-400 space-y-4 text-sm leading-relaxed">
               <p>
-                At TNT First Aid, engineering, technology, and innovation are
-                the cornerstones of everything we do. Our commitment to
-                precision begins with advanced manufacturing processes and
-                extends through rigorous quality control testing on every lot we
-                produce.
+                TNT First Aid has been equipping workplaces, schools, and
+                families with life-saving supplies and training for over two
+                decades. Every kit we ship and every class we teach is built
+                around the same goal: making sure the right tools are on hand
+                &mdash; and that the people using them know how.
               </p>
               <p>
-                We leverage data from thousands of rounds tested through
-                chronographs, pressure traces, and accuracy validation to
-                continuously refine our processes and deliver brass that
-                performs at the highest level.
+                Whether you need a 25-person OSHA-compliant workplace kit, an
+                AED for your office, or on-site Stop the Bleed training for
+                your team, we&rsquo;ll help you build the right solution and
+                keep it ready for the day you hope never comes.
               </p>
             </div>
           </AnimateIn>

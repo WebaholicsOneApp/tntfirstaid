@@ -58,7 +58,7 @@ export default function Footer({
                   href="/shop"
                   className="text-secondary-400 hover:text-primary-500 text-sm transition-colors"
                 >
-                  Brass
+                  First Aid Kits
                 </Link>
               </li>
               <li>
@@ -66,7 +66,7 @@ export default function Footer({
                   href="/shop"
                   className="text-secondary-400 hover:text-primary-500 text-sm transition-colors"
                 >
-                  Reamers &amp; Gear
+                  AEDs &amp; Training
                 </Link>
               </li>
             </ul>
@@ -84,14 +84,6 @@ export default function Footer({
                   className="text-secondary-400 hover:text-primary-500 text-sm transition-colors"
                 >
                   About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/team"
-                  className="text-secondary-400 hover:text-primary-500 text-sm transition-colors"
-                >
-                  Team
                 </Link>
               </li>
               <li>
@@ -155,7 +147,7 @@ export default function Footer({
             {/* Social icons */}
             <div className="order-2 flex items-center gap-4 sm:order-1">
               <a
-                href="https://www.facebook.com/alphamunitions/"
+                href="https://www.facebook.com/tntfirstaid/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-secondary-500 hover:text-primary-500 transition-colors"
@@ -170,7 +162,7 @@ export default function Footer({
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/alpha_munitions/"
+                href="https://www.instagram.com/tntfirstaid/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-secondary-500 hover:text-primary-500 transition-colors"

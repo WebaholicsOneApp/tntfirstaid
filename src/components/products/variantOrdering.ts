@@ -1,10 +1,8 @@
 /**
- * Static dropdown ordering to match alphamunitions.com (WooCommerce).
+ * Static dropdown ordering for product variants.
  *
  * Keyed by variantType label (case-insensitive lookup).
  * Options not listed here will be appended at the end in their original order.
- *
- * To update: edit the arrays below to match the WooCommerce attribute term order.
  */
 
 const VARIANT_ORDER: Record<string, string[]> = {

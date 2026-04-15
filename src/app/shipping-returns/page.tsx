@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
   return {
     title: "Shipping, Returns & Exchanges",
-    description: `Shipping, return, and exchange policies at ${config.siteName}. Includes ammunition shipping restrictions and ORM-D requirements.`,
+    description: `Shipping, return, and exchange policies at ${config.siteName}.`,
   };
 }
 
@@ -64,78 +64,6 @@ export default async function ShippingReturnsPage() {
 
       <main className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-4xl space-y-16">
-          {/* Ammunition Shipping Restrictions */}
-          {config.showAmmoRestrictions && (
-            <section id="ammo-restrictions" className="scroll-mt-48">
-              <div className="mb-8 flex items-center gap-4">
-                <div className="bg-primary-500/10 text-primary-600 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded">
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                </div>
-                <h2 className="font-display text-secondary-900 text-2xl font-bold md:text-3xl">
-                  Ammunition Shipping Restrictions
-                </h2>
-              </div>
-              <div className="space-y-6 border border-amber-200 bg-amber-50 p-8 md:p-12">
-                <p className="text-secondary-700 leading-relaxed">
-                  Ammunition and reloading components are classified as{" "}
-                  <span className="text-secondary-800 font-bold">
-                    ORM-D / Limited Quantity
-                  </span>{" "}
-                  under DOT regulations. Please review the following
-                  restrictions before placing your order:
-                </p>
-                <div className="space-y-4">
-                  {[
-                    {
-                      label: "Ground Only",
-                      text: "We ship via UPS Ground only. Air shipping is not available for ammunition or components due to HAZMAT regulations.",
-                    },
-                    {
-                      label: "State Restrictions",
-                      text: "Some states have restrictions on ammunition purchases. It is the buyer's responsibility to be aware of and comply with all applicable laws in their jurisdiction.",
-                    },
-                    {
-                      label: "Processing Time",
-                      text: `Orders typically ship within ${config.processingTimeDaysMin}-${config.processingTimeDaysMax} business days. Custom or high-volume orders may require additional processing time.`,
-                    },
-                    {
-                      label: "Age Requirement",
-                      text: "You must be at least 18 years of age to purchase rifle and shotgun ammunition, and 21 years of age for handgun ammunition.",
-                    },
-                    {
-                      label: "Signature Required",
-                      text: "Some shipments may require an adult signature upon delivery depending on your state and local regulations.",
-                    },
-                  ].map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-4 rounded-xl border border-amber-100 bg-white p-5"
-                    >
-                      <span className="mt-0.5 text-sm font-bold whitespace-nowrap text-amber-600 uppercase">
-                        {item.label}
-                      </span>
-                      <p className="text-secondary-600 text-sm leading-relaxed">
-                        {item.text}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
           {/* Returns & Exchanges */}
           {config.showReturnsExchanges && (
             <section id="refund-policy" className="scroll-mt-48">
@@ -176,8 +104,8 @@ export default async function ShippingReturnsPage() {
                   </p>
                   <p className="text-secondary-600 leading-relaxed font-medium">
                     Products must be in the condition you received them and in
-                    the original box and/or packaging. Opened ammunition cannot
-                    be returned.
+                    the original box and/or packaging. Opened or used medical
+                    supplies cannot be returned for safety reasons.
                   </p>
                 </div>
 
@@ -187,9 +115,9 @@ export default async function ShippingReturnsPage() {
                       Important Note
                     </h4>
                     <p className="text-secondary-500 text-sm leading-relaxed">
-                      Ammunition or components that have been opened, used, or
-                      are missing the factory packaging cannot be accepted for
-                      refund or exchange under any circumstances.
+                      Medical supplies that have been opened, used, or are
+                      missing the factory packaging cannot be accepted for
+                      refund or exchange, for safety and sterility reasons.
                     </p>
                   </div>
                   <div className="border-secondary-100 rounded-xl border bg-white p-6">
@@ -197,8 +125,9 @@ export default async function ShippingReturnsPage() {
                       What Can Be Returned?
                     </h4>
                     <p className="text-secondary-500 text-sm leading-relaxed">
-                      Unopened brass, reamers, tools, and accessories in their
-                      original packaging. Custom-order items are non-returnable.
+                      Unopened kits, AED accessories, training supplies, and
+                      durable equipment in their original packaging.
+                      Custom-built kits are non-returnable.
                     </p>
                   </div>
                   <div className="border-secondary-100 rounded-xl border bg-white p-6">
@@ -206,9 +135,9 @@ export default async function ShippingReturnsPage() {
                       Exchanges
                     </h4>
                     <p className="text-secondary-500 text-sm leading-relaxed">
-                      Need a different caliber or quantity? We offer hassle-free
-                      exchanges within {config.returnWindowDays} days. Contact
-                      our support team to initiate.
+                      Need a different size or configuration? We offer
+                      hassle-free exchanges within {config.returnWindowDays}{" "}
+                      days. Contact our support team to initiate.
                     </p>
                   </div>
                 </div>
@@ -393,8 +322,9 @@ export default async function ShippingReturnsPage() {
                       Carrier
                     </h4>
                     <p className="text-secondary-500 text-sm leading-relaxed">
-                      All ammunition and component orders ship via UPS Ground.
-                      Non-hazmat accessories may ship via other carriers.
+                      Orders ship via {config.shippingCarriers}. Expedited
+                      shipping is available at checkout for time-sensitive
+                      orders.
                     </p>
                   </div>
                 </div>
@@ -451,9 +381,9 @@ export default async function ShippingReturnsPage() {
                         <span className="text-secondary-800 font-semibold">
                           P.O. Boxes:
                         </span>{" "}
-                        We are unable to ship ammunition to P.O. Box addresses
-                        due to carrier restrictions. Please provide a physical
-                        street address.
+                        We are unable to ship to P.O. Box addresses due to
+                        carrier restrictions. Please provide a physical street
+                        address.
                       </p>
                     </div>
                   )}

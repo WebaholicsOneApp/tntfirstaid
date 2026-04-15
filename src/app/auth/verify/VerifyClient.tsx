@@ -59,7 +59,7 @@ export default function VerifyClient() {
           {/* Logo */}
           <div className="mb-8 flex justify-center">
             <Image
-              src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+              src="/images/tnt-logo.png"
               alt="TNT First Aid"
               width={300}
               height={50}

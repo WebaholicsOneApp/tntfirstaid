@@ -179,7 +179,7 @@ export default function AccountPage() {
           {/* Logo */}
           <div className="mb-8 flex justify-center">
             <Image
-              src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+              src="/images/tnt-logo.png"
               alt="TNT First Aid"
               width={300}
               height={50}
@@ -427,16 +427,6 @@ export default function AccountPage() {
           )}
         </div>
 
-        {/* Dealer link */}
-        <p className="text-secondary-500 mt-4 text-center text-sm">
-          Not a customer?{" "}
-          <Link
-            href="/dealer-sign-up"
-            className="text-primary-500 hover:text-primary-400 font-medium transition-colors"
-          >
-            Apply as a dealer →
-          </Link>
-        </p>
       </div>
     </div>
   );

@@ -1,25 +1,13 @@
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
-import {
-  getFeaturedProducts,
-  getCategoryIdsByNamePattern,
-  getProducts,
-} from "~/lib/data";
-
-const HudHeroSection = dynamic(
-  () => import("~/components/home/HudHeroSection"),
-  { loading: () => <div className="bg-secondary-950 h-screen" /> },
-);
-
-export const revalidate = 300;
+import { getFeaturedProducts } from "~/lib/data";
+import HeroSection from "~/components/home/HeroSection";
 import MarqueeBand from "~/components/home/MarqueeBand";
-import OcdTechnologySection from "~/components/home/OcdTechnologySection";
 import FeatureIconsSection from "~/components/home/FeatureIconsSection";
 import DataDrivenSection from "~/components/home/DataDrivenSection";
-import ShopBrassCarousel from "~/components/home/ShopBrassCarousel";
-import ReamersSection from "~/components/home/ReamersSection";
-import SignaturesSection from "~/components/home/SignaturesSection";
+import FeaturedProductsCarousel from "~/components/home/FeaturedProductsCarousel";
 import FooterCtaBanner from "~/components/home/FooterCtaBanner";
+
+export const revalidate = 300;
 
 function CarouselSkeleton({ count = 4 }: { count?: number }) {
   return (
@@ -64,65 +52,19 @@ function CarouselSkeleton({ count = 4 }: { count?: number }) {
 export default function HomePage() {
   return (
     <>
-      <HudHeroSection />
+      <HeroSection />
       <MarqueeBand />
-      <OcdTechnologySection />
       <FeatureIconsSection />
       <DataDrivenSection />
       <Suspense fallback={<CarouselSkeleton count={6} />}>
-        <BrassCarouselLoader />
+        <FeaturedProductsLoader />
       </Suspense>
-      <Suspense fallback={<CarouselSkeleton count={4} />}>
-        <ReamersSectionLoader />
-      </Suspense>
-      <SignaturesSection />
       <FooterCtaBanner />
     </>
   );
 }
 
-async function BrassCarouselLoader() {
-  const products = await getBrassProducts();
-  return <ShopBrassCarousel products={products} />;
-}
-
-async function ReamersSectionLoader() {
-  const products = await getReamerProducts();
-  return <ReamersSection products={products} />;
-}
-
-async function getBrassProducts() {
-  try {
-    const brassCategoryIds = await getCategoryIdsByNamePattern("Brass");
-    if (brassCategoryIds.length > 0) {
-      const result = await getProducts(
-        { categoryIds: brassCategoryIds },
-        "best_sellers",
-        { page: 1, pageSize: 12 },
-      );
-      return result.products;
-    }
-    // Fallback to featured products if no brass category found
-    return getFeaturedProducts(12);
-  } catch {
-    return [];
-  }
-}
-
-async function getReamerProducts() {
-  try {
-    const reamerCategoryIds = await getCategoryIdsByNamePattern("Reamer");
-    if (reamerCategoryIds.length > 0) {
-      const result = await getProducts(
-        { categoryIds: reamerCategoryIds },
-        "best_sellers",
-        { page: 1, pageSize: 4 },
-      );
-      return result.products;
-    }
-    // Fallback to featured products if no reamer category found
-    return getFeaturedProducts(4);
-  } catch {
-    return [];
-  }
+async function FeaturedProductsLoader() {
+  const products = await getFeaturedProducts(12).catch(() => []);
+  return <FeaturedProductsCarousel products={products} />;
 }

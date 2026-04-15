@@ -151,28 +151,29 @@ export default function NewsletterPopup() {
         style={{ border: "1px solid rgba(255,255,255,0.06)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ── Left: Image Panel ── */}
-        <div className="relative hidden md:block">
-          <Image
-            src="/images/about/shooting.jpg"
-            alt="TNT First Aid"
-            fill
-            className="object-cover"
-            sizes="(min-width: 768px) 50vw, 0vw"
-            priority
-          />
-          {/* Gradient overlay */}
+        {/* ── Left: Brand Panel ── */}
+        <div className="bg-secondary-950 relative hidden md:block">
           <div
+            aria-hidden
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.15) 50%)",
+                "radial-gradient(ellipse at 30% 30%, rgba(227,24,55,0.35) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(227,24,55,0.18) 0%, transparent 55%)",
             }}
           />
-          {/* Logo at bottom */}
+          <div className="relative flex h-full items-center justify-center p-8">
+            <Image
+              src="/images/tnt-logo.png"
+              alt="TNT First Aid"
+              width={200}
+              height={200}
+              priority
+              className="h-auto w-[140px] drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+            />
+          </div>
           <div className="absolute bottom-0 left-0 right-0 p-6">
             <Image
-              src="/images/alpha-logo-wide.png"
+              src="/images/tnt-logo-wide.png"
               alt="TNT First Aid"
               width={180}
               height={28}
@@ -309,7 +310,7 @@ export default function NewsletterPopup() {
                 <button
                   type="submit"
                   disabled={formState === "submitting"}
-                  className="bg-primary-500 text-secondary-950 hover:bg-primary-400 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-mono text-[0.6rem] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(233,195,96,0.2)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-primary-500 text-secondary-950 hover:bg-primary-400 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-mono text-[0.6rem] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:shadow-[0_0_20px_rgba(227,24,55,0.2)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {formState === "submitting" ? (
                     <>

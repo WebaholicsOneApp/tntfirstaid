@@ -69,7 +69,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: storeConfig.siteName,
       template: `%s | ${storeConfig.siteName}`,
     },
-    description: `${storeConfig.siteName} - Premium ammunition and reloading supplies`,
+    description: `${storeConfig.siteName} - First aid kits, medical supplies, and training`,
     icons: [
       { rel: "icon", url: "/favicon.ico", sizes: "any" },
       { rel: "icon", url: "/favicon.png", type: "image/png" },

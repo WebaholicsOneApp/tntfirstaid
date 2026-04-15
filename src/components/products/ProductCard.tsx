@@ -86,8 +86,8 @@ export default function ProductCard({
       className={cn(
         "group block border transition-all duration-300 ease-out",
         isDark
-          ? "bg-secondary-900 border-primary-500/10 hover:border-primary-500/30 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.12)] active:translate-y-0 active:scale-[0.99]"
-          : "border-secondary-100 hover:border-primary-300 rounded-lg bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(233,195,96,0.10)] active:translate-y-0 active:scale-[0.99]",
+          ? "bg-secondary-900 border-primary-500/10 hover:border-primary-500/30 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(227,24,55,0.12)] active:translate-y-0 active:scale-[0.99]"
+          : "border-secondary-100 hover:border-primary-300 rounded-lg bg-white hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(227,24,55,0.10)] active:translate-y-0 active:scale-[0.99]",
         className,
       )}
     >

@@ -223,26 +223,6 @@ export default async function TermsOfServicePage() {
                     </p>
                   </div>
                 </div>
-                <div className="border-secondary-100 border bg-white p-8">
-                  <h3 className="text-secondary-900 mb-4 text-lg font-bold">
-                    Ammunition Regulations
-                  </h3>
-                  <div className="text-secondary-600 space-y-3 text-sm leading-relaxed">
-                    <p>
-                      Ammunition and reloading components are subject to
-                      federal, state, and local regulations. By placing an
-                      order, you certify that you are legally permitted to
-                      purchase ammunition and components in your jurisdiction
-                      and that you are at least 18 years of age (21 for handgun
-                      ammunition).
-                    </p>
-                    <p>
-                      We reserve the right to cancel orders that cannot be
-                      legally fulfilled due to shipping destination
-                      restrictions.
-                    </p>
-                  </div>
-                </div>
               </div>
             </section>
           )}
@@ -272,16 +252,16 @@ export default async function TermsOfServicePage() {
               </div>
               <div className="bg-secondary-50 border-secondary-100 text-secondary-600 space-y-4 border p-8 leading-relaxed md:p-12">
                 <p>
-                  All ammunition and components are shipped via UPS Ground only.
-                  Air shipping is not available for ammunition products due to
-                  HAZMAT regulations. Delivery times are estimated and not
-                  guaranteed.
+                  Orders are shipped via ground or expedited carriers depending
+                  on the service selected at checkout. Delivery times are
+                  estimated and not guaranteed.
                 </p>
                 <p>
                   Returns and exchanges are accepted within{" "}
                   {config.returnWindowDays} days of receipt. Items must be in
                   original, unopened condition with all original packaging.
-                  Ammunition that has been opened or used cannot be returned.
+                  Opened or used medical supplies cannot be returned for safety
+                  reasons.
                 </p>
                 <p className="text-sm">
                   For full details, please review our{" "}

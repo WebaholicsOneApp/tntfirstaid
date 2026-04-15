@@ -25,7 +25,7 @@ export async function generateMetadata({
 
   const description = product.description
     ? stripHtml(product.description).slice(0, 160)
-    : `${product.name} - premium ammunition from TNT First Aid`;
+    : `${product.name} - first aid supplies from TNT First Aid`;
 
   return {
     title: product.name,

@@ -13,7 +13,7 @@ export const storeConfig = {
   mapsQuery:
     process.env.NEXT_PUBLIC_MAPS_QUERY || "TNT+First+Aid",
   logoUrl: process.env.NEXT_PUBLIC_LOGO_URL || "/images/tnt-logo-wide.png",
-  primaryColor: process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#e9c360",
+  primaryColor: process.env.NEXT_PUBLIC_PRIMARY_COLOR || "#E31837",
   secondaryColor: process.env.NEXT_PUBLIC_SECONDARY_COLOR || "#1A1A1A",
 };
 

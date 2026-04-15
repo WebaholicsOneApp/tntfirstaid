@@ -48,7 +48,7 @@ export async function generateMetadata({
 
   return {
     title: category.categoryName,
-    description: `Shop ${category.categoryName} - premium ammunition and reloading supplies.`,
+    description: `Shop ${category.categoryName} from TNT First Aid — professional first aid supplies and equipment.`,
   };
 }
 

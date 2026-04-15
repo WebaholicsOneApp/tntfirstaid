@@ -3,61 +3,159 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useParallax } from "~/hooks/useParallax";
+
+const SLIDES = [
+  "/images/hero/kit-full-spread.png",
+  "/images/hero/kit-red-bag.png",
+  "/images/hero/kit-contents.png",
+  "/images/hero/cpr-mask-kit.png",
+  "/images/hero/kit-packed.png",
+];
+
+const SLIDE_INTERVAL_MS = 5000;
+const FADE_MS = 1400;
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
-  const { ref: parallaxRef, style: parallaxStyle } = useParallax(0.1);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
     setLoaded(true);
   }, []);
 
-  return (
-    <section className="relative overflow-hidden">
-      {/* Background image with parallax */}
-      <div className="relative h-[60vh] max-h-[800px] min-h-[400px] sm:h-[70vh] sm:min-h-[500px]">
-        <div
-          ref={parallaxRef}
-          className="absolute inset-[-10%]"
-          style={parallaxStyle}
-        >
-          <Image
-            src="/images/hero-homepage.jpg"
-            alt="TNT First Aid - American Made Alpha Grade"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-        </div>
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/40" />
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIdx((i) => (i + 1) % SLIDES.length);
+    }, SLIDE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
 
-        {/* Content overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-          <h1
-            className={`text-3xl font-bold tracking-[0.3em] uppercase transition-[opacity,transform] duration-700 sm:text-4xl md:text-5xl lg:text-6xl ${loaded ? "hero-shimmer translate-y-0 opacity-100" : "text-primary-500 translate-y-4 opacity-0"}`}
-          >
-            <span className="block">American Made.</span>
-            <span className="block">Alpha Grade.</span>
-          </h1>
-          {/* Gold underline — draws left to right */}
+  return (
+    <section className="relative overflow-hidden bg-black">
+      {/* Slideshow layer — cross-fading background images */}
+      <div aria-hidden className="absolute inset-0">
+        {SLIDES.map((src, i) => (
           <div
-            className={`bg-primary-500 mt-6 mb-8 h-0.5 w-20 ${loaded ? "animate-draw-line" : "opacity-0"}`}
-          />
-          {/* Shop button */}
-          <Link
-            href="/shop"
-            className={`group border-primary-500 relative inline-block overflow-hidden rounded border-2 px-12 py-4 text-sm font-semibold tracking-[0.2em] uppercase transition-all delay-400 duration-700 ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+            key={src}
+            className="absolute inset-0 transition-opacity ease-in-out"
+            style={{
+              opacity: i === activeIdx ? 1 : 0,
+              transitionDuration: `${FADE_MS}ms`,
+            }}
           >
-            {/* Sweep layer */}
-            <span className="bg-primary-500 absolute inset-0 -translate-x-full transition-transform duration-500 ease-in-out group-hover:translate-x-0" />
-            {/* Text */}
-            <span className="group-hover:text-secondary-900 relative z-10 text-white transition-colors duration-500">
-              SHOP
+            <Image
+              src={src}
+              alt=""
+              fill
+              priority={i === 0}
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Darkening + brand-tinted overlay — stronger on the left for text readability */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(100deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.82) 38%, rgba(20,6,10,0.55) 70%, rgba(30,4,12,0.35) 100%)",
+        }}
+      />
+      {/* Soft red accent at bottom-right for depth */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 85% 90%, rgba(227,24,55,0.18) 0%, transparent 55%)",
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative mx-auto flex min-h-[560px] max-w-7xl items-center px-6 py-24 sm:py-28 md:min-h-[640px] md:py-32 lg:px-8 lg:py-40">
+        <div className="max-w-2xl text-center md:text-left">
+          <div
+            className={`mb-5 flex items-center justify-center gap-3 transition-all duration-700 md:justify-start ${loaded ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+          >
+            <div className="bg-primary-500/70 h-px w-6" />
+            <span className="text-primary-400 font-mono text-[0.7rem] tracking-[0.3em] uppercase md:text-xs">
+              Training &amp; Sales
             </span>
-          </Link>
+          </div>
+
+          <h1
+            className={`font-display text-5xl leading-[1.05] font-bold text-white transition-all delay-75 duration-700 sm:text-6xl md:text-7xl lg:text-8xl ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.6)" }}
+          >
+            <span className="block">First Aid Gear</span>
+            <span className="text-primary-500 block">You Can Trust.</span>
+          </h1>
+
+          <div
+            className={`bg-primary-500 mx-auto mt-7 mb-6 h-0.5 w-16 md:mx-0 ${loaded ? "animate-draw-line" : "opacity-0"}`}
+          />
+
+          <p
+            className={`text-secondary-200 mx-auto max-w-md text-sm leading-relaxed transition-all delay-200 duration-700 sm:text-base md:mx-0 ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+            style={{ textShadow: "0 1px 12px rgba(0,0,0,0.7)" }}
+          >
+            Professionally curated kits, AEDs, trauma supplies, and hands-on
+            CPR &amp; First Aid training — everything you need to be ready
+            when seconds matter.
+          </p>
+
+          <div
+            className={`mt-10 flex flex-col items-center justify-center gap-3 transition-all delay-300 duration-700 sm:flex-row md:justify-start ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+          >
+            <Link
+              href="/shop"
+              className="group bg-primary-500 text-white hover:bg-primary-600 inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-sm font-semibold tracking-[0.15em] uppercase shadow-[0_8px_30px_rgba(227,24,55,0.35)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+            >
+              Shop Now
+              <svg
+                className="h-3 w-3 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                />
+              </svg>
+            </Link>
+            <Link
+              href="/services"
+              className="border-primary-500/60 text-primary-400 hover:border-primary-500 hover:bg-primary-500/10 hover:text-primary-300 inline-flex items-center rounded-full border px-7 py-3.5 text-sm font-semibold tracking-[0.15em] uppercase backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+            >
+              Book Training
+            </Link>
+          </div>
+
+          {/* Slide dots */}
+          <div
+            className={`mt-12 flex justify-center gap-2 transition-opacity delay-500 duration-700 md:justify-start ${loaded ? "opacity-100" : "opacity-0"}`}
+            aria-hidden
+          >
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setActiveIdx(i)}
+                aria-label={`Show slide ${i + 1}`}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  i === activeIdx
+                    ? "bg-primary-500 w-8"
+                    : "bg-white/30 hover:bg-white/50 w-4"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

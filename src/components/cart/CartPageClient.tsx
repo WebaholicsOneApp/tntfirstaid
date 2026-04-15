@@ -57,7 +57,7 @@ export default function CartPageClient() {
             Your Cart is Empty
           </h1>
           <p className="text-secondary-400 mb-8 text-sm leading-relaxed">
-            Browse our selection of precision ammunition and brass components.
+            Browse our first aid kits, medical supplies, and training gear.
           </p>
           <Link
             href="/shop"

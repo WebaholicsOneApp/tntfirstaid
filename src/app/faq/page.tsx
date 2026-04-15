@@ -7,26 +7,44 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
   return {
     title: "FAQ & Help",
-    description: `Frequently asked questions about ${config.siteName} products, shipping, OCD Technology, and more.`,
+    description: `Frequently asked questions about ${config.siteName} products, training classes, shipping, and returns.`,
   };
 }
 
 const faqSections = [
   {
     id: "products",
-    category: "Products & Technology",
+    category: "Products & Kits",
     questions: [
       {
-        q: "What is OCD Technology?",
-        a: "OCD (Obsessive Cartridge Disorder) Technology is our proprietary brass processing method. Every piece of brass is individually weight-sorted, dimensionally inspected, and processed to tolerances far beyond industry standard. The result is brass with exceptional consistency in neck tension, case capacity, and concentricity.",
+        q: "Are your first aid kits OSHA compliant?",
+        a: "Yes. Our workplace kits meet or exceed ANSI/ISEA Z308.1 Class A and Class B standards, which are the benchmarks OSHA references for workplace first aid supplies. Every kit lists the standard it complies with and the recommended team size.",
       },
       {
-        q: "Are your products made in the USA?",
-        a: "Yes. All TNT First Aid products are manufactured in our facility in American Fork, Utah. We source domestically whenever possible and are proud to support American manufacturing.",
+        q: "How often should I restock or replace items in my kit?",
+        a: "Check your kit every 3-6 months. Replace any items that are expired, used, or damaged. We offer restock subscriptions and can send reminders. Certain items (like epinephrine auto-injectors and AED pads/batteries) have shorter shelf lives and should be tracked individually.",
       },
       {
-        q: "What calibers do you offer?",
-        a: "We offer a growing selection of precision brass, reamers, and components across popular long-range and competition calibers. Check our Shop page for our current product catalog, which is updated regularly as we release new offerings.",
+        q: "Do you sell AEDs and batteries/pads?",
+        a: "Yes. We carry AEDs from leading manufacturers along with replacement pads, batteries, and wall cabinets. If you already own an AED, we can help you find the right replacement consumables by model.",
+      },
+    ],
+  },
+  {
+    id: "training",
+    category: "Training & Certification",
+    questions: [
+      {
+        q: "What classes do you offer?",
+        a: "CPR/AED (adult, child, and infant), First Aid, Bloodborne Pathogens, and Stop the Bleed. Courses are available as stand-alone classes or combined into a single certification. All classes are taught by certified instructors.",
+      },
+      {
+        q: "Can you come train my team on-site?",
+        a: "Yes — that's what we do best. We travel to workplaces, schools, and community organizations across the region. Contact us with your location, group size, and preferred dates and we'll put together a quote.",
+      },
+      {
+        q: "How long are certifications valid?",
+        a: "CPR, AED, and First Aid certifications are typically valid for 2 years. Bloodborne Pathogens certification is annual (required by OSHA for covered workers). We'll send a renewal reminder before your card expires.",
       },
     ],
   },
@@ -35,16 +53,16 @@ const faqSections = [
     category: "Orders & Shipping",
     questions: [
       {
-        q: "Do you ship to all states?",
-        a: "We ship to the continental United States. However, some states have restrictions on ammunition and component purchases. It is the buyer's responsibility to verify that their purchase complies with all applicable federal, state, and local laws. We reserve the right to cancel orders that cannot be legally fulfilled.",
+        q: "How long does shipping take?",
+        a: "Orders are typically processed within 1-2 business days. Standard ground delivery takes 3-7 business days after shipment. Expedited shipping is available at checkout for time-sensitive orders.",
       },
       {
-        q: "How long does shipping take?",
-        a: "Orders are typically processed within 1-3 business days. Standard ground delivery takes 3-7 business days after shipment. All ammunition and components ship via UPS Ground only due to HAZMAT regulations -- air shipping is not available.",
+        q: "Do you ship to all states?",
+        a: "Yes — we ship throughout the continental United States. Contact us for Alaska, Hawaii, or international shipping inquiries.",
       },
       {
         q: "How do I track my order?",
-        a: "Once your order ships, you will receive an email with a UPS tracking number. You can use this number to track your package on the UPS website. If you have not received tracking information within 5 business days of placing your order, please contact us.",
+        a: "Once your order ships, you'll receive an email with a tracking number. If you haven't received tracking info within 3 business days of ordering, please contact us.",
       },
     ],
   },
@@ -54,11 +72,11 @@ const faqSections = [
     questions: [
       {
         q: "What is your return policy?",
-        a: "We offer a 30-day return policy for items in their original, unopened condition with all original packaging. Ammunition that has been opened or used cannot be returned. Custom-order items are non-returnable. Contact our support team to request a Return Authorization before shipping anything back.",
+        a: "We offer a 30-day return policy for items in their original, unopened condition with all original packaging. Opened or used medical supplies cannot be returned for safety reasons. Contact our team to request a Return Authorization before shipping anything back.",
       },
       {
-        q: "Do you offer wholesale pricing?",
-        a: "Yes, we offer wholesale and dealer pricing for qualified retailers and distributors. Visit our Distributors page or contact us directly to learn about our wholesale program, minimums, and dealer application process.",
+        q: "Do you offer bulk or corporate pricing?",
+        a: "Yes. We work with businesses, schools, and healthcare organizations on bulk kit orders, recurring restocking programs, and AED rollouts. Contact us directly for a quote.",
       },
     ],
   },
@@ -72,7 +90,7 @@ const faqSections = [
       },
       {
         q: "Is my payment information secure?",
-        a: "Absolutely. All payments are processed through Stripe, a PCI Level 1 certified payment processor -- the highest level of security in the payments industry. Your card details are encrypted with 256-bit SSL and never stored on our servers.",
+        a: "Yes. All payments are processed through Stripe, a PCI Level 1 certified payment processor — the highest level of security in the payments industry. Your card details are encrypted with 256-bit SSL and never stored on our servers.",
       },
     ],
   },

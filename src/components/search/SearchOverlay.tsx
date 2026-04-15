@@ -280,7 +280,7 @@ export function SearchOverlay({
                 className="flex items-center"
               >
                 <Image
-                  src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+                  src="/images/tnt-logo.png"
                   alt="TNT First Aid"
                   width={300}
                   height={50}
@@ -298,7 +298,7 @@ export function SearchOverlay({
                 className="hidden flex-shrink-0 items-center sm:flex"
               >
                 <Image
-                  src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+                  src="/images/tnt-logo.png"
                   alt="TNT First Aid"
                   width={300}
                   height={50}

@@ -66,7 +66,7 @@ export default function MobileMenu({
         {/* Menu header */}
         <div className="border-secondary-700 flex items-center justify-between border-b px-5 py-4">
           <Image
-            src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
+            src="/images/tnt-logo.png"
             alt={siteName}
             width={300}
             height={50}
@@ -98,11 +98,11 @@ export default function MobileMenu({
           {/* Main navigation links */}
           {[
             { href: "/shop", label: "Shop" },
-            { href: "/team", label: "Team" },
+            { href: "/services", label: "Services" },
+            { href: "/training-videos", label: "Training Videos" },
             { href: "/about", label: "About Us" },
-            { href: "/distributors", label: "Distributors" },
-            { href: "/news", label: "News and Data" },
-            { href: "/calculator", label: "Kauber's Wind Constant Calculator" },
+            { href: "/news", label: "News" },
+            { href: "/faq", label: "FAQ" },
             { href: "/contact", label: "Contact" },
           ].map((link) => (
             <Link
@@ -114,13 +114,6 @@ export default function MobileMenu({
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/dealer-sign-up"
-            onClick={onClose}
-            className="text-secondary-300 hover:text-primary-500 hover:bg-secondary-700 block px-8 py-2.5 text-sm transition-colors"
-          >
-            Dealer Sign Up
-          </Link>
 
           {/* Account link — hidden when auth is disabled */}
           {customerAuthEnabled && !isAuthenticated && (

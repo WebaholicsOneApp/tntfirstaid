@@ -23,7 +23,7 @@ export async function generateMetadata({
     title: query ? `Search: ${query}` : "Search",
     description: query
       ? `Search results for "${query}" at TNT First Aid.`
-      : "Search for ammunition and reloading supplies.",
+      : "Search for first aid kits, medical supplies, and training gear.",
   };
 }
 
@@ -52,7 +52,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           Search Products
         </h1>
         <p className="text-secondary-500">
-          Enter a search term to find ammunition and reloading supplies.
+          Enter a search term to find first aid kits, AEDs, and training
+          gear.
         </p>
       </div>
     );

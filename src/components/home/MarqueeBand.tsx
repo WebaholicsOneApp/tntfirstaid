@@ -1,21 +1,20 @@
-const CALIBERS = [
-  "204 RUGER",
-  "6.5 CREEDMOOR",
-  ".308 WINCHESTER",
-  "6MM ARC",
-  "7MM-08 REMINGTON",
-  "25 GT",
-  "6.5 GRENDEL",
-  "8.6 BLK",
-  "6MM PPC",
-  ".260 REMINGTON",
+const CATEGORIES = [
+  "FIRST AID KITS",
+  "TRAUMA & BLEEDING CONTROL",
+  "AED & DEFIBRILLATORS",
+  "CPR TRAINING",
+  "BURN CARE",
+  "SPLINTS & IMMOBILIZATION",
+  "BLOODBORNE PATHOGEN KITS",
+  "PPE & PROTECTION",
+  "BANDAGES & DRESSINGS",
+  "WORKPLACE SAFETY",
 ];
 
-const SEP = <span className="text-secondary-950/30 mx-6 select-none">·</span>;
+const SEP = <span className="text-white/40 mx-6 select-none">+</span>;
 
 export default function MarqueeBand() {
-  // Triple items for seamless loop: animate translateX(-33.333%) = 1 complete cycle
-  const items = [...CALIBERS, ...CALIBERS, ...CALIBERS];
+  const items = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
 
   return (
     <div
@@ -26,7 +25,7 @@ export default function MarqueeBand() {
         {items.map((name, i) => (
           <span
             key={i}
-            className="text-secondary-950 flex items-center font-mono text-[0.6rem] tracking-[0.3em] uppercase"
+            className="flex items-center font-mono text-[0.6rem] tracking-[0.3em] text-white uppercase"
           >
             {name}
             {SEP}

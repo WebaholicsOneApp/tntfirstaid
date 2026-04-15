@@ -23,33 +23,6 @@ export default function ShippingReturnsLoading() {
       {/* Content skeleton */}
       <div className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-4xl space-y-16">
-          {/* Ammo restrictions section */}
-          <div>
-            <div className="mb-8 flex items-center gap-4">
-              <div
-                className="skeleton h-12 w-12 !rounded"
-                style={{ animationDelay: "160ms" }}
-              />
-              <div
-                className="skeleton h-7 w-72"
-                style={{ animationDelay: "200ms" }}
-              />
-            </div>
-            <div className="border-secondary-100 space-y-4 border bg-amber-50/50 p-8 md:p-12">
-              <div
-                className="skeleton h-4 w-full"
-                style={{ animationDelay: "240ms" }}
-              />
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="skeleton h-16 w-full !rounded-xl"
-                  style={{ animationDelay: `${280 + i * 60}ms` }}
-                />
-              ))}
-            </div>
-          </div>
-
           {/* Returns section */}
           <div>
             <div className="mb-8 flex items-center gap-4">

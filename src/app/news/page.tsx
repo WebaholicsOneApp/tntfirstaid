@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { getStoreConfig } from "~/lib/store-config.server";
 import NewsGrid from "./NewsGrid";
 
@@ -8,23 +7,23 @@ export const revalidate = 3600;
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
   return {
-    title: "News & Data",
-    description: `The latest news, technical articles, and data-driven insights from ${config.siteName}.`,
+    title: "News",
+    description: `The latest news, training updates, and preparedness tips from ${config.siteName}.`,
   };
 }
 
 export default async function NewsPage() {
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-secondary-900 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
-        <Image
-          src="/images/heroes/distributors.jpg"
-          alt="TNT First Aid products"
-          fill
-          className="object-cover object-center"
-          priority
+      <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 20% 40%, rgba(227,24,55,0.28) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+          }}
         />
-        <div className="from-secondary-900/85 via-secondary-900/40 absolute inset-0 bg-gradient-to-r to-black/10" />
         <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">
@@ -34,11 +33,11 @@ export default async function NewsPage() {
               </span>
             </div>
             <h1 className="font-display mb-4 text-4xl font-bold text-white md:text-5xl">
-              News &amp; Data
+              News
             </h1>
-            <p className="max-w-lg text-sm leading-relaxed text-white/60">
-              Technical articles, data-driven insights, and everything happening
-              at TNT First Aid.
+            <p className="max-w-lg text-sm leading-relaxed text-white/70">
+              Training announcements, first aid tips, and preparedness
+              resources from the TNT First Aid team.
             </p>
           </div>
         </div>

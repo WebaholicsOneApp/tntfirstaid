@@ -362,7 +362,7 @@ function ReviewPageContent() {
             Your review has been submitted and will be visible after moderation.
           </p>
           <p className="text-secondary-400 mb-8 text-sm">
-            Your feedback helps fellow shooters make better choices.
+            Your feedback helps fellow customers make better choices.
           </p>
           {remaining.length > 0 ? (
             <button
