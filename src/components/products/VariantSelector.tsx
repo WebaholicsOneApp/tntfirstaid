@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import type { VariationDetail } from "~/types";
+import { sortVariantOptions } from "./variantOrdering";
 
 interface VariantSelectorProps {
   variations: VariationDetail[];
@@ -28,10 +29,15 @@ export default function VariantSelector({
     selectedVariation?.variationTwo ?? "",
   );
 
-  // Get unique in-stock values for each dimension
+  const label1 = variations[0]?.variantType ?? "Option";
+  const label2 = hasSecondDimension
+    ? (variations[0]?.variantTypeTwo ?? "Option 2")
+    : null;
+
+  // Get unique in-stock values for each dimension, sorted to match WooCommerce
   const options1 = useMemo(() => {
     const seen = new Set<string>();
-    return variations
+    const raw = variations
       .filter((v) => v.inStock)
       .map((v) => v.variation)
       .filter((val): val is string => {
@@ -39,12 +45,13 @@ export default function VariantSelector({
         seen.add(val);
         return true;
       });
-  }, [variations]);
+    return sortVariantOptions(label1, raw);
+  }, [variations, label1]);
 
   const options2 = useMemo(() => {
-    if (!hasSecondDimension) return [];
+    if (!hasSecondDimension || !label2) return [];
     const seen = new Set<string>();
-    return variations
+    const raw = variations
       .filter((v) => {
         if (!v.inStock) return false;
         if (sel1) return v.variation === sel1;
@@ -56,7 +63,8 @@ export default function VariantSelector({
         seen.add(val);
         return true;
       });
-  }, [variations, hasSecondDimension, sel1]);
+    return sortVariantOptions(label2, raw);
+  }, [variations, hasSecondDimension, sel1, label2]);
 
   // Find matching variation for current selections
   const findMatch = useCallback(
@@ -71,11 +79,6 @@ export default function VariantSelector({
   );
 
   if (variations.length <= 1) return null;
-
-  const label1 = variations[0]?.variantType ?? "Option";
-  const label2 = hasSecondDimension
-    ? (variations[0]?.variantTypeTwo ?? "Option 2")
-    : null;
 
   const handleSelect1 = (value: string) => {
     setSel1(value);

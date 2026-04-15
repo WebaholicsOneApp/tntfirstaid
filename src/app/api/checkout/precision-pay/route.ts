@@ -23,11 +23,11 @@ export async function POST(request: Request) {
       shippingAddress,
       customerEmail,
       phoneNumber,
-<<<<<<< Updated upstream
-=======
       shippingCostCents,
       discountCode,
->>>>>>> Stashed changes
+      shippingServiceName,
+      shippingServiceCode,
+      taxCents,
     } = body;
 
     // Validate discountCode shape before forwarding — the upstream will also
@@ -70,11 +70,11 @@ export async function POST(request: Request) {
         })),
         shippingAddress,
         phoneNumber,
-<<<<<<< Updated upstream
-=======
         ...(shippingCostCents != null ? { shippingCostCents } : {}),
         ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
->>>>>>> Stashed changes
+        ...(shippingServiceName ? { shippingServiceName } : {}),
+        ...(shippingServiceCode ? { shippingServiceCode } : {}),
+        ...(taxCents != null ? { taxCents } : {}),
       });
 
       return NextResponse.json(orderResult, { status: 201 });
@@ -254,11 +254,11 @@ export async function POST(request: Request) {
       })),
       shippingAddress,
       phoneNumber,
-<<<<<<< Updated upstream
-=======
       ...(shippingCostCents != null ? { shippingCostCents } : {}),
       ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
->>>>>>> Stashed changes
+      ...(shippingServiceName ? { shippingServiceName } : {}),
+      ...(shippingServiceCode ? { shippingServiceCode } : {}),
+      ...(taxCents != null ? { taxCents } : {}),
     });
 
     return NextResponse.json(orderResult, { status: 201 });

@@ -35,6 +35,9 @@ interface PlaceOrderPanelProps {
   /** Absolute discount amount in cents, already validated server-side by
    * /api/checkout/apply-discount. */
   discountCents?: number;
+  shippingCostCents?: number;
+  shippingServiceName?: string;
+  shippingServiceCode?: string;
   onSuccess: (data: { orderId: number; orderNumber: string | null }) => void;
   onError: (message: string) => void;
 }
@@ -46,6 +49,9 @@ export default function PlaceOrderPanel({
   shippingAddress,
   discountCode,
   discountCents,
+  shippingCostCents,
+  shippingServiceName,
+  shippingServiceCode,
   onSuccess,
   onError,
 }: PlaceOrderPanelProps) {
@@ -76,11 +82,6 @@ export default function PlaceOrderPanel({
           ...(phone ? { phoneNumber: phone } : {}),
           items: items.map((item) => ({
             variationId: item.id,
-            productId: item.productId,
-            name: item.name,
-            variation: item.variation || null,
-            manufacturerNo: item.manufacturerNo || null,
-            imageUrl: item.image || null,
             quantity: item.quantity,
             price: item.price,
           })),
@@ -98,6 +99,9 @@ export default function PlaceOrderPanel({
           discountCents > 0
             ? { discountCode, discountCents }
             : {}),
+          shippingCostCents: shippingCostCents ?? 0,
+          shippingServiceName,
+          shippingServiceCode,
           sendEmail,
         }),
       });

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ProductImage } from "~/components/ui/ProductImage";
 import type { CartItem } from "~/types/cart";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
+import { calculateTax } from "~/lib/tax";
 import PromoCodeInput, {
   type AppliedDiscount,
 } from "~/components/checkout/PromoCodeInput";
@@ -13,6 +14,8 @@ interface OrderSummaryProps {
   cart: { items: CartItem[]; subtotal: number; itemCount: number };
   showItemDetails?: boolean;
   shippingCost?: number | undefined;
+  shippingLabel?: string;
+  shippingState?: string;
   isDigitalOnly?: boolean;
   ctaButton?: ReactNode;
   /** Hide the promo code input — used on the success page where editing is inappropriate. */
@@ -46,6 +49,8 @@ export default function OrderSummary({
   cart,
   showItemDetails = true,
   shippingCost,
+  shippingLabel,
+  shippingState,
   isDigitalOnly,
   ctaButton,
   hidePromoCode,
@@ -95,7 +100,7 @@ export default function OrderSummary({
     ? Math.min(discount.discountCents, cart.subtotal)
     : 0;
   const discountedSubtotal = Math.max(0, cart.subtotal - discountCents);
-  const estimatedTax = Math.round(discountedSubtotal * 0.08);
+  const estimatedTax = calculateTax(discountedSubtotal, shippingState);
   const resolvedShipping = shippingCost ?? 0;
   const total = discountedSubtotal + resolvedShipping + estimatedTax;
 
@@ -193,7 +198,14 @@ export default function OrderSummary({
               )}
               {!isDigitalOnly && (
                 <div className="flex justify-between">
-                  <span className="text-secondary-500">Shipping</span>
+                  <div>
+                    <span className="text-secondary-500">Shipping</span>
+                    {shippingLabel && (
+                      <p className="text-secondary-400 text-xs">
+                        {shippingLabel}
+                      </p>
+                    )}
+                  </div>
                   {shippingCost === undefined ? (
                     <span className="text-secondary-400">&mdash;</span>
                   ) : shippingCost === 0 ? (

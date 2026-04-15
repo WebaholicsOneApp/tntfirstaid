@@ -34,10 +34,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, shippingAddress, discountCode } = body as Record<
-      string,
-      unknown
-    >;
+    const { items, shippingAddress, shippingCostCents, discountCode } =
+      body as Record<string, unknown>;
 
     // Validate items array
     const itemsValidation = validateCheckoutItems(items);
@@ -63,6 +61,7 @@ export async function POST(request: Request) {
       subtotal: number;
       discountCents?: number;
       tax: number;
+      shippingCost?: number;
       publishableKey?: string;
       stripeConnectAccountId?: string;
     }>("/checkout/payment-intent", {
@@ -71,6 +70,7 @@ export async function POST(request: Request) {
         quantity: item.quantity,
       })),
       ...(shippingAddress ? { shippingAddress } : {}),
+      ...(typeof shippingCostCents === "number" ? { shippingCostCents } : {}),
       ...(normalizedDiscountCode
         ? { discountCode: normalizedDiscountCode }
         : {}),
@@ -83,6 +83,7 @@ export async function POST(request: Request) {
       subtotal: paymentIntent.subtotal,
       discountCents: paymentIntent.discountCents ?? 0,
       tax: paymentIntent.tax,
+      shippingCost: paymentIntent.shippingCost ?? 0,
       publishableKey: paymentIntent.publishableKey || null,
       stripeConnectAccountId: paymentIntent.stripeConnectAccountId || null,
     });

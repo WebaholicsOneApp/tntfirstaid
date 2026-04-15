@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CheckoutStepIndicator from "~/components/checkout/CheckoutStepIndicator";
@@ -13,7 +13,9 @@ import ShippingForm, {
 import {
   SESSION_KEY,
   type CheckoutSessionData,
+  type SelectedShippingRate,
 } from "~/components/checkout/CheckoutTypes";
+import { formatCentsToDollars } from "~/lib/utils";
 import { useAuth } from "~/lib/auth/AuthContext";
 import { useCart } from "~/lib/cart/CartContext";
 
@@ -26,9 +28,17 @@ export default function CheckoutShippingClient() {
   const [shippingFieldErrors, setShippingFieldErrors] = useState<
     Map<string, string>
   >(new Map());
-  const [shippingMethod, setShippingMethod] = useState<"standard">("standard");
   const [savedDetailsApplied, setSavedDetailsApplied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Shipping rate state
+  const [rates, setRates] = useState<SelectedShippingRate[]>([]);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState<string | null>(null);
+  const [selectedRate, setSelectedRate] = useState<SelectedShippingRate | null>(
+    null,
+  );
+  const [ratesFetched, setRatesFetched] = useState(false);
 
   // ---- Redirect to shop if cart is empty ----
   useEffect(() => {
@@ -39,7 +49,7 @@ export default function CheckoutShippingClient() {
     return () => clearTimeout(timer);
   }, [cart.items.length, router]);
 
-  // ---- Restore shipping fields from sessionStorage (back-nav from payment) ----
+  // ---- Restore shipping fields and selected rate from sessionStorage ----
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_KEY);
@@ -58,8 +68,10 @@ export default function CheckoutShippingClient() {
             country: data.shipping.country || "US",
           });
         }
-        if (data.shippingMethod) {
-          setShippingMethod(data.shippingMethod as "standard");
+        if (data.selectedShippingRate) {
+          setSelectedRate(data.selectedShippingRate);
+          setRates([data.selectedShippingRate]);
+          setRatesFetched(true);
         }
       }
     } catch {
@@ -79,6 +91,11 @@ export default function CheckoutShippingClient() {
         return n;
       });
       setError(null);
+      // Clear rates when address changes — require re-fetch
+      setRates([]);
+      setSelectedRate(null);
+      setRatesFetched(false);
+      setRatesError(null);
     },
     [],
   );
@@ -99,6 +116,10 @@ export default function CheckoutShippingClient() {
     setSavedDetailsApplied(true);
     setShippingFieldErrors(new Map<string, string>());
     setError(null);
+    setRates([]);
+    setSelectedRate(null);
+    setRatesFetched(false);
+    setRatesError(null);
   }, [customer]);
 
   const handleClearSavedDetails = useCallback(() => {
@@ -106,7 +127,7 @@ export default function CheckoutShippingClient() {
     setSavedDetailsApplied(false);
   }, []);
 
-  const handleContinueToPayment = useCallback(() => {
+  const validateAddress = useCallback((): boolean => {
     const shipErrors = new Map<string, string>();
     if (!shipping.name.trim()) shipErrors.set("name", "Full name is required");
     if (!shipping.email.trim())
@@ -120,9 +141,104 @@ export default function CheckoutShippingClient() {
 
     if (shipErrors.size > 0) {
       setShippingFieldErrors(shipErrors);
-      return;
+      return false;
     }
     setShippingFieldErrors(new Map<string, string>());
+    return true;
+  }, [shipping]);
+
+  // ---- Fetch shipping rates from UPS via API ----
+  const fetchRates = useCallback(async () => {
+    setRatesLoading(true);
+    setRatesError(null);
+    setRates([]);
+    setSelectedRate(null);
+
+    try {
+      const res = await fetch("/api/checkout/shipping-rates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.items.map((item) => ({
+            variationId: item.id,
+            quantity: item.quantity,
+          })),
+          shippingAddress: {
+            line1: shipping.line1,
+            line2: shipping.line2 || undefined,
+            city: shipping.city,
+            state: shipping.state,
+            postalCode: shipping.postalCode,
+            country: shipping.country || "US",
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRatesError(
+          data.message || "Failed to fetch shipping rates. Please try again.",
+        );
+        setRatesLoading(false);
+        return;
+      }
+
+      const fetchedRates: SelectedShippingRate[] = data.rates ?? [];
+      if (fetchedRates.length === 0) {
+        setRatesError(
+          "No UPS shipping options available for this address. Please verify your address and try again.",
+        );
+      } else {
+        setRates(fetchedRates);
+        // Auto-select UPS Ground (code '03') or fall back to cheapest
+        const ground = fetchedRates.find((r) => r.serviceCode === "03");
+        setSelectedRate(ground ?? fetchedRates[0] ?? null);
+      }
+      setRatesFetched(true);
+    } catch {
+      setRatesError("Failed to fetch shipping rates. Please try again.");
+    } finally {
+      setRatesLoading(false);
+    }
+  }, [shipping, cart.items]);
+
+  // ---- Auto-fetch rates when address is sufficiently complete (debounced) ----
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const hasAddress =
+      shipping.city.trim().length > 1 &&
+      shipping.state.trim().length >= 2 &&
+      shipping.postalCode.trim().length >= 5;
+
+    if (!hasAddress || cart.items.length === 0) return;
+
+    debounceRef.current = setTimeout(() => {
+      fetchRates();
+    }, 600);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [
+    shipping.city,
+    shipping.state,
+    shipping.postalCode,
+    shipping.line1,
+    fetchRates,
+    cart.items.length,
+  ]);
+
+  const handleContinueToPayment = useCallback(() => {
+    if (!validateAddress()) return;
+
+    if (!selectedRate) {
+      setError("Please select a shipping option.");
+      return;
+    }
+
     setError(null);
 
     const sessionData: CheckoutSessionData = {
@@ -137,19 +253,21 @@ export default function CheckoutShippingClient() {
         postalCode: shipping.postalCode,
         country: shipping.country || undefined,
       },
-      shippingMethod: shippingMethod,
-      paymentMethod: "credit_card", // default, will be overwritten in step 2
+      shippingMethod: selectedRate.serviceCode,
+      selectedShippingRate: selectedRate,
+      paymentMethod: "credit_card",
       sendEmail: false,
     };
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
     router.push("/checkout/payment");
-  }, [shipping, shippingMethod, router]);
+  }, [shipping, selectedRate, router, validateAddress]);
 
   // ---- CTA button for sidebar ----
   const ctaButton = (
     <button
       onClick={handleContinueToPayment}
-      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98]"
+      disabled={!selectedRate}
+      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
       style={{
         transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
       }}
@@ -249,49 +367,7 @@ export default function CheckoutShippingClient() {
               Back to Review
             </Link>
 
-            {/* Shipping Method Card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="bg-primary-500 h-px w-6" />
-                  <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                    Shipping Method
-                  </span>
-                </div>
-
-                <label
-                  className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
-                    shippingMethod === "standard"
-                      ? "border-primary-500 bg-primary-50/30"
-                      : "border-secondary-200 hover:border-secondary-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="shippingMethod"
-                    value="standard"
-                    checked={shippingMethod === "standard"}
-                    onChange={() => setShippingMethod("standard")}
-                    className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
-                  />
-                  <div className="flex flex-1 items-center justify-between">
-                    <div>
-                      <p className="text-secondary-900 text-sm font-medium">
-                        Standard Shipping
-                      </p>
-                      <p className="text-secondary-500 text-xs">
-                        Estimated 5-7 business days
-                      </p>
-                    </div>
-                    <span className="font-mono text-sm font-semibold text-green-600">
-                      FREE
-                    </span>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            {/* Shipping Form Card */}
+            {/* Shipping Information Card */}
             <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
               <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                 <div className="mb-6 flex items-center gap-3">
@@ -300,12 +376,6 @@ export default function CheckoutShippingClient() {
                     Shipping Information
                   </span>
                 </div>
-
-                {error && (
-                  <div className="mb-4 rounded-xl border border-red-200/80 bg-red-50 p-4">
-                    <p className="text-sm text-red-600">{error}</p>
-                  </div>
-                )}
 
                 {/* Saved address card */}
                 {isAuthenticated && customer && (
@@ -324,6 +394,89 @@ export default function CheckoutShippingClient() {
                   onChange={handleShippingChange}
                   fieldErrors={shippingFieldErrors}
                 />
+
+                {/* Shipping Method — inline after address fields */}
+                {(ratesLoading || ratesFetched || ratesError) && (
+                  <div className="mt-6">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="bg-primary-500 h-px w-6" />
+                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                        Shipping Method
+                      </span>
+                    </div>
+
+                    {ratesLoading && rates.length === 0 && (
+                      <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="border-secondary-100 animate-pulse rounded-2xl border-2 p-4"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="bg-secondary-100 h-4 w-4 rounded-full" />
+                              <div className="flex flex-1 items-center justify-between">
+                                <div className="space-y-1.5">
+                                  <div className="bg-secondary-100 h-4 w-28 rounded" />
+                                  <div className="bg-secondary-50 h-3 w-20 rounded" />
+                                </div>
+                                <div className="bg-secondary-100 h-4 w-16 rounded" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {ratesError && !ratesLoading && (
+                      <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
+                        <p className="text-sm text-red-600">{ratesError}</p>
+                      </div>
+                    )}
+
+                    {rates.length > 0 && (
+                      <div className="space-y-3">
+                        {rates.map((rate) => (
+                          <label
+                            key={rate.serviceCode}
+                            className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                              selectedRate?.serviceCode === rate.serviceCode
+                                ? "border-primary-500 bg-primary-50/30"
+                                : "border-secondary-200 hover:border-secondary-300"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="shippingRate"
+                              value={rate.serviceCode}
+                              checked={
+                                selectedRate?.serviceCode === rate.serviceCode
+                              }
+                              onChange={() => setSelectedRate(rate)}
+                              className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                            />
+                            <div className="flex flex-1 items-center justify-between">
+                              <div>
+                                <p className="text-secondary-900 text-sm font-medium">
+                                  {rate.serviceName}
+                                </p>
+                                {rate.deliveryDays !== null ? (
+                                  <p className="text-secondary-500 text-xs">
+                                    {rate.deliveryDays} business day
+                                    {rate.deliveryDays !== 1 ? "s" : ""}
+                                  </p>
+                                ) : null}
+                              </div>
+                              <span className="text-secondary-900 font-mono text-sm font-semibold">
+                                {formatCentsToDollars(rate.totalCents)}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
               </div>
             </div>
           </div>
@@ -333,7 +486,9 @@ export default function CheckoutShippingClient() {
             <OrderSummary
               cart={cart}
               showItemDetails={false}
-              shippingCost={undefined}
+              shippingCost={selectedRate?.totalCents}
+              shippingLabel={selectedRate?.serviceName}
+              shippingState={shipping.state}
               ctaButton={ctaButton}
             />
           </div>

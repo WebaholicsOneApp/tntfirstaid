@@ -303,7 +303,7 @@ export default function CheckoutProductReviewPage() {
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-secondary-500">Est. Tax</span>
+                      <span className="text-secondary-500">Tax</span>
                       <span className="text-secondary-400">&mdash;</span>
                     </div>
                   </div>

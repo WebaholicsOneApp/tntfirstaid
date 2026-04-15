@@ -375,10 +375,6 @@ export default function HudHeroSection() {
         <div data-hud="hero-text">
           <h1
             className="font-avenir text-primary-500 text-5xl leading-[0.88] font-black tracking-[0.06em] uppercase md:text-7xl lg:text-8xl xl:text-9xl"
-            style={{
-              textShadow:
-                "0 0 40px rgba(233,195,96,0.25), 0 0 80px rgba(233,195,96,0.1)",
-            }}
           >
             <span className="block">AMERICAN</span>
             <span className="block">MADE</span>

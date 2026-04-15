@@ -6,6 +6,14 @@ export const DISCOUNT_SESSION_KEY = "alpha-checkout-discount";
 
 export type PaymentMethod = "credit_card" | "precision_pay";
 
+export interface SelectedShippingRate {
+  serviceCode: string;
+  serviceName: string;
+  totalCents: number;
+  deliveryDays: number | null;
+  estimatedDelivery: string | null;
+}
+
 export interface AppliedDiscountSession {
   code: string;
   discountCents: number;
@@ -26,7 +34,8 @@ export interface CheckoutSessionData {
     postalCode: string;
     country?: string;
   };
-  shippingMethod: "standard" | "express";
+  shippingMethod: string;
+  selectedShippingRate?: SelectedShippingRate;
   billing?: {
     name: string;
     line1: string;

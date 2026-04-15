@@ -22,7 +22,11 @@ export async function POST(request: Request) {
       items,
       opaqueData,
       shippingAddress,
+      shippingCostCents,
+      shippingServiceName,
+      shippingServiceCode,
       discountCode,
+      taxCents,
     } = body;
 
     if (!customerEmail || !items?.length || !opaqueData || !shippingAddress) {
@@ -58,6 +62,9 @@ export async function POST(request: Request) {
         dataDescriptor: opaqueData.dataDescriptor,
         dataValue: opaqueData.dataValue,
       },
+      ...(shippingCostCents != null ? { shippingCostCents } : {}),
+      ...(shippingServiceName ? { shippingServiceName } : {}),
+      ...(shippingServiceCode ? { shippingServiceCode } : {}),
       shippingAddress: {
         name: shippingAddress.name,
         line1: shippingAddress.line1,
@@ -70,6 +77,7 @@ export async function POST(request: Request) {
       ...(normalizedDiscountCode
         ? { discountCode: normalizedDiscountCode }
         : {}),
+      ...(taxCents != null ? { taxCents } : {}),
     });
 
     return NextResponse.json(result);

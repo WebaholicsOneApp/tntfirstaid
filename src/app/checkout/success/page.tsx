@@ -44,6 +44,7 @@ interface OrderInfo {
   items?: OrderItem[];
   subtotal?: number;
   shippingCost?: number;
+  shippingServiceName?: string | null;
   tax?: number;
   total?: number;
   discountCents?: number;
@@ -124,7 +125,7 @@ function OrderSummary({ orderInfo }: { orderInfo: OrderInfo }) {
                 x{item.quantity}
               </p>
               <p className="text-secondary-900 text-sm font-semibold">
-                {formatCents(item.price * item.quantity)}
+                {formatCents(item.price)}
               </p>
             </div>
           </div>
@@ -210,7 +211,14 @@ function OrderSummary({ orderInfo }: { orderInfo: OrderInfo }) {
             </div>
           )}
           <div className="text-secondary-500 flex justify-between text-sm">
-            <span>Shipping</span>
+            <div>
+              <span>Shipping</span>
+              {orderInfo.shippingServiceName && (
+                <p className="text-secondary-400 text-xs">
+                  {orderInfo.shippingServiceName}
+                </p>
+              )}
+            </div>
             <span
               className={orderInfo.shippingCost === 0 ? "text-green-600" : ""}
             >
