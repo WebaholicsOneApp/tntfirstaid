@@ -60,6 +60,15 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
 .animate-slide-up { animation: slide-up 0.4s ease-out; }
 .animate-slide-in-right { animation: slide-in-right 0.3s ease-out; }
 
+/* Newsletter popup */
+@keyframes popup-backdrop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popup-enter {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-popup-backdrop { animation: popup-backdrop 0.3s ease-out both; }
+.animate-popup-enter { animation: popup-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
 /* Bullet hotspot pulse */
 @keyframes hotspot-pulse {
   0% { transform: scale(1); opacity: 0.6; }

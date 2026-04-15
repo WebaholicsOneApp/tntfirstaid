@@ -23,6 +23,7 @@ import StickyHeader from "~/components/layout/StickyHeader";
 import HeaderWrapper from "~/components/layout/HeaderWrapper";
 import Footer from "~/components/layout/Footer";
 import { CartDrawer } from "~/components/cart";
+import NewsletterPopup from "~/components/ui/NewsletterPopup";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -126,6 +127,7 @@ export default async function RootLayout({
                 />
 
                 <CartDrawer />
+                <NewsletterPopup />
               </NavigationLoadingProvider>
             </CartProvider>
           </AuthProvider>
