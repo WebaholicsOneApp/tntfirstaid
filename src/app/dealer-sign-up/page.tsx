@@ -5,7 +5,7 @@ import DealerSignUpForm from "./DealerSignUpForm";
 export const metadata: Metadata = {
   title: "Dealer Sign Up",
   description:
-    "Apply to become an authorized Alpha Munitions dealer. Fill out the form and a representative will reach out within 24-48 hours.",
+    "Apply to become an authorized TNT First Aid dealer. Fill out the form and a representative will reach out within 24-48 hours.",
 };
 
 export default function DealerSignUpPage() {

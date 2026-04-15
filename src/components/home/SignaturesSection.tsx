@@ -30,7 +30,7 @@ export default function SignaturesSection() {
 
           {/* Attribution */}
           <p className="text-secondary-400 mb-6 font-mono text-[0.62rem] tracking-[0.25em] uppercase">
-            — Alpha Munitions, Est. 2014
+            — TNT First Aid, Est. 2014
           </p>
 
           {/* Gold divider */}
@@ -46,7 +46,7 @@ export default function SignaturesSection() {
         <div ref={imgRef} className="relative mx-auto w-full max-w-sm">
           <Image
             src="https://alphamunitions.com/wp-content/uploads/2025/01/alpha-signatures-1.jpg"
-            alt="Alpha Munitions team signatures"
+            alt="TNT First Aid team signatures"
             width={500}
             height={300}
             className="h-auto w-full transition-[filter,opacity] duration-[1200ms] ease-out"

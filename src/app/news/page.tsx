@@ -19,7 +19,7 @@ export default async function NewsPage() {
       <header className="bg-secondary-900 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
         <Image
           src="/images/heroes/distributors.jpg"
-          alt="Alpha Munitions products"
+          alt="TNT First Aid products"
           fill
           className="object-cover object-center"
           priority
@@ -38,7 +38,7 @@ export default async function NewsPage() {
             </h1>
             <p className="max-w-lg text-sm leading-relaxed text-white/60">
               Technical articles, data-driven insights, and everything happening
-              at Alpha Munitions.
+              at TNT First Aid.
             </p>
           </div>
         </div>

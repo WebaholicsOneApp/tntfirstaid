@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
+      process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
     const domain = new URL(siteUrl).hostname;
 
     // Request Apple Pay merchant session
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         merchantIdentifier: process.env.APPLE_PAY_MERCHANT_ID,
         domainName: domain,
-        displayName: "Alpha Munitions",
+        displayName: "TNT First Aid",
       }),
     });
 

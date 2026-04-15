@@ -155,7 +155,7 @@ export default function NewsletterPopup() {
         <div className="relative hidden md:block">
           <Image
             src="/images/about/shooting.jpg"
-            alt="Alpha Munitions"
+            alt="TNT First Aid"
             fill
             className="object-cover"
             sizes="(min-width: 768px) 50vw, 0vw"
@@ -173,7 +173,7 @@ export default function NewsletterPopup() {
           <div className="absolute bottom-0 left-0 right-0 p-6">
             <Image
               src="/images/alpha-logo-wide.png"
-              alt="Alpha Munitions"
+              alt="TNT First Aid"
               width={180}
               height={28}
               className="opacity-80"

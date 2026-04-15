@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     const siteUrl =
       process.env.CORS_ALLOWED_ORIGINS ||
       process.env.NEXT_PUBLIC_SITE_URL ||
-      "https://alphamunitions.com";
+      "https://tntfirstaid.com";
 
     const response = await fetch(`${PP_API_URL}/merchant-nonce`, {
       headers: {

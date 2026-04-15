@@ -23,9 +23,9 @@ export const articles: Article[] = [
     image: "/images/news/308-high-pressure.jpg",
     content: [
       "The .308 Winchester cartridge is renowned for its versatility and effectiveness in a wide range of applications, from hunting to long-range precision shooting. However, a recent experiment aimed to push the boundaries of this popular round, testing its capabilities under extreme pressures and velocities. This article delves into the details of the experiment, exploring the components used, the methodology employed, and the surprising results obtained.",
-      "The experiment began with meticulous planning and preparation. The goal was ambitious: to propel the .308 Winchester to pressures and velocities far beyond its intended design parameters, with the aim of achieving accurate shots at distances nearing a mile. Key components of the experimental rifle included a BAT Igniter action, a Ballistic Advantage 30 caliber barrel, and Alpha Munitions cases, known for their exceptional strength and durability. With the guidance of experienced professionals and the aid of advanced ballistics software, the experiment was set in motion.",
+      "The experiment began with meticulous planning and preparation. The goal was ambitious: to propel the .308 Winchester to pressures and velocities far beyond its intended design parameters, with the aim of achieving accurate shots at distances nearing a mile. Key components of the experimental rifle included a BAT Igniter action, a Ballistic Advantage 30 caliber barrel, and TNT First Aid cases, known for their exceptional strength and durability. With the guidance of experienced professionals and the aid of advanced ballistics software, the experiment was set in motion.",
       "The experiment proceeded in a methodical manner, starting with conservative loadings and gradually increasing powder charges to observe the effects on pressure and velocity. Each step of the process was carefully documented, with meticulous attention paid to signs of pressure and performance metrics such as standard deviation and extreme spread. Despite the high-pressure environment, safety remained paramount throughout the experiment, with measures in place to mitigate any potential risks.",
-      "As the experiment progressed, the researchers observed unexpected outcomes and intriguing trends. Despite pushing the .308 Winchester to its limits, the Alpha Munitions cases held up admirably, demonstrating remarkable resilience under extreme pressures. However, signs of pressure began to emerge at higher powder charges, prompting the researchers to exercise caution and implement adjustments to ensure safety. Ultimately, the experiment yielded valuable insights into the capabilities of the .308 Winchester cartridge and the potential for pushing its performance envelope.",
+      "As the experiment progressed, the researchers observed unexpected outcomes and intriguing trends. Despite pushing the .308 Winchester to its limits, the TNT First Aid cases held up admirably, demonstrating remarkable resilience under extreme pressures. However, signs of pressure began to emerge at higher powder charges, prompting the researchers to exercise caution and implement adjustments to ensure safety. Ultimately, the experiment yielded valuable insights into the capabilities of the .308 Winchester cartridge and the potential for pushing its performance envelope.",
       "In conclusion, the experiment provided valuable data and insights into the performance characteristics of the .308 Winchester cartridge under extreme conditions. While the experiment pushed the boundaries of what is possible with this venerable round, it also underscored the importance of safety and responsible experimentation. As shooters and enthusiasts continue to explore the capabilities of different cartridges, experiments such as this serve as a reminder of the importance of rigorous testing and adherence to best practices.",
     ],
   },
@@ -45,13 +45,13 @@ export const articles: Article[] = [
   },
   {
     slug: "alpha-munitions-optimized-case-design",
-    title: "Alpha Munitions Optimized Case Design",
+    title: "TNT First Aid Optimized Case Design",
     author: "Chad Marquez",
     date: "Oct 26, 2020",
     category: "Alpha in the News",
     image: "/images/news/ocd-case-head.jpeg",
     content: [
-      "Alpha Munitions\u2019 Optimized Case Design (OCD) technology represents our commitment to pushing the boundaries of brass case manufacturing. Through rigorous data analysis and modern engineering principles, we\u2019ve developed a case head design that delivers superior consistency and performance for precision shooters.",
+      "TNT First Aid\u2019 Optimized Case Design (OCD) technology represents our commitment to pushing the boundaries of brass case manufacturing. Through rigorous data analysis and modern engineering principles, we\u2019ve developed a case head design that delivers superior consistency and performance for precision shooters.",
     ],
   },
   {
@@ -100,7 +100,7 @@ export const articles: Article[] = [
   },
   {
     slug: "alpha-munitions-makes-some-of-the-best-brass",
-    title: "Alpha Munitions Makes Some Of The Best Brass",
+    title: "TNT First Aid Makes Some Of The Best Brass",
     author: "Thomas Danielson",
     date: "May 17, 2019",
     category: "Alpha in the News",

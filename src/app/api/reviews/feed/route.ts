@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getApiClient } from "~/lib/api-client";
 import { escapeXml, slugify } from "~/lib/xml-helpers";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunition.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
 
 export async function GET() {
   try {
@@ -53,7 +53,7 @@ export async function GET() {
       xsi:noNamespaceSchemaLocation="http://www.google.com/shopping/reviews/schema/product/2.3/product_reviews.xsd">
   <version>2.3</version>
   <publisher>
-    <name>${escapeXml(process.env.STORE_NAME || "Alpha Munitions")}</name>
+    <name>${escapeXml(process.env.STORE_NAME || "TNT First Aid")}</name>
     <link>${escapeXml(siteUrl)}</link>
   </publisher>
   <reviews>

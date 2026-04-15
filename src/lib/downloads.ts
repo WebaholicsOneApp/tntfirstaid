@@ -10,7 +10,7 @@ const DOWNLOAD_MAP: Record<string, string> = {
 
 /** Known downloadable product names (for matching order items without slugs) */
 const DOWNLOAD_NAME_MAP: Record<string, string> = {
-  "Alpha Munitions Reloading Card (download)":
+  "TNT First Aid Reloading Card (download)":
     "/downloads/alpha-munitions-reloading-card.pdf",
 };
 

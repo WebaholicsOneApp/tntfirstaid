@@ -69,7 +69,7 @@ export default function OcdTechnologySection() {
             <div className="relative" style={{ aspectRatio: "1946 / 704" }}>
               <Image
                 src="/images/bullet-side-homepage.jpg"
-                alt="Alpha Munitions brass cartridge cutaway showing precision engineering"
+                alt="TNT First Aid brass cartridge cutaway showing precision engineering"
                 fill
                 className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -129,7 +129,7 @@ export default function OcdTechnologySection() {
             </div>
 
             <h2 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
-              Alpha Munitions Ultra Premium Rifle Brass with OCD (Optimized Case
+              TNT First Aid Ultra Premium Rifle Brass with OCD (Optimized Case
               Design) Technology.
             </h2>
 

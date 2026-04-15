@@ -22,7 +22,7 @@ export async function generateMetadata({
   return {
     title: query ? `Search: ${query}` : "Search",
     description: query
-      ? `Search results for "${query}" at Alpha Munitions.`
+      ? `Search results for "${query}" at TNT First Aid.`
       : "Search for ammunition and reloading supplies.",
   };
 }

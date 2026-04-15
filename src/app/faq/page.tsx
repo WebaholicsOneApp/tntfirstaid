@@ -22,7 +22,7 @@ const faqSections = [
       },
       {
         q: "Are your products made in the USA?",
-        a: "Yes. All Alpha Munitions products are manufactured in our facility in American Fork, Utah. We source domestically whenever possible and are proud to support American manufacturing.",
+        a: "Yes. All TNT First Aid products are manufactured in our facility in American Fork, Utah. We source domestically whenever possible and are proud to support American manufacturing.",
       },
       {
         q: "What calibers do you offer?",

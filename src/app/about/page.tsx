@@ -82,7 +82,7 @@ export default async function AboutPage() {
       <header className="bg-secondary-900 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
         <Image
           src="/images/about/banner.jpg"
-          alt="Alpha Munitions facility"
+          alt="TNT First Aid facility"
           fill
           className="object-cover object-center"
           priority
@@ -138,7 +138,7 @@ export default async function AboutPage() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/about/facility-1.jpg"
-                  alt="Alpha Munitions team and facility"
+                  alt="TNT First Aid team and facility"
                   fill
                   className="object-cover"
                 />
@@ -154,7 +154,7 @@ export default async function AboutPage() {
               <div className="relative order-last aspect-[4/3] overflow-hidden rounded-2xl md:order-first">
                 <Image
                   src="/images/about/facility-2.jpg"
-                  alt="Alpha Munitions manufacturing facility"
+                  alt="TNT First Aid manufacturing facility"
                   fill
                   className="object-cover"
                 />
@@ -175,7 +175,7 @@ export default async function AboutPage() {
                   advanced technologies available in both manufacturing and
                   quality control. Abandoning outdated manufacturing principles
                   and utilizing a laboratory-based, data driven approach ensures
-                  Alpha Munitions brass is extremely consistent. Owning this
+                  TNT First Aid brass is extremely consistent. Owning this
                   process means we can continually innovate, making better
                   products for the precision shooting community.
                 </p>
@@ -199,7 +199,7 @@ export default async function AboutPage() {
                   Why We Do It
                 </h2>
                 <p className="text-secondary-600 text-lg leading-relaxed">
-                  We started Alpha Munitions to be different than other brass
+                  We started TNT First Aid to be different than other brass
                   manufacturers. Along with using the most advanced
                   manufacturing technology in the industry, we wanted to improve
                   the customer experience with the product. From packaging our
@@ -213,7 +213,7 @@ export default async function AboutPage() {
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
                 <Image
                   src="/images/about/shooting.jpg"
-                  alt="Precision shooting with Alpha Munitions"
+                  alt="Precision shooting with TNT First Aid"
                   fill
                   className="object-cover"
                 />
@@ -234,7 +234,7 @@ export default async function AboutPage() {
           <div className="relative z-10 container mx-auto px-4 text-center">
             <Image
               src="/images/alpha-logo.png"
-              alt="Alpha Munitions"
+              alt="TNT First Aid"
               width={80}
               height={80}
               className="mx-auto mb-8 opacity-80 brightness-0 invert"

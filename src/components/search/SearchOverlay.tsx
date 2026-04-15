@@ -281,7 +281,7 @@ export function SearchOverlay({
               >
                 <Image
                   src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
-                  alt="Alpha Munitions"
+                  alt="TNT First Aid"
                   width={300}
                   height={50}
                   className="h-auto w-[140px]"
@@ -299,7 +299,7 @@ export function SearchOverlay({
               >
                 <Image
                   src="https://alphamunitions.com/wp-content/uploads/2019/03/Alpha-Muntions-Gold.png"
-                  alt="Alpha Munitions"
+                  alt="TNT First Aid"
                   width={300}
                   height={50}
                   className="h-auto w-[160px]"

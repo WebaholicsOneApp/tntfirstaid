@@ -1,4 +1,4 @@
-# Alpha Munitions — OneApp API Migration Checklist
+# TNT First Aid — OneApp API Migration Checklist
 
 ## Pre-Deploy Checks
 - [ ] `npm run build` passes with zero TypeScript errors

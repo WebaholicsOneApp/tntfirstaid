@@ -4,7 +4,7 @@
  *
  * Every exported function preserves its original signature exactly.
  * Internal Knex queries have been replaced with getApiClient() calls.
- * Adapter functions transform OneApp API responses into alphamunition types.
+ * Adapter functions transform OneApp API responses into TNT First Aid types.
  */
 import { getApiClient } from "./api-client";
 import { getDownloadUrl, isKnownDownloadable } from "./downloads";
@@ -145,7 +145,7 @@ export async function enrichProductList(
 }
 
 // ============================================
-// Adapter functions — transform API responses to alphamunition types
+// Adapter functions — transform API responses to TNT First Aid types
 // ============================================
 
 function toProductListItem(card: any): ProductListItem {

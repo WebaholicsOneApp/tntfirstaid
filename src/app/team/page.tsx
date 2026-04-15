@@ -39,7 +39,7 @@ export default async function TeamAlphaPage() {
       <header className="bg-secondary-900 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
         <Image
           src="/images/about/banner.jpg"
-          alt="Alpha Munitions facility"
+          alt="TNT First Aid facility"
           fill
           className="object-cover object-center"
           priority

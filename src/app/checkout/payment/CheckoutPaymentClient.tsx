@@ -656,7 +656,7 @@ export default function CheckoutPaymentClient({ devBypass }: Props) {
                 <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
                   <div className="rounded-xl border border-amber-200/80 bg-amber-50 p-6 text-sm text-amber-800">
                     Checkout is not configured for this storefront yet. Please
-                    contact Alpha Munitions support.
+                    contact TNT First Aid support.
                   </div>
                 </div>
               </div>

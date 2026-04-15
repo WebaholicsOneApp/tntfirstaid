@@ -9,7 +9,7 @@ interface FooterProps {
 }
 
 export default function Footer({
-  siteName = "Alpha Munitions",
+  siteName = "TNT First Aid",
   logoUrl = "/apple-touch-icon.png",
   storeConfig,
 }: FooterProps) {
@@ -88,10 +88,10 @@ export default function Footer({
               </li>
               <li>
                 <Link
-                  href="/team-alpha"
+                  href="/team"
                   className="text-secondary-400 hover:text-primary-500 text-sm transition-colors"
                 >
-                  Team Alpha
+                  Team
                 </Link>
               </li>
               <li>

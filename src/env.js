@@ -20,7 +20,7 @@ export const env = createEnv({
     // Email
     RESEND_API_KEY: z.string().optional(),
     FROM_EMAIL: z.string().email().optional(),
-    STORE_NAME: z.string().default("Alpha Munitions"),
+    STORE_NAME: z.string().default("TNT First Aid"),
 
     // CORS
     CORS_ALLOWED_ORIGINS: z.string().optional(),
@@ -32,7 +32,7 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_SITE_URL: z.string().url(),
-    NEXT_PUBLIC_SITE_NAME: z.string().default("Alpha Munitions"),
+    NEXT_PUBLIC_SITE_NAME: z.string().default("TNT First Aid"),
 
     // Store contact info (optional — can be set via OneApp storefront branding instead)
     NEXT_PUBLIC_STORE_ADDRESS: z.string().optional(),

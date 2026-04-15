@@ -334,7 +334,7 @@ export default async function DistributorsPage() {
       <header className="bg-secondary-900 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
         <Image
           src="/images/heroes/distributors.jpg"
-          alt="Alpha Munitions products"
+          alt="TNT First Aid products"
           fill
           className="object-cover object-center"
           priority

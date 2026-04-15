@@ -1,7 +1,7 @@
 /**
  * Nexus-based sales tax calculation.
  *
- * Alpha Munitions only has economic nexus in Utah (home state).
+ * TNT First Aid only has economic nexus in Utah (home state).
  * Add states here as a tax professional confirms additional nexus.
  */
 export const NEXUS_TAX_RATES: Record<string, number> = {

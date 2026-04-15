@@ -98,7 +98,7 @@ export default function MobileMenu({
           {/* Main navigation links */}
           {[
             { href: "/shop", label: "Shop" },
-            { href: "/team-alpha", label: "Team Alpha" },
+            { href: "/team", label: "Team" },
             { href: "/about", label: "About Us" },
             { href: "/distributors", label: "Distributors" },
             { href: "/news", label: "News and Data" },

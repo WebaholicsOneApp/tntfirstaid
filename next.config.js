@@ -15,9 +15,6 @@ const config = {
       { protocol: "https", hostname: "*.amazonaws.com" },
       // Azure Blob Storage (OneApp product images)
       { protocol: "https", hostname: "*.blob.core.windows.net" },
-      // Alpha Munitions CDN
-      { protocol: "https", hostname: "cdn.alphamunitions.com" },
-      { protocol: "https", hostname: "alphamunitions.com" },
       // Shopify CDN (WPS imported product images)
       { protocol: "https", hostname: "cdn.shopify.com" },
       // WPS CDN (supplier images)

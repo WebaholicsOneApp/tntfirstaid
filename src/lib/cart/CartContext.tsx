@@ -11,7 +11,7 @@ import {
 } from "react";
 import type { Cart, CartItem, CartContextType } from "~/types/cart";
 
-const CART_STORAGE_KEY = "alpha-munitions-cart";
+const CART_STORAGE_KEY = "tnt-first-aid-cart";
 
 // Initial empty cart state
 const initialCart: Cart = {

@@ -24,7 +24,7 @@ export default function HeroSection() {
         >
           <Image
             src="/images/hero-homepage.jpg"
-            alt="Alpha Munitions - American Made Alpha Grade"
+            alt="TNT First Aid - American Made Alpha Grade"
             fill
             className="object-cover"
             priority

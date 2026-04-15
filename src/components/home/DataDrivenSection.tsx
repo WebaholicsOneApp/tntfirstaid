@@ -66,7 +66,7 @@ export default function DataDrivenSection() {
             {/* Body */}
             <div className="text-secondary-400 space-y-4 text-sm leading-relaxed">
               <p>
-                At Alpha Munitions, engineering, technology, and innovation are
+                At TNT First Aid, engineering, technology, and innovation are
                 the cornerstones of everything we do. Our commitment to
                 precision begins with advanced manufacturing processes and
                 extends through rigorous quality control testing on every lot we

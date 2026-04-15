@@ -1,5 +1,5 @@
 /**
- * Cart Types for Alpha Munitions Storefront
+ * Cart Types for TNT First Aid Storefront
  */
 
 export interface CartItem {

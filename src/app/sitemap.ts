@@ -6,7 +6,7 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
 
   let productsResult: { products: { slug: string }[] } = { products: [] };
   let categories: { categoryName: string }[] = [];
@@ -62,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/team-alpha`,
+      url: `${baseUrl}/team`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.6,

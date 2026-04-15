@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     const siteUrl =
       process.env.CORS_ALLOWED_ORIGINS ||
       process.env.NEXT_PUBLIC_SITE_URL ||
-      "https://alphamunitions.com";
+      "https://tntfirstaid.com";
 
     const amount = body.amount;
     if (!amount || amount <= 0) {

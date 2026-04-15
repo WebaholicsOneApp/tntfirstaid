@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: article.title,
     description:
       article.content?.[0]?.slice(0, 160) ??
-      `${article.title} — Alpha Munitions News & Data`,
+      `${article.title} — TNT First Aid News & Data`,
   };
 }
 

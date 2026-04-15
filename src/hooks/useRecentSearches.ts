@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "alpha-munitions-recent-searches";
+const STORAGE_KEY = "tnt-first-aid-recent-searches";
 const MAX_SEARCHES = 8;
 
 export function useRecentSearches() {

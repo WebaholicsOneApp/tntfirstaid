@@ -74,9 +74,9 @@ export async function sendOrderEmail(
   data: OrderEmailData,
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
-  const storeName = process.env.STORE_NAME || "Alpha Munitions";
+  const storeName = process.env.STORE_NAME || "TNT First Aid";
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
 
   try {
     // Generate tracking URL if available
@@ -172,9 +172,9 @@ export async function sendOrderConfirmationEmail(
   data: OrderConfirmationEmailData,
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
-  const storeName = process.env.STORE_NAME || "Alpha Munitions";
+  const storeName = process.env.STORE_NAME || "TNT First Aid";
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://alphamunitions.com";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
 
   try {
     const { subject, html } = orderConfirmedTemplate({

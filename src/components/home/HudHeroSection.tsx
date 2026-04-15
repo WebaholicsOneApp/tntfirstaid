@@ -366,7 +366,7 @@ export default function HudHeroSection() {
               className="font-avenir text-sm font-medium tracking-[0.3em] uppercase md:text-base"
               style={{ color: "#e9c25f" }}
             >
-              Alpha Munitions
+              TNT First Aid
             </span>
           </div>
         </div>

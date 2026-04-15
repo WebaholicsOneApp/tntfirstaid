@@ -108,7 +108,7 @@ export default function FeatureIconsSection() {
               Constant Innovation
             </h3>
             <p className="text-secondary-400 text-sm leading-relaxed">
-              Alpha Munitions pushes the boundaries of brass manufacturing. Our
+              TNT First Aid pushes the boundaries of brass manufacturing. Our
               relentless pursuit of innovation results in cutting-edge processes
               that deliver the highest-performing brass cases ever produced.
             </p>

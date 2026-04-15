@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       signal: controller.signal,
       body: JSON.stringify({
         stripePaymentIntentId,
-        customerEmail: customerEmail || "express-checkout@alphamunitions.com",
+        customerEmail: customerEmail || "express-checkout@tntfirstaid.com",
         paymentMethod,
         items,
         subtotal,

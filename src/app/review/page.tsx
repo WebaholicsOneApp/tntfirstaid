@@ -531,7 +531,7 @@ function ReviewPageContent() {
 
           <div className="mt-6 text-center">
             <span className="text-secondary-400 text-lg font-bold">
-              {process.env.NEXT_PUBLIC_SITE_NAME || "Alpha Munitions"}
+              {process.env.NEXT_PUBLIC_SITE_NAME || "TNT First Aid"}
             </span>
           </div>
         </div>
@@ -845,7 +845,7 @@ function ReviewPageContent() {
         {/* Branding */}
         <div className="mt-6 text-center">
           <span className="text-secondary-400 text-lg font-bold">
-            {process.env.NEXT_PUBLIC_SITE_NAME || "Alpha Munitions"}
+            {process.env.NEXT_PUBLIC_SITE_NAME || "TNT First Aid"}
           </span>
         </div>
       </div>

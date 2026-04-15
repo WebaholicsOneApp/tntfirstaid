@@ -18,7 +18,7 @@ interface HeaderProps {
 
 const navLinks = [
   { href: "/shop", label: "Shop" },
-  { href: "/team-alpha", label: "Team Alpha" },
+  { href: "/team", label: "Team" },
   { href: "/about", label: "About Us" },
   { href: "/distributors", label: "Distributors" },
   { href: "/news", label: "News and Data" },
@@ -34,7 +34,7 @@ const navLinks = [
 ];
 
 export default function Header({
-  siteName = "Alpha Munitions",
+  siteName = "TNT First Aid",
   logoUrl = "/images/alpha-logo-wide.png",
   categories,
 }: HeaderProps) {

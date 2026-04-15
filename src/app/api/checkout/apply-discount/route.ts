@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       }
       const obj = it as Record<string, unknown>;
       // Accept either `variationId` (preferred) or `id` — the
-      // alphamunition cart uses `id` as the variationId.
+      // TNT First Aid cart uses `id` as the variationId.
       const variationId =
         typeof obj.variationId === "number"
           ? obj.variationId
