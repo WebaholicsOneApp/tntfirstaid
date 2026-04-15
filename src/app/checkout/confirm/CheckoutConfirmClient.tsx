@@ -144,6 +144,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
       // Read any persisted discount from sessionStorage — OrderSummary is the
       // single source of truth for applied promo codes during checkout.
       let discountCode: string | undefined;
+      let ccDiscountCents = 0;
       try {
         const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
         if (rawDiscount) {
@@ -154,11 +155,18 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
           ) {
             discountCode = parsed.code;
+            ccDiscountCents = parsed.discountCents || 0;
           }
         }
       } catch {
         // Malformed or unavailable — proceed without discount.
       }
+
+      const displayAmount = cart.items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+      const ccTax = calculateTax(displayAmount - ccDiscountCents, checkoutData.shipping.state);
 
       const res = await fetch("/api/authorize-net/charge", {
         method: "POST",
@@ -174,6 +182,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           shippingCostCents: shippingCost,
           shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
           shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
+          taxCents: ccTax,
           isDigitalOnly: checkoutData.isDigitalOnly || undefined,
           shippingAddress: checkoutData.isDigitalOnly
             ? undefined

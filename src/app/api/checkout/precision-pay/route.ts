@@ -258,6 +258,7 @@ export async function POST(request: Request) {
       ...(normalizedDiscountCode ? { discountCode: normalizedDiscountCode } : {}),
       ...(shippingServiceName ? { shippingServiceName } : {}),
       ...(shippingServiceCode ? { shippingServiceCode } : {}),
+      ...(taxCents != null ? { taxCents } : {}),
     });
 
     return NextResponse.json(orderResult, { status: 201 });

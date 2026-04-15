@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       shippingServiceName,
       shippingServiceCode,
       discountCode,
+      taxCents,
     } = body;
 
     if (!customerEmail || !items?.length || !opaqueData || !shippingAddress) {
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
       ...(normalizedDiscountCode
         ? { discountCode: normalizedDiscountCode }
         : {}),
+      ...(taxCents != null ? { taxCents } : {}),
     });
 
     return NextResponse.json(result);
