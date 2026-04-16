@@ -60,9 +60,6 @@ function buildCSPWithNonce(nonce: string, isProduction: boolean): string {
       "https://www.google.com",
       "https://maps.google.com",
       "https://www.youtube-nocookie.com",
-      // PrecisionPay checkout portal (iframe from PrecisionPayPopup.tsx)
-      "https://checkout.myprecisionpay.com",
-      "https://sandbox-checkout.myprecisionpay.com",
     ],
     "frame-ancestors": ["'self'"],
     "form-action": ["'self'"],

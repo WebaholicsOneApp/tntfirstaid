@@ -27,6 +27,10 @@ export const env = createEnv({
 
     // Dev checkout bypass (never enable in production)
     DEV_CHECKOUT_BYPASS: z.string().optional(),
+
+    // Dev mock UPS rates (never enable in production) — bypasses OneApp call
+    // and returns canned shipping options so checkout can be exercised end-to-end.
+    DEV_FAKE_SHIPPING_RATES: z.string().optional(),
   },
 
   client: {
@@ -82,6 +86,7 @@ export const env = createEnv({
 
     // Dev checkout bypass
     DEV_CHECKOUT_BYPASS: process.env.DEV_CHECKOUT_BYPASS,
+    DEV_FAKE_SHIPPING_RATES: process.env.DEV_FAKE_SHIPPING_RATES,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

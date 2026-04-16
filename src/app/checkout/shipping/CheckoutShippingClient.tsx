@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CheckoutStepIndicator from "~/components/checkout/CheckoutStepIndicator";
 import OrderSummary from "~/components/checkout/OrderSummary";
+import TrustBadges from "~/components/checkout/TrustBadges";
 import SavedDetailsCard from "~/components/checkout/SavedDetailsCard";
 import ShippingForm, {
   EMPTY_SHIPPING,
@@ -91,11 +92,22 @@ export default function CheckoutShippingClient() {
         return n;
       });
       setError(null);
-      // Clear rates when address changes — require re-fetch
-      setRates([]);
-      setSelectedRate(null);
-      setRatesFetched(false);
-      setRatesError(null);
+      // Only invalidate rates when address fields change — name/email/phone
+      // don't affect UPS rates, so don't drop the customer's rate selection.
+      const addressFields: Array<keyof ShippingFields> = [
+        "line1",
+        "line2",
+        "city",
+        "state",
+        "postalCode",
+        "country",
+      ];
+      if (addressFields.includes(field)) {
+        setRates([]);
+        setSelectedRate(null);
+        setRatesFetched(false);
+        setRatesError(null);
+      }
     },
     [],
   );
@@ -263,19 +275,28 @@ export default function CheckoutShippingClient() {
   }, [shipping, selectedRate, router, validateAddress]);
 
   // ---- CTA button for sidebar ----
+  const ctaHint = !selectedRate
+    ? cart.items.length === 0
+      ? null
+      : shipping.postalCode.trim().length < 5
+        ? "Enter your shipping address to see options"
+        : ratesLoading
+          ? "Calculating shipping rates…"
+          : ratesError
+            ? null
+            : "Select a shipping option to continue"
+    : null;
+
   const ctaButton = (
-    <button
-      onClick={handleContinueToPayment}
-      disabled={!selectedRate}
-      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-      style={{
-        transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-      }}
-    >
-      <span>Continue to Payment</span>
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
+    <div>
+      <button
+        onClick={handleContinueToPayment}
+        disabled={!selectedRate}
+        className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold text-white uppercase transition-colors active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <span>Continue to Payment</span>
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -287,8 +308,11 @@ export default function CheckoutShippingClient() {
             d="M14 5l7 7m0 0l-7 7m7-7H3"
           />
         </svg>
-      </span>
-    </button>
+      </button>
+      {ctaHint && (
+        <p className="text-secondary-500 mt-2 text-center text-xs">{ctaHint}</p>
+      )}
+    </div>
   );
 
   // ---- Empty cart state ----
@@ -314,7 +338,7 @@ export default function CheckoutShippingClient() {
           <div>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-8" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                 Checkout
               </span>
             </div>
@@ -324,7 +348,7 @@ export default function CheckoutShippingClient() {
           </div>
           <Link
             href="/checkout"
-            className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
+            className="text-secondary-500 hover:text-primary-600 hidden items-center gap-2 text-sm font-medium transition-colors sm:flex"
           >
             <svg
               className="h-4 w-4"
@@ -349,7 +373,7 @@ export default function CheckoutShippingClient() {
             {/* Back link mobile */}
             <Link
               href="/checkout"
-              className="text-secondary-400 hover:text-primary-600 flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:hidden"
+              className="text-secondary-500 hover:text-primary-600 flex items-center gap-2 text-sm font-medium transition-colors sm:hidden"
             >
               <svg
                 className="h-4 w-4"
@@ -368,42 +392,41 @@ export default function CheckoutShippingClient() {
             </Link>
 
             {/* Shipping Information Card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="bg-primary-500 h-px w-6" />
-                  <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                    Shipping Information
-                  </span>
+            <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="bg-primary-500 h-px w-6" />
+                <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                  Shipping Information
+                </span>
+              </div>
+
+              {/* Saved address card */}
+              {isAuthenticated && customer && (
+                <div className="mb-6">
+                  <SavedDetailsCard
+                    customer={customer}
+                    isApplied={savedDetailsApplied}
+                    onApply={handleUseSavedDetails}
+                    onClear={handleClearSavedDetails}
+                  />
                 </div>
+              )}
 
-                {/* Saved address card */}
-                {isAuthenticated && customer && (
-                  <div className="mb-6">
-                    <SavedDetailsCard
-                      customer={customer}
-                      isApplied={savedDetailsApplied}
-                      onApply={handleUseSavedDetails}
-                      onClear={handleClearSavedDetails}
-                    />
+              <ShippingForm
+                data={shipping}
+                onChange={handleShippingChange}
+                fieldErrors={shippingFieldErrors}
+              />
+
+              {/* Shipping Method — inline after address fields */}
+              {(ratesLoading || ratesFetched || ratesError) && (
+                <div className="mt-8">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="bg-primary-500 h-px w-6" />
+                    <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                      Shipping Method
+                    </span>
                   </div>
-                )}
-
-                <ShippingForm
-                  data={shipping}
-                  onChange={handleShippingChange}
-                  fieldErrors={shippingFieldErrors}
-                />
-
-                {/* Shipping Method — inline after address fields */}
-                {(ratesLoading || ratesFetched || ratesError) && (
-                  <div className="mt-6">
-                    <div className="mb-4 flex items-center gap-3">
-                      <div className="bg-primary-500 h-px w-6" />
-                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                        Shipping Method
-                      </span>
-                    </div>
 
                     {ratesLoading && rates.length === 0 && (
                       <div className="space-y-3">
@@ -434,63 +457,62 @@ export default function CheckoutShippingClient() {
                     )}
 
                     {rates.length > 0 && (
-                      <div className="space-y-3">
-                        {rates.map((rate) => (
-                          <label
-                            key={rate.serviceCode}
-                            className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-all ${
+                    <div className="space-y-3">
+                      {rates.map((rate) => (
+                        <label
+                          key={rate.serviceCode}
+                          className={`flex cursor-pointer items-center gap-4 rounded-2xl border-2 p-4 transition-colors ${
+                            selectedRate?.serviceCode === rate.serviceCode
+                              ? "border-primary-500 bg-primary-50/30"
+                              : "border-secondary-200 hover:border-secondary-300"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="shippingRate"
+                            value={rate.serviceCode}
+                            checked={
                               selectedRate?.serviceCode === rate.serviceCode
-                                ? "border-primary-500 bg-primary-50/30"
-                                : "border-secondary-200 hover:border-secondary-300"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="shippingRate"
-                              value={rate.serviceCode}
-                              checked={
-                                selectedRate?.serviceCode === rate.serviceCode
-                              }
-                              onChange={() => setSelectedRate(rate)}
-                              className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
-                            />
-                            <div className="flex flex-1 items-center justify-between">
-                              <div>
-                                <p className="text-secondary-900 text-sm font-medium">
-                                  {rate.serviceName}
+                            }
+                            onChange={() => setSelectedRate(rate)}
+                            className="border-secondary-300 text-primary-500 focus:ring-primary-500 h-4 w-4"
+                          />
+                          <div className="flex flex-1 items-center justify-between">
+                            <div>
+                              <p className="text-secondary-900 text-sm font-medium">
+                                {rate.serviceName}
+                              </p>
+                              {rate.deliveryDays !== null ? (
+                                <p className="text-secondary-500 text-xs">
+                                  {rate.deliveryDays} business day
+                                  {rate.deliveryDays !== 1 ? "s" : ""}
                                 </p>
-                                {rate.deliveryDays !== null ? (
-                                  <p className="text-secondary-500 text-xs">
-                                    {rate.deliveryDays} business day
-                                    {rate.deliveryDays !== 1 ? "s" : ""}
-                                  </p>
-                                ) : null}
-                              </div>
-                              <span className="text-secondary-900 font-mono text-sm font-semibold">
-                                {formatCentsToDollars(rate.totalCents)}
-                              </span>
+                              ) : null}
                             </div>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-              </div>
+                            <span className="text-secondary-900 text-sm font-semibold tabular-nums">
+                              {formatCentsToDollars(rate.totalCents)}
+                            </span>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right column — Order Summary */}
-          <div className="lg:col-span-1">
+          {/* Right column — Order Summary + Trust */}
+          <div className="space-y-5 lg:col-span-1">
             <OrderSummary
               cart={cart}
-              showItemDetails={false}
+              showItemDetails={true}
               shippingCost={selectedRate?.totalCents}
               shippingLabel={selectedRate?.serviceName}
               shippingState={shipping.state}
               ctaButton={ctaButton}
             />
+            <TrustBadges />
           </div>
         </div>
       </div>

@@ -7,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
   return {
     title: "About Us",
-    description: `Learn about ${config.siteName} — certified first aid training and professional-grade medical supplies for workplaces, schools, and families.`,
+    description: `Learn about ${config.siteName} — family-owned since 2011 in Kaysville, Utah. Professional first aid supplies, AHA-certified training, OSHA compliance, and emergency preparedness.`,
   };
 }
 
@@ -32,7 +32,7 @@ const values = [
   {
     title: "Expertise",
     description:
-      "Our instructors are certified emergency responders and healthcare professionals. When you train with us, you learn from people who use these skills for a living.",
+      "Our instructors are working EMS and emergency care professionals. When you train with us, you learn from people who use these skills in the field every day.",
     icon: (
       <svg className="h-8 w-8" fill="none" stroke={STROKE} viewBox="0 0 24 24">
         <path
@@ -61,6 +61,18 @@ const values = [
   },
 ];
 
+const offerings = [
+  "First-Aid Product Sales",
+  "CPR / First Aid Training (American Heart Association)",
+  "OSHA Written Documents & Preparation",
+  "OSHA Safety Inspections & Training Courses",
+  "Safety Products",
+  "Emergency Planning for Homes & Businesses",
+  "16-Hour Disaster Medicine Training",
+  "Active Shooter Training Course",
+  "Mass Casualty Disaster Drills",
+];
+
 export default async function AboutPage() {
   const storeConfig = await getStoreConfig();
 
@@ -79,7 +91,7 @@ export default async function AboutPage() {
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6" />
-              <span className="text-primary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-400 text-sm font-semibold tracking-wide uppercase">
                 Our Story
               </span>
             </div>
@@ -87,9 +99,9 @@ export default async function AboutPage() {
               About {storeConfig.siteName}
             </h1>
             <p className="max-w-lg text-sm leading-relaxed text-white/70">
-              Life-saving supplies and hands-on training for the people who
-              show up first — in workplaces, schools, and homes across the
-              country.
+              Founded by medical professionals in 2011 and based in Kaysville,
+              Utah — serving businesses, families, and first responders with
+              quality supplies and expert training.
             </p>
           </div>
         </div>
@@ -102,26 +114,31 @@ export default async function AboutPage() {
             <div className="mx-auto max-w-3xl">
               <div className="mb-3 flex items-center gap-3">
                 <div className="bg-primary-500 h-px w-6" />
-                <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                   Who We Are
                 </span>
               </div>
               <h2 className="font-display text-secondary-900 mb-6 text-3xl font-bold md:text-4xl">
-                Training meets supply.
+                In business since 2011.
               </h2>
               <div className="text-secondary-600 space-y-5 text-lg leading-relaxed">
                 <p>
-                  TNT First Aid started with a simple observation: the
-                  companies selling first aid supplies rarely knew how to use
-                  them, and the people teaching first aid rarely had a reliable
-                  place to send students for gear. We set out to be both.
+                  TNT First-Aid has been serving customers since 2011 from our
+                  home in Kaysville, Utah. We were founded by medical
+                  professionals with a passion for preparedness &mdash; for
+                  businesses as well as families &mdash; and we&rsquo;ve spent
+                  over a decade finding the best quality products on the market
+                  to help our customers reduce costly emergency room visits and
+                  often find better healing results.
                 </p>
                 <p>
-                  Today we equip workplaces, schools, and families with
-                  professionally curated first aid kits, AEDs, trauma supplies,
-                  and bloodborne pathogen kits &mdash; and we back it all up
-                  with nationally recognized CPR, First Aid, AED, and Stop the
-                  Bleed training taught by certified instructors.
+                  Whether you&rsquo;re a business looking for your first aid
+                  solutions, a family looking for training and proper first aid
+                  in your home, or an emergency first responder stocking up,
+                  we&rsquo;re your answer. We&rsquo;re the best product and
+                  training company for all your needs &mdash; and you&rsquo;ll
+                  be trained by professionals who work in EMS and emergency
+                  care.
                 </p>
               </div>
             </div>
@@ -131,73 +148,157 @@ export default async function AboutPage() {
         {/* What We Do */}
         <section className="bg-secondary-50 py-20 md:py-28">
           <div className="container mx-auto px-4">
-            <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2">
-              <div className="border-secondary-100 rounded-2xl border bg-white p-8">
-                <div className="bg-primary-500/10 text-primary-600 mb-6 flex h-12 w-12 items-center justify-center rounded">
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
+            <div className="mx-auto max-w-6xl">
+              <div className="mb-10 text-center">
+                <div className="mb-3 flex items-center justify-center gap-3">
+                  <div className="bg-primary-500 h-px w-6" />
+                  <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                    What We Offer
+                  </span>
                 </div>
-                <h3 className="font-display text-secondary-900 mb-3 text-2xl font-bold">
-                  Supplies
-                </h3>
-                <p className="text-secondary-600 text-sm leading-relaxed">
-                  OSHA-compliant workplace kits, home and family kits, vehicle
-                  kits, AEDs, bleed-control stations, burn care, and
-                  restocking. We carry trusted brands and stand behind every
-                  product we ship.
-                </p>
+                <h2 className="font-display text-secondary-900 text-3xl font-bold md:text-4xl">
+                  Products, training, and planning &mdash; all under one roof.
+                </h2>
               </div>
-              <div className="border-secondary-100 rounded-2xl border bg-white p-8">
-                <div className="bg-primary-500/10 text-primary-600 mb-6 flex h-12 w-12 items-center justify-center rounded">
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    viewBox="0 0 24 24"
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {offerings.map((item) => (
+                  <div
+                    key={item}
+                    className="border-secondary-100 flex items-start gap-3 rounded-xl border bg-white p-5"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443"
-                    />
-                  </svg>
+                    <div className="bg-primary-500/10 text-primary-600 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded">
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-secondary-700 text-sm font-medium leading-snug">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-secondary-500 mx-auto mt-10 max-w-2xl text-center text-sm">
+                Order online or call for special pricing and discounts.
+                Military members and government agencies always receive a
+                discount.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Virtual Medic App */}
+        <section className="py-20 md:py-28">
+          <div className="container mx-auto max-w-6xl px-4">
+            <div className="grid items-center gap-12 md:grid-cols-2">
+              <div>
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="bg-primary-500 h-px w-6" />
+                  <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                    Virtual Medic App
+                  </span>
                 </div>
-                <h3 className="font-display text-secondary-900 mb-3 text-2xl font-bold">
-                  Training
-                </h3>
-                <p className="text-secondary-600 text-sm leading-relaxed">
-                  CPR, First Aid, AED, Bloodborne Pathogens, and Stop the
-                  Bleed. On-site at your workplace or scheduled at our
-                  training center. Certifications recognized nationwide.
-                </p>
+                <h2 className="font-display text-secondary-900 mb-5 text-3xl font-bold md:text-4xl">
+                  The first video-based first aid app.
+                </h2>
+                <div className="text-secondary-600 space-y-4 text-base leading-relaxed">
+                  <p>
+                    We released the first ever video-based first aid app for
+                    your phone. Content downloads to your device and walks you
+                    through every kind of medical emergency &mdash; from nose
+                    bleeds to fractures and punctured lungs &mdash; so it works
+                    even when you don&rsquo;t have cell service.
+                  </p>
+                  <p>
+                    The whole app uses less than 30 MB of storage. First aid
+                    books cost ten times the price and can&rsquo;t show you a
+                    real-looking injury to treat as you follow along. Virtual
+                    Medic is available for iOS and Android, and we now offer
+                    <strong className="text-secondary-800">
+                      {" "}
+                      Virtual Medic ASL
+                    </strong>{" "}
+                    with every video in sign language and full subtitles.
+                  </p>
+                  <p className="text-secondary-500 text-sm italic">
+                    Download it today &mdash; it may help you save the life of
+                    someone you love.
+                  </p>
+                </div>
+              </div>
+              <div className="relative">
+                <div
+                  aria-hidden
+                  className="bg-primary-500/10 absolute -inset-4 rounded-3xl blur-2xl"
+                />
+                <div className="bg-secondary-950 border-secondary-800 relative overflow-hidden rounded-2xl border p-10 text-center">
+                  <div
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse at 50% 30%, rgba(227,24,55,0.18) 0%, transparent 60%)",
+                    }}
+                  />
+                  <div className="relative z-10">
+                    <div className="bg-primary-500/20 text-primary-400 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl">
+                      <svg
+                        className="h-8 w-8"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-display mb-2 text-2xl font-bold text-white">
+                      Virtual Medic
+                    </h3>
+                    <p className="text-secondary-400 mb-6 text-sm">
+                      Works offline &middot; Under 30 MB
+                    </p>
+                    <div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
+                      <span className="border-secondary-700 text-secondary-200 rounded-full border px-4 py-2 text-xs font-semibold">
+                        iOS
+                      </span>
+                      <span className="border-secondary-700 text-secondary-200 rounded-full border px-4 py-2 text-xs font-semibold">
+                        Android
+                      </span>
+                      <span className="border-primary-500/40 text-primary-300 rounded-full border px-4 py-2 text-xs font-semibold">
+                        ASL Edition
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Mission */}
-        <section className="relative overflow-hidden py-28 md:py-36">
+        <section className="bg-secondary-950 relative overflow-hidden py-28 md:py-36">
           <div
             aria-hidden
-            className="bg-secondary-950 absolute inset-0"
+            className="absolute inset-0"
             style={{
               background:
                 "radial-gradient(ellipse at 50% 40%, rgba(227,24,55,0.25) 0%, transparent 60%)",
             }}
           />
-          <div className="bg-secondary-950 absolute inset-0 -z-10" />
           <div className="relative z-10 container mx-auto max-w-3xl px-4 text-center">
             <Image
               src="/images/tnt-logo.png"
@@ -208,7 +309,7 @@ export default async function AboutPage() {
             />
             <div className="mb-5 flex items-center justify-center gap-3">
               <div className="bg-primary-500/60 h-px w-6" />
-              <span className="text-primary-400/80 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-400 text-sm font-semibold tracking-wide uppercase">
                 Our Mission
               </span>
               <div className="bg-primary-500/60 h-px w-6" />
@@ -231,7 +332,7 @@ export default async function AboutPage() {
             <div className="mb-10 text-center">
               <div className="mb-3 flex items-center justify-center gap-3">
                 <div className="bg-primary-500 h-px w-6" />
-                <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                   What Drives Us
                 </span>
               </div>
@@ -260,8 +361,72 @@ export default async function AboutPage() {
           </div>
         </section>
 
+        {/* Testimonial */}
+        <section className="bg-secondary-50 py-20 md:py-28">
+          <div className="container mx-auto max-w-4xl px-4">
+            <div className="mb-10 text-center">
+              <div className="mb-3 flex items-center justify-center gap-3">
+                <div className="bg-primary-500 h-px w-6" />
+                <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                  From A Customer
+                </span>
+              </div>
+              <h2 className="font-display text-secondary-900 text-3xl font-bold md:text-4xl">
+                In their words.
+              </h2>
+            </div>
+            <figure className="border-secondary-100 relative rounded-2xl border bg-white p-8 md:p-12">
+              <svg
+                aria-hidden
+                className="text-primary-500/20 absolute top-6 left-6 h-12 w-12"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z" />
+              </svg>
+              <blockquote className="relative">
+                <p className="text-secondary-700 mb-6 text-lg leading-relaxed italic md:text-xl">
+                  &ldquo;I came across TNT First-Aid while shopping for trauma
+                  and first aid supplies. I gave Jeff a call and he spent time
+                  answering all my questions about the proper supplies I should
+                  be keeping in my kit. I told him I was in search of a quality
+                  backpack for my medical supplies, and he shared details of a
+                  new backpack he was developing that sounded exactly like what
+                  I was looking for.
+                </p>
+                <p className="text-secondary-700 mb-6 text-lg leading-relaxed italic md:text-xl">
+                  I received my backpack today and I&rsquo;m thrilled with the
+                  quality and space it offers. It&rsquo;s perfect for anyone
+                  serious about storing their medical supplies &mdash; easy
+                  access, clear pockets to view everything you need. Jeff
+                  really thought this through. I&rsquo;ve bought several
+                  different bags over the years and this is by far my favorite.
+                  I don&rsquo;t believe I&rsquo;ll ever need another
+                  backpack/bag again.
+                </p>
+                <p className="text-secondary-700 text-lg leading-relaxed italic md:text-xl">
+                  Thank you Jeff for your sincere advice and consultative
+                  approach. TNT First-Aid is my go-to source for all my First
+                  Aid supplies.&rdquo;
+                </p>
+              </blockquote>
+              <figcaption className="border-secondary-100 mt-8 flex items-center gap-4 border-t pt-6">
+                <div className="bg-primary-500/10 text-primary-600 flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold">
+                  AH
+                </div>
+                <div>
+                  <div className="text-secondary-900 font-semibold">
+                    Adam Herrman
+                  </div>
+                  <div className="text-secondary-500 text-sm">Optimum</div>
+                </div>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
         {/* CTA */}
-        <section className="pb-20 md:pb-28">
+        <section className="py-20 md:py-28">
           <div className="container mx-auto max-w-6xl px-4">
             <div className="bg-secondary-950 relative overflow-hidden rounded-2xl p-10 text-center md:p-16">
               <div
@@ -278,18 +443,32 @@ export default async function AboutPage() {
                 </h2>
                 <p className="text-secondary-300 mx-auto mb-8 max-w-lg">
                   Browse our kits and supplies, or get in touch to schedule
-                  on-site CPR and First Aid training for your team.
+                  on-site CPR and First Aid training for your team. Military
+                  and government discounts available.
                 </p>
                 <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
                   <Link
                     href="/shop"
-                    className="group bg-primary-500 text-white hover:bg-primary-600 inline-flex items-center gap-3 rounded-full px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+                    className="group bg-primary-500 text-white hover:bg-primary-600 inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold uppercase shadow-[0_8px_30px_rgba(227,24,55,0.35)] transition-colors active:scale-[0.98]"
                   >
                     Shop Now
+                    <svg
+                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                      />
+                    </svg>
                   </Link>
                   <Link
                     href="/contact"
-                    className="border-primary-500/40 text-primary-400 hover:border-primary-500 hover:text-primary-300 inline-flex items-center rounded-full border px-8 py-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+                    className="border-primary-500/60 text-primary-300 hover:border-primary-500 hover:bg-primary-500/10 hover:text-white inline-flex items-center rounded-full border px-7 py-3 text-sm font-semibold uppercase transition-colors active:scale-[0.98]"
                   >
                     Book Training
                   </Link>

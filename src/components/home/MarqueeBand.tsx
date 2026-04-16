@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const CATEGORIES = [
   "FIRST AID KITS",
   "TRAUMA & BLEEDING CONTROL",
@@ -17,9 +19,10 @@ export default function MarqueeBand() {
   const items = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
 
   return (
-    <div
-      className="bg-primary-500 relative overflow-hidden py-3 select-none"
-      aria-hidden="true"
+    <Link
+      href="/shop"
+      aria-label="Browse all shop categories"
+      className="bg-primary-500 hover:bg-primary-600 relative block overflow-hidden py-3 transition-colors select-none"
     >
       <div className="animate-marquee-scroll flex whitespace-nowrap">
         {items.map((name, i) => (
@@ -32,6 +35,6 @@ export default function MarqueeBand() {
           </span>
         ))}
       </div>
-    </div>
+    </Link>
   );
 }

@@ -22,6 +22,8 @@ interface OrderSummaryProps {
   hidePromoCode?: boolean;
 }
 
+const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
+
 /** Load the persisted applied discount from sessionStorage, if any. */
 function loadDiscount(): AppliedDiscount | null {
   if (typeof window === "undefined") return null;
@@ -105,12 +107,12 @@ export default function OrderSummary({
   const total = discountedSubtotal + resolvedShipping + estimatedTax;
 
   return (
-    <div className="sticky top-8">
-      <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-        <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+    <div>
+      <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+        <div>
           <div className="mb-5 flex items-center gap-3">
             <div className="bg-primary-500 h-px w-6" />
-            <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+            <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
               Order Summary
             </span>
           </div>
@@ -150,7 +152,7 @@ export default function OrderSummary({
                     <p className="text-secondary-900 truncate text-[0.8rem] leading-tight font-medium">
                       {item.name}
                     </p>
-                    <p className="text-secondary-400 font-mono text-[0.6rem]">
+                    <p className="text-secondary-500 text-xs">
                       Qty {item.quantity}
                     </p>
                   </div>
@@ -167,6 +169,76 @@ export default function OrderSummary({
               showItemDetails ? "border-secondary-100 border-t pt-4" : ""
             }
           >
+            {/* Free shipping progress — hidden for digital orders or when already unlocked */}
+            {!isDigitalOnly && cart.subtotal > 0 && (
+              <div className="mb-4">
+                {cart.subtotal < FREE_SHIPPING_THRESHOLD_CENTS ? (
+                  <>
+                    <div className="text-secondary-600 mb-2 flex items-center justify-between text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <svg
+                          className="text-primary-500 h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={1.75}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M8.25 18.75a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM18.75 18.75a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM3 4.5h11.25v10.5H3V4.5zm11.25 4.5h3.621a1.5 1.5 0 011.06.44l1.879 1.878a1.5 1.5 0 01.44 1.061V15h-7V9z"
+                          />
+                        </svg>
+                        Add{" "}
+                        <span className="text-secondary-900 font-semibold tabular-nums">
+                          {formatCentsToDollars(
+                            FREE_SHIPPING_THRESHOLD_CENTS - cart.subtotal,
+                          )}
+                        </span>{" "}
+                        for free shipping
+                      </span>
+                    </div>
+                    <div
+                      className="bg-secondary-100 h-1.5 w-full overflow-hidden rounded-full"
+                      role="progressbar"
+                      aria-valuenow={Math.round(
+                        (cart.subtotal / FREE_SHIPPING_THRESHOLD_CENTS) * 100,
+                      )}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <div
+                        className="from-primary-500 to-primary-400 h-full bg-gradient-to-r transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            (cart.subtotal / FREE_SHIPPING_THRESHOLD_CENTS) *
+                              100,
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-1.5 rounded-lg bg-green-50 px-3 py-2 text-xs font-medium text-green-700">
+                    <svg
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
+                    </svg>
+                    You&rsquo;ve unlocked free shipping
+                  </div>
+                )}
+              </div>
+            )}
             {!hidePromoCode && cart.items.length > 0 && (
               <div className="mb-4">
                 <PromoCodeInput
@@ -187,7 +259,7 @@ export default function OrderSummary({
                 <div className="flex justify-between">
                   <span className="text-secondary-500">
                     Discount{" "}
-                    <span className="text-secondary-400 font-mono text-[0.65rem]">
+                    <span className="text-secondary-500 text-xs">
                       ({discount.code})
                     </span>
                   </span>
@@ -219,7 +291,7 @@ export default function OrderSummary({
               )}
               <div className="flex justify-between">
                 <span className="text-secondary-500">Est. Tax</span>
-                <span className="text-secondary-900 font-mono tabular-nums">
+                <span className="text-secondary-900 tabular-nums">
                   {formatCentsToDollars(estimatedTax)}
                 </span>
               </div>
@@ -227,7 +299,7 @@ export default function OrderSummary({
 
             <div className="border-secondary-100 mt-4 border-t pt-4">
               <div className="flex items-baseline justify-between">
-                <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                   Total
                 </span>
                 <span className="font-display text-secondary-900 text-2xl font-bold tracking-tight">

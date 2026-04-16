@@ -143,10 +143,10 @@ export default function PromoCodeInput({
       <div className="border-secondary-100 rounded-xl border bg-green-50/50 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+            <div className="text-green-700 text-xs font-medium">
               Promo applied
             </div>
-            <div className="text-secondary-900 truncate font-mono text-sm font-semibold">
+            <div className="text-secondary-900 truncate text-sm font-semibold">
               {applied.code}
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function PromoCodeInput({
     <div>
       <label
         htmlFor="promo-code-input"
-        className="text-secondary-400 mb-2 block font-mono text-[0.6rem] tracking-[0.3em] uppercase"
+        className="text-secondary-600 mb-2 block text-xs font-medium uppercase"
       >
         Promo code
       </label>
@@ -175,6 +175,7 @@ export default function PromoCodeInput({
         <input
           id="promo-code-input"
           type="text"
+          size={1}
           value={value}
           onChange={(e) => setValue(e.target.value.toUpperCase())}
           onKeyDown={(e) => {
@@ -188,13 +189,13 @@ export default function PromoCodeInput({
           autoComplete="off"
           spellCheck={false}
           disabled={loading}
-          className="border-secondary-100 focus:border-primary-500 focus:ring-primary-500/20 placeholder:text-secondary-300 flex-1 rounded-lg border bg-white px-3 py-2 font-mono text-sm tracking-wider uppercase focus:ring-2 focus:outline-none disabled:opacity-50"
+          className="border-secondary-100 focus:border-primary-500 focus:ring-primary-500/20 placeholder:text-secondary-300 min-w-0 flex-1 rounded-lg border bg-white px-3 py-2 font-mono text-sm tracking-wider uppercase focus:ring-2 focus:outline-none disabled:opacity-50"
         />
         <button
           type="button"
           onClick={handleApply}
           disabled={loading || value.trim().length < 3}
-          className="bg-secondary-900 hover:bg-secondary-800 rounded-lg px-4 py-2 text-[0.7rem] font-semibold tracking-wider text-white uppercase disabled:opacity-40"
+          className="bg-secondary-900 hover:bg-secondary-800 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold text-white uppercase transition-colors disabled:opacity-40"
         >
           {loading ? "…" : "Apply"}
         </button>

@@ -5,6 +5,31 @@ import {
   rateLimitResponse,
 } from "~/lib/ratelimit";
 import { getApiClient } from "~/lib/api-client";
+import { env } from "~/env";
+
+const MOCK_RATES = [
+  {
+    serviceCode: "03",
+    serviceName: "UPS Ground",
+    totalCents: 950,
+    deliveryDays: 4,
+    estimatedDelivery: null,
+  },
+  {
+    serviceCode: "02",
+    serviceName: "UPS 2nd Day Air",
+    totalCents: 2499,
+    deliveryDays: 2,
+    estimatedDelivery: null,
+  },
+  {
+    serviceCode: "01",
+    serviceName: "UPS Next Day Air",
+    totalCents: 4999,
+    deliveryDays: 1,
+    estimatedDelivery: null,
+  },
+];
 
 export async function POST(request: Request) {
   const clientIp = getClientIp(request);
@@ -46,6 +71,15 @@ export async function POST(request: Request) {
         { message: "shippingAddress is required" },
         { status: 400 },
       );
+    }
+
+    // Dev-only: return canned UPS rates so checkout works without OneApp.
+    // Hard-gated to non-production to prevent accidental enablement in prod.
+    if (
+      env.NODE_ENV !== "production" &&
+      env.DEV_FAKE_SHIPPING_RATES === "1"
+    ) {
+      return NextResponse.json({ rates: MOCK_RATES });
     }
 
     const result = await getApiClient().post<{

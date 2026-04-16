@@ -15,7 +15,7 @@ const STEPS = [
 function CheckIcon() {
   return (
     <svg
-      className="h-3 w-3"
+      className="h-3.5 w-3.5"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -35,22 +35,19 @@ function getDividerClass(stepIndex: number, currentStep: number): string {
   const rightStep = stepIndex + 2;
 
   if (leftStep < currentStep && rightStep <= currentStep) {
-    return "h-px w-12 bg-green-600";
+    return "h-[2px] w-10 sm:w-16 rounded-full bg-green-600";
   }
   if (leftStep < currentStep && rightStep === currentStep) {
-    return "h-px w-12 bg-secondary-900";
+    return "h-[2px] w-10 sm:w-16 rounded-full bg-gradient-to-r from-green-600 to-secondary-900";
   }
-  if (leftStep === currentStep) {
-    return "h-px w-12 bg-secondary-200";
-  }
-  return "h-px w-12 bg-secondary-200";
+  return "h-[2px] w-10 sm:w-16 rounded-full bg-secondary-200";
 }
 
 export default function CheckoutStepIndicator({
   currentStep,
 }: CheckoutStepIndicatorProps) {
   return (
-    <div className="mb-12 flex items-center justify-center gap-3">
+    <div className="mb-12 flex items-center justify-center gap-3 sm:gap-4">
       {STEPS.map((step, index) => {
         const isCompleted = step.number < currentStep;
         const isActive = step.number === currentStep;
@@ -61,34 +58,34 @@ export default function CheckoutStepIndicator({
             {isCompleted && (
               <Link
                 href={step.href}
-                className="flex items-center gap-2 transition-opacity hover:opacity-70"
+                className="group flex items-center gap-2.5 transition-opacity hover:opacity-80"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 font-mono text-[0.6rem] text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-white shadow-sm ring-2 ring-green-600/15 ring-offset-2 ring-offset-[#FAFAF8]">
                   <CheckIcon />
                 </span>
-                <span className="text-secondary-400 font-mono text-[0.65rem] tracking-[0.2em] uppercase">
+                <span className="text-secondary-600 group-hover:text-secondary-800 text-sm font-medium transition-colors">
                   {step.label}
                 </span>
               </Link>
             )}
 
             {isActive && (
-              <div className="flex items-center gap-2">
-                <span className="bg-secondary-900 flex h-6 w-6 items-center justify-center rounded-full font-mono text-[0.6rem] text-white">
+              <div className="flex items-center gap-2.5">
+                <span className="bg-secondary-900 ring-secondary-900/15 ring-offset-[#FAFAF8] flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-white shadow-sm ring-2 ring-offset-2">
                   {step.number}
                 </span>
-                <span className="text-secondary-900 font-mono text-[0.65rem] font-medium tracking-[0.2em] uppercase">
+                <span className="text-secondary-900 text-sm font-semibold">
                   {step.label}
                 </span>
               </div>
             )}
 
             {isFuture && (
-              <div className="flex items-center gap-2 opacity-40">
-                <span className="bg-secondary-200 text-secondary-500 flex h-6 w-6 items-center justify-center rounded-full font-mono text-[0.6rem]">
+              <div className="flex items-center gap-2.5">
+                <span className="border-secondary-200 text-secondary-400 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white text-sm font-medium">
                   {step.number}
                 </span>
-                <span className="text-secondary-400 font-mono text-[0.65rem] tracking-[0.2em] uppercase">
+                <span className="text-secondary-400 hidden text-sm font-medium sm:inline">
                   {step.label}
                 </span>
               </div>

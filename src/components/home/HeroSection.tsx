@@ -7,12 +7,10 @@ import { useEffect, useState } from "react";
 const SLIDES = [
   "/images/hero/kit-full-spread.png",
   "/images/hero/kit-red-bag.png",
-  "/images/hero/kit-contents.png",
   "/images/hero/cpr-mask-kit.png",
-  "/images/hero/kit-packed.png",
 ];
 
-const SLIDE_INTERVAL_MS = 5000;
+const SLIDE_INTERVAL_MS = 8000;
 const FADE_MS = 1400;
 
 export default function HeroSection() {
@@ -81,7 +79,7 @@ export default function HeroSection() {
             className={`mb-5 flex items-center justify-center gap-3 transition-all duration-700 md:justify-start ${loaded ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
           >
             <div className="bg-primary-500/70 h-px w-6" />
-            <span className="text-primary-400 font-mono text-[0.7rem] tracking-[0.3em] uppercase md:text-xs">
+            <span className="text-primary-400 text-sm font-semibold tracking-wide uppercase">
               Training &amp; Sales
             </span>
           </div>
@@ -112,11 +110,11 @@ export default function HeroSection() {
           >
             <Link
               href="/shop"
-              className="group bg-primary-500 text-white hover:bg-primary-600 inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-sm font-semibold tracking-[0.15em] uppercase shadow-[0_8px_30px_rgba(227,24,55,0.35)] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+              className="group bg-primary-500 text-white hover:bg-primary-600 inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold uppercase shadow-[0_8px_30px_rgba(227,24,55,0.35)] transition-colors active:scale-[0.98]"
             >
               Shop Now
               <svg
-                className="h-3 w-3 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5"
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -131,7 +129,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/services"
-              className="border-primary-500/60 text-primary-400 hover:border-primary-500 hover:bg-primary-500/10 hover:text-primary-300 inline-flex items-center rounded-full border px-7 py-3.5 text-sm font-semibold tracking-[0.15em] uppercase backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+              className="border-primary-500/60 text-primary-300 hover:border-primary-500 hover:bg-primary-500/10 hover:text-white inline-flex items-center rounded-full border px-7 py-3 text-sm font-semibold uppercase backdrop-blur-sm transition-colors active:scale-[0.98]"
             >
               Book Training
             </Link>
@@ -139,15 +137,18 @@ export default function HeroSection() {
 
           {/* Slide dots */}
           <div
+            role="tablist"
+            aria-label="Hero slideshow"
             className={`mt-12 flex justify-center gap-2 transition-opacity delay-500 duration-700 md:justify-start ${loaded ? "opacity-100" : "opacity-0"}`}
-            aria-hidden
           >
             {SLIDES.map((_, i) => (
               <button
                 key={i}
                 type="button"
+                role="tab"
                 onClick={() => setActiveIdx(i)}
-                aria-label={`Show slide ${i + 1}`}
+                aria-label={`Show slide ${i + 1} of ${SLIDES.length}`}
+                aria-selected={i === activeIdx}
                 className={`h-1 rounded-full transition-all duration-500 ${
                   i === activeIdx
                     ? "bg-primary-500 w-8"

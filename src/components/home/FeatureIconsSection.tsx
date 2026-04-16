@@ -1,24 +1,16 @@
-"use client";
-
 import Link from "next/link";
-import { useInView } from "~/hooks/useInView";
 
-const EASE = "transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]";
 const STROKE = "#C8102E";
 
 export default function FeatureIconsSection() {
-  const { ref, isInView } = useInView();
-
   return (
     <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
-      <div ref={ref} className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
-        <div
-          className={`mb-14 md:mb-18 ${EASE} ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-        >
-          <div className="mb-7 flex items-center gap-3">
+        <div className="mb-14 md:mb-18">
+          <div className="mb-4 flex items-center gap-3">
             <div className="bg-primary-500 h-px w-6" />
-            <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
+            <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
               Why TNT First Aid
             </span>
           </div>
@@ -30,11 +22,8 @@ export default function FeatureIconsSection() {
         <div className="bg-primary-500/20 h-px w-full" />
 
         <div className="divide-secondary-100 grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
-          {/* 01 Training */}
-          <div
-            className={`flex flex-col items-center px-10 py-14 text-center ${EASE} ${isInView ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-            style={{ transitionDelay: "100ms" }}
-          >
+          {/* Training */}
+          <div className="flex flex-col items-center px-10 py-14 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Medical cross with pulse */}
               <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
@@ -55,27 +44,21 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
-              01
-            </span>
-            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
+            <p className="text-primary-600 mb-3 text-xs font-semibold tracking-wider uppercase">
               Training
             </p>
-            <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
+            <h3 className="font-display text-secondary-900 mb-4 text-2xl leading-tight font-bold">
               Hands-On CPR &amp; First Aid Certification
             </h3>
-            <p className="text-secondary-400 text-sm leading-relaxed">
+            <p className="text-secondary-600 text-base leading-relaxed">
               Real instructors. Real practice. We teach CPR, AED use,
               Stop&nbsp;the&nbsp;Bleed, and workplace first aid — onsite at
               your facility or ours. Certifications recognized nationwide.
             </p>
           </div>
 
-          {/* 02 Quality */}
-          <div
-            className={`flex flex-col items-center px-10 py-14 text-center ${EASE} ${isInView ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-            style={{ transitionDelay: "200ms" }}
-          >
+          {/* Quality */}
+          <div className="flex flex-col items-center px-10 py-14 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Shield with check */}
               <svg width="52" height="56" viewBox="0 0 52 56" fill="none">
@@ -95,16 +78,13 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
-              02
-            </span>
-            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
+            <p className="text-primary-600 mb-3 text-xs font-semibold tracking-wider uppercase">
               Quality
             </p>
-            <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
+            <h3 className="font-display text-secondary-900 mb-4 text-2xl leading-tight font-bold">
               Professional-Grade Supplies
             </h3>
-            <p className="text-secondary-400 text-sm leading-relaxed">
+            <p className="text-secondary-600 text-base leading-relaxed">
               Every kit is curated by emergency-care professionals. We stock
               trusted brands, check expiration dates, and stand behind every
               product we ship — because OSHA compliance and life-saving gear
@@ -112,11 +92,8 @@ export default function FeatureIconsSection() {
             </p>
           </div>
 
-          {/* 03 Support */}
-          <div
-            className={`flex flex-col items-center px-10 py-14 text-center ${EASE} ${isInView ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"}`}
-            style={{ transitionDelay: "300ms" }}
-          >
+          {/* Support */}
+          <div className="flex flex-col items-center px-10 py-14 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Heart with pulse line */}
               <svg width="64" height="52" viewBox="0 0 64 52" fill="none">
@@ -137,16 +114,13 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <span className="text-primary-500 mb-2 font-mono text-xs tracking-[0.2em] select-none md:text-sm">
-              03
-            </span>
-            <p className="text-secondary-300 mb-4 font-mono text-xs tracking-[0.22em] uppercase md:text-sm">
+            <p className="text-primary-600 mb-3 text-xs font-semibold tracking-wider uppercase">
               Support
             </p>
-            <h3 className="font-display text-secondary-900 mb-4 text-3xl leading-tight font-bold">
+            <h3 className="font-display text-secondary-900 mb-4 text-2xl leading-tight font-bold">
               Real People Who Know First Aid
             </h3>
-            <p className="text-secondary-400 mb-8 text-sm leading-relaxed">
+            <p className="text-secondary-600 mb-8 text-base leading-relaxed">
               Questions about kit restocking, AED maintenance, or training for
               your team? Our staff are certified instructors &mdash; not a
               call center.
@@ -154,24 +128,22 @@ export default function FeatureIconsSection() {
             <div className="mt-auto">
               <Link
                 href="/contact"
-                className="group bg-primary-500 hover:bg-primary-600 inline-flex items-center gap-3 rounded-full px-6 py-3 font-mono text-[0.7rem] tracking-[0.15em] text-white uppercase transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]"
+                className="group bg-primary-500 hover:bg-primary-600 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white uppercase transition-colors active:scale-[0.98]"
               >
                 Get in Touch
-                <span className="bg-white/15 flex h-5 w-5 items-center justify-center rounded-full transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:scale-110">
-                  <svg
-                    className="h-2.5 w-2.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
-                    />
-                  </svg>
-                </span>
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                  />
+                </svg>
               </Link>
             </div>
           </div>

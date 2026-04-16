@@ -81,7 +81,7 @@ export default function Header({
 
   return (
     <header
-      className={`transition-all duration-500 ${scrolled ? "bg-secondary-800/95 border-primary-500/[0.08] border-b shadow-lg backdrop-blur-sm" : "bg-secondary-800 border-secondary-800 border-b"}`}
+      className={`transition-all duration-500 ${scrolled ? "border-secondary-200 border-b bg-white/95 shadow-sm backdrop-blur-sm" : "border-secondary-200 border-b bg-white"}`}
     >
       <div className="w-full px-4 py-5 lg:px-6">
         <div className="flex items-center justify-between">
@@ -89,7 +89,7 @@ export default function Header({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="text-white/80 p-2 transition-colors hover:text-white lg:hidden"
+              className="text-secondary-700 hover:text-secondary-900 p-2 transition-colors lg:hidden"
               aria-label="Open navigation menu"
             >
               <svg
@@ -134,8 +134,8 @@ export default function Header({
                       href={link.href}
                       className={`relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px] ${
                         megaMenuOpen
-                          ? "text-white"
-                          : "text-white/85 hover:text-white"
+                          ? "text-secondary-900"
+                          : "text-secondary-700 hover:text-secondary-900"
                       }`}
                     >
                       {link.label}
@@ -152,7 +152,7 @@ export default function Header({
                 <div key={link.href} className="group relative">
                   <Link
                     href={link.href}
-                    className="relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap text-white/85 uppercase transition-colors hover:text-white xl:text-[13px]"
+                    className="text-secondary-700 hover:text-secondary-900 relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px]"
                   >
                     {link.label}
                     <span className="bg-primary-500 absolute bottom-0 left-0 h-[2px] w-0 transition-[width] duration-300 group-hover:w-full" />
@@ -167,7 +167,7 @@ export default function Header({
             {/* Search icon */}
             <button
               onClick={() => setSearchOverlayOpen(!searchOverlayOpen)}
-              className="text-white/80 p-2 transition-colors hover:text-white"
+              className="text-secondary-700 hover:text-secondary-900 p-2 transition-colors"
               aria-label="Open search"
             >
               <svg
@@ -189,7 +189,7 @@ export default function Header({
             {customerAuthEnabled && !isAuthenticated && (
               <Link
                 href="/account"
-                className="text-white/80 p-2 transition-colors hover:text-white"
+                className="text-secondary-700 hover:text-secondary-900 p-2 transition-colors"
                 aria-label="Sign in"
               >
                 <svg
@@ -224,7 +224,7 @@ export default function Header({
               >
                 <Link
                   href="/account/dashboard"
-                  className="text-white/80 block p-2 transition-colors hover:text-white"
+                  className="text-secondary-700 hover:text-secondary-900 block p-2 transition-colors"
                   aria-label="My account"
                 >
                   <svg
@@ -236,42 +236,42 @@ export default function Header({
                   </svg>
                 </Link>
                 {accountDropdownOpen && (
-                  <div className="bg-secondary-800 border-secondary-700 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border py-1 shadow-xl">
+                  <div className="border-secondary-200 absolute top-full right-0 z-50 mt-1 min-w-[160px] rounded-md border bg-white py-1 shadow-xl">
                     <Link
                       href="/account/dashboard"
-                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 block px-4 py-2 text-sm transition-colors"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       My Account
                     </Link>
                     <Link
                       href="/account/profile"
-                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 block px-4 py-2 text-sm transition-colors"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
                       href="/account/orders"
-                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 block px-4 py-2 text-sm transition-colors"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Orders
                     </Link>
                     <Link
                       href="/account/security"
-                      className="text-white/80 hover:bg-secondary-700 block px-4 py-2 text-sm transition-colors hover:text-white"
+                      className="text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 block px-4 py-2 text-sm transition-colors"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Security
                     </Link>
-                    <div className="border-secondary-700 my-1 border-t" />
+                    <div className="border-secondary-200 my-1 border-t" />
                     <button
                       onClick={() => {
                         setAccountDropdownOpen(false);
                         logout();
                       }}
-                      className="hover:bg-secondary-700 w-full px-4 py-2 text-left text-sm text-red-400 transition-colors hover:text-red-300"
+                      className="hover:bg-secondary-100 w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:text-red-700"
                     >
                       Sign Out
                     </button>
@@ -283,7 +283,7 @@ export default function Header({
             {/* Cart icon */}
             <button
               onClick={openCart}
-              className="text-white/80 relative p-2 transition-colors hover:text-white"
+              className="text-secondary-700 hover:text-secondary-900 relative p-2 transition-colors"
               aria-label="Open cart"
               suppressHydrationWarning
             >
@@ -302,7 +302,7 @@ export default function Header({
               </svg>
               {cart.itemCount > 0 && (
                 <span
-                  className="bg-primary-500 text-secondary-800 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold"
+                  className="bg-primary-500 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white"
                   suppressHydrationWarning
                 >
                   {cart.itemCount > 99 ? "99+" : cart.itemCount}

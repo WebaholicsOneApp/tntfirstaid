@@ -4,7 +4,7 @@ export const SESSION_KEY = "alpha-checkout-data";
 // still hold a valid promo code across page loads.
 export const DISCOUNT_SESSION_KEY = "alpha-checkout-discount";
 
-export type PaymentMethod = "credit_card" | "precision_pay";
+export type PaymentMethod = "credit_card";
 
 export interface SelectedShippingRate {
   serviceCode: string;

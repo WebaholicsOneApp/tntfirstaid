@@ -1,3 +1,5 @@
+import { US_STATES } from "~/lib/us-states";
+
 export interface ShippingFields {
   name: string;
   email: string;
@@ -29,7 +31,20 @@ interface ShippingFormProps {
 }
 
 const inputClass = (field: string, fieldErrors?: Map<string, string>) =>
-  `w-full rounded-xl border-0 bg-secondary-50/80 px-4 py-3 text-sm text-secondary-900 ${fieldErrors?.has(field) ? "ring-1 ring-red-400" : "ring-1 ring-black/[0.06]"} placeholder:text-secondary-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/40`;
+  `w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-secondary-900 transition-all ${fieldErrors?.has(field) ? "ring-1 ring-red-400" : "ring-1 ring-secondary-200 hover:ring-secondary-300"} placeholder:text-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500`;
+
+const selectClass = (field: string, fieldErrors?: Map<string, string>) =>
+  `${inputClass(field, fieldErrors)} cursor-pointer appearance-none bg-[length:16px] bg-[right_1rem_center] bg-no-repeat pr-10`;
+
+const chevronBg = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475467' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E\")",
+};
+
+const COUNTRY_OPTIONS = [
+  { value: "US", label: "United States" },
+  { value: "CA", label: "Canada" },
+];
 
 export default function ShippingForm({
   data,
@@ -173,15 +188,21 @@ export default function ShippingForm({
           >
             State
           </label>
-          <input
+          <select
             id="shipping-state"
-            type="text"
             value={data.state}
             onChange={(e) => onChange("state", e.target.value)}
-            placeholder="UT"
             autoComplete="address-level1"
-            className={inputClass("state", fieldErrors)}
-          />
+            className={selectClass("state", fieldErrors)}
+            style={chevronBg}
+          >
+            <option value="">—</option>
+            {US_STATES.map((s) => (
+              <option key={s.abbr} value={s.abbr}>
+                {s.abbr} — {s.name}
+              </option>
+            ))}
+          </select>
           {fieldErrors?.has("state") && (
             <p className="mt-1 text-sm text-red-500">
               {fieldErrors.get("state")}
@@ -219,15 +240,20 @@ export default function ShippingForm({
         >
           Country
         </label>
-        <input
+        <select
           id="shipping-country"
-          type="text"
-          value={data.country}
-          onChange={(e) => onChange("country", e.target.value.toUpperCase())}
-          placeholder="US"
+          value={data.country || "US"}
+          onChange={(e) => onChange("country", e.target.value)}
           autoComplete="country"
-          className={inputClass("country", fieldErrors)}
-        />
+          className={selectClass("country", fieldErrors)}
+          style={chevronBg}
+        >
+          {COUNTRY_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );

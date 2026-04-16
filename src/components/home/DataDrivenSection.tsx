@@ -1,10 +1,7 @@
-"use client";
-
 import Image from "next/image";
-import AnimateIn from "~/components/ui/AnimateIn";
 
 const stats = [
-  { value: "25+", label: "Years Serving" },
+  { value: "2011", label: "Founded" },
   { value: "10k+", label: "People Trained" },
   { value: "100%", label: "OSHA Aligned" },
 ];
@@ -15,10 +12,7 @@ export default function DataDrivenSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-20">
           {/* Left: brand panel */}
-          <AnimateIn
-            animation="slide-right"
-            className="ring-secondary-100 bg-secondary-950 relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full"
-          >
+          <div className="ring-secondary-100 bg-secondary-950 relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full">
             <div
               className="absolute inset-0"
               style={{
@@ -44,13 +38,13 @@ export default function DataDrivenSection() {
                 className="h-auto w-[180px] drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)] sm:w-[240px] md:w-[280px]"
               />
             </div>
-          </AnimateIn>
+          </div>
 
           {/* Right: content */}
-          <AnimateIn animation="fade-up" delay={150} className="w-full">
-            <div className="mb-6 flex items-center gap-3">
+          <div className="w-full">
+            <div className="mb-4 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6 shrink-0" />
-              <span className="text-secondary-400 font-mono text-xs tracking-[0.3em] uppercase md:text-sm">
+              <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                 Proven Track Record
               </span>
             </div>
@@ -71,20 +65,20 @@ export default function DataDrivenSection() {
                   <p className="font-display text-secondary-900 text-3xl leading-none font-bold tabular-nums sm:text-4xl lg:text-5xl">
                     {value}
                   </p>
-                  <p className="text-secondary-400 mt-2.5 font-mono text-[0.58rem] tracking-[0.18em] uppercase">
+                  <p className="text-secondary-600 mt-2.5 text-xs font-medium tracking-wide uppercase">
                     {label}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="text-secondary-400 space-y-4 text-sm leading-relaxed">
+            <div className="text-secondary-700 space-y-4 text-base leading-relaxed">
               <p>
                 TNT First Aid has been equipping workplaces, schools, and
-                families with life-saving supplies and training for over two
-                decades. Every kit we ship and every class we teach is built
-                around the same goal: making sure the right tools are on hand
-                &mdash; and that the people using them know how.
+                families with life-saving supplies and training since 2011.
+                Every kit we ship and every class we teach is built around the
+                same goal: making sure the right tools are on hand &mdash; and
+                that the people using them know how.
               </p>
               <p>
                 Whether you need a 25-person OSHA-compliant workplace kit, an
@@ -93,7 +87,7 @@ export default function DataDrivenSection() {
                 keep it ready for the day you hope never comes.
               </p>
             </div>
-          </AnimateIn>
+          </div>
         </div>
       </div>
     </section>

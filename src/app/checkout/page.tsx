@@ -65,7 +65,7 @@ export default function CheckoutProductReviewPage() {
           <div>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-8" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                 Checkout
               </span>
             </div>
@@ -75,7 +75,7 @@ export default function CheckoutProductReviewPage() {
           </div>
           <Link
             href="/shop"
-            className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
+            className="text-secondary-500 hover:text-primary-600 hidden items-center gap-2 text-sm font-medium transition-colors sm:flex"
           >
             <svg
               className="h-4 w-4"
@@ -100,7 +100,7 @@ export default function CheckoutProductReviewPage() {
             {/* Back link mobile */}
             <Link
               href="/shop"
-              className="text-secondary-400 hover:text-primary-600 flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:hidden"
+              className="text-secondary-500 hover:text-primary-600 flex items-center gap-2 text-sm font-medium transition-colors sm:hidden"
             >
               <svg
                 className="h-4 w-4"
@@ -119,12 +119,12 @@ export default function CheckoutProductReviewPage() {
             </Link>
 
             {/* Product Items Card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 overflow-hidden rounded-[calc(2rem-0.375rem)] border">
+            <div className="ring-secondary-100 overflow-hidden rounded-2xl bg-white shadow-sm ring-1">
+              <div>
                 <div className="border-secondary-100/60 border-b px-6 py-4 sm:px-8">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                    <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                       Order Items ({cart.itemCount})
                     </span>
                   </div>
@@ -174,18 +174,18 @@ export default function CheckoutProductReviewPage() {
                           {item.name}
                         </Link>
                         {item.packCount && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             Quantity: {item.packCount}
                           </p>
                         )}
                         {item.variation && !item.packCount && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             {item.variantType ? `${item.variantType}: ` : ""}
                             {item.variation}
                           </p>
                         )}
                         {item.variationTwo && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             {item.variantTypeTwo
                               ? `${item.variantTypeTwo}: `
                               : ""}
@@ -193,7 +193,7 @@ export default function CheckoutProductReviewPage() {
                           </p>
                         )}
                         {item.manufacturerNo && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.1em]">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             SKU: {item.manufacturerNo}
                           </p>
                         )}
@@ -220,7 +220,7 @@ export default function CheckoutProductReviewPage() {
                                 />
                               </svg>
                             </button>
-                            <span className="text-secondary-900 w-8 text-center font-mono text-sm">
+                            <span className="text-secondary-900 w-8 text-center text-sm tabular-nums">
                               {item.quantity}
                             </span>
                             <button
@@ -280,76 +280,68 @@ export default function CheckoutProductReviewPage() {
           {/* Right column — Subtotal sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
-                  <div className="mb-5 flex items-center gap-3">
-                    <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                      Order Summary
+              <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="bg-primary-500 h-px w-6" />
+                  <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
+                    Order Summary
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-secondary-500">Subtotal</span>
+                    <span className="text-secondary-900 tabular-nums">
+                      {formatCentsToDollars(cart.subtotal)}
                     </span>
                   </div>
-
-                  <div className="space-y-2 text-sm">
+                  {!isDigitalOnly && (
                     <div className="flex justify-between">
-                      <span className="text-secondary-500">Subtotal</span>
-                      <span className="text-secondary-900 tabular-nums">
-                        {formatCentsToDollars(cart.subtotal)}
-                      </span>
-                    </div>
-                    {!isDigitalOnly && (
-                      <div className="flex justify-between">
-                        <span className="text-secondary-500">Shipping</span>
-                        <span className="text-secondary-400">&mdash;</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-secondary-500">Tax</span>
+                      <span className="text-secondary-500">Shipping</span>
                       <span className="text-secondary-400">&mdash;</span>
                     </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-secondary-500">Tax</span>
+                    <span className="text-secondary-400">&mdash;</span>
                   </div>
+                </div>
 
-                  <div className="border-secondary-100 mt-4 border-t pt-4">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
-                        Subtotal
-                      </span>
-                      <span className="font-display text-secondary-900 text-2xl font-bold tracking-tight">
-                        {formatCentsToDollars(cart.subtotal)}
-                      </span>
-                    </div>
+                <div className="border-secondary-100 mt-4 border-t pt-4">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-secondary-700 text-sm font-semibold uppercase">
+                      Subtotal
+                    </span>
+                    <span className="font-display text-secondary-900 text-2xl font-bold tracking-tight">
+                      {formatCentsToDollars(cart.subtotal)}
+                    </span>
                   </div>
+                </div>
 
-                  <div className="mt-6">
-                    <Link
-                      href={
-                        isDigitalOnly
-                          ? "/checkout/payment"
-                          : "/checkout/shipping"
-                      }
-                      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98]"
-                      style={{
-                        transitionTimingFunction:
-                          "cubic-bezier(0.16, 1, 0.3, 1)",
-                      }}
+                <div className="mt-6">
+                  <Link
+                    href={
+                      isDigitalOnly
+                        ? "/checkout/payment"
+                        : "/checkout/shipping"
+                    }
+                    className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold text-white uppercase transition-colors active:scale-[0.98]"
+                  >
+                    <span>Proceed to Checkout</span>
+                    <svg
+                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <span>Proceed to Checkout</span>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M14 5l7 7m0 0l-7 7m7-7H3"
-                          />
-                        </svg>
-                      </span>
-                    </Link>
-                  </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -362,7 +354,7 @@ export default function CheckoutProductReviewPage() {
           <section className="mt-16">
             <div className="mb-6 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                 Recommended
               </span>
             </div>

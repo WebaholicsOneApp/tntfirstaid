@@ -9,7 +9,6 @@ import CardBrandIcon from "~/components/checkout/CardBrandIcon";
 import { ProductImage } from "~/components/ui/ProductImage";
 import { formatCentsToDollars, getImageUrl } from "~/lib/utils";
 import PlaceOrderPanel from "~/components/checkout/PlaceOrderPanel";
-import { openPrecisionPayPortal } from "~/components/checkout/PrecisionPayPopup";
 import { useCart, cartIsDigitalOnly } from "~/lib/cart/CartContext";
 import {
   SESSION_KEY,
@@ -250,182 +249,6 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
     }
   }, [checkoutData, cart.items, clearCart, router]);
 
-  // ---- Place Order: PrecisionPay ----
-  const handlePlaceOrderPP = useCallback(async () => {
-    if (!checkoutData) return;
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const displayAmount = cart.items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-      // Read any persisted discount from sessionStorage
-      let discountCode: string | undefined;
-      let discountCents = 0;
-      try {
-        const rawDiscount = sessionStorage.getItem(DISCOUNT_SESSION_KEY);
-        if (rawDiscount) {
-          const parsed = JSON.parse(rawDiscount);
-          if (
-            parsed &&
-            typeof parsed.code === "string" &&
-            /^[A-Z0-9_-]{3,32}$/.test(parsed.code)
-          ) {
-            discountCode = parsed.code;
-            discountCents = parsed.discountCents || 0;
-          }
-        }
-      } catch { /* malformed */ }
-
-      // Tax on discounted subtotal to match OrderSummary
-      const tax = calculateTax(displayAmount - discountCents, checkoutData.shipping.state);
-
-      // Dev bypass: skip PP portal, go straight to order creation
-      if (devBypass) {
-        const res = await fetch("/api/checkout/precision-pay", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            devBypass: true,
-            amount: displayAmount - discountCents + shippingCost + tax,
-            customerEmail: checkoutData.shipping.email,
-            phoneNumber: checkoutData.shipping.phone || undefined,
-            items: cart.items.map((item) => ({
-              variationId: item.id,
-              quantity: item.quantity,
-            })),
-            shippingCostCents: shippingCost,
-            shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
-            shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
-            taxCents: tax,
-            shippingAddress: {
-              name: checkoutData.shipping.name,
-              line1: checkoutData.shipping.line1,
-              line2: checkoutData.shipping.line2 || undefined,
-              city: checkoutData.shipping.city,
-              state: checkoutData.shipping.state,
-              postalCode: checkoutData.shipping.postalCode,
-              country: checkoutData.shipping.country || "US",
-            },
-            ...(discountCode ? { discountCode } : {}),
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok || !data.orderId) {
-          throw new Error(data.error || "Failed to create order");
-        }
-
-        try {
-          sessionStorage.removeItem(SESSION_KEY);
-          sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
-        } catch {}
-        try {
-          const ids = cart.items.map((i) => i.productId).filter(Boolean);
-          if (ids.length > 0)
-            sessionStorage.setItem(
-              "alpha-checkout-product-ids",
-              JSON.stringify(ids),
-            );
-        } catch {}
-        clearCart();
-        const params = new URLSearchParams({ order_id: String(data.orderId) });
-        if (data.orderNumber) params.set("order_number", data.orderNumber);
-        router.push(`/checkout/success?${params.toString()}`);
-        return;
-      }
-
-      // Step 1: Get merchant nonce from server
-      const nonceRes = await fetch("/api/checkout/precision-pay/nonce");
-      if (!nonceRes.ok) {
-        throw new Error("Failed to initialize PrecisionPay checkout");
-      }
-      const nonceData = await nonceRes.json();
-
-      // Step 2: Open PP portal iframe
-      const amountDollars = (
-        (displayAmount - discountCents + shippingCost + tax) /
-        100
-      ).toFixed(2);
-
-      const result = await openPrecisionPayPortal({
-        merchantNonce: nonceData.merchantNonce,
-        amountDollars,
-        env: nonceData.env,
-        checkoutPortalUrl: nonceData.checkoutPortalUrl,
-      });
-
-      if (!result.success) {
-        setError(result.error || "Payment was not completed.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Step 3: Complete payment + create order via API route
-      const res = await fetch("/api/checkout/precision-pay", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          precisionPayToken: result.precisionPayToken || undefined,
-          plaidData: result.plaidData || undefined,
-          amount: displayAmount - discountCents + shippingCost + tax,
-          customerEmail: checkoutData.shipping.email,
-          phoneNumber: checkoutData.shipping.phone || undefined,
-          items: cart.items.map((item) => ({
-            variationId: item.id,
-            quantity: item.quantity,
-          })),
-          shippingCostCents: shippingCost,
-          shippingServiceName: checkoutData?.selectedShippingRate?.serviceName,
-          shippingServiceCode: checkoutData?.selectedShippingRate?.serviceCode,
-          taxCents: tax,
-          shippingAddress: {
-            name: checkoutData.shipping.name,
-            line1: checkoutData.shipping.line1,
-            line2: checkoutData.shipping.line2 || undefined,
-            city: checkoutData.shipping.city,
-            state: checkoutData.shipping.state,
-            postalCode: checkoutData.shipping.postalCode,
-            country: checkoutData.shipping.country || "US",
-          },
-          ...(discountCode ? { discountCode } : {}),
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.orderId) {
-        throw new Error(data.error || "Failed to create order");
-      }
-
-      try {
-        sessionStorage.removeItem(SESSION_KEY);
-        sessionStorage.removeItem(DISCOUNT_SESSION_KEY);
-      } catch {}
-      try {
-        const ids = cart.items.map((i) => i.productId).filter(Boolean);
-        if (ids.length > 0)
-          sessionStorage.setItem(
-            "alpha-checkout-product-ids",
-            JSON.stringify(ids),
-          );
-      } catch {}
-      clearCart();
-      const params = new URLSearchParams({ order_id: String(data.orderId) });
-      if (data.orderNumber) params.set("order_number", data.orderNumber);
-      router.push(`/checkout/success?${params.toString()}`);
-    } catch (err) {
-      console.error("[PrecisionPay] Error:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Payment failed. Please try again.",
-      );
-      setIsLoading(false);
-    }
-  }, [devBypass, checkoutData, cart.items, clearCart, router]);
-
   // ---- Loading / redirect states ----
   if (!isReady || !checkoutData) {
     return (
@@ -455,87 +278,42 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
   const cardLast4 = checkoutData.cardLast4 || "****";
 
   // ---- Branded Pay button ----
-  const payButton =
-    paymentMethod === "credit_card" ? (
-      <button
-        type="button"
-        disabled={isLoading}
-        onClick={devBypass ? undefined : handlePlaceOrderCC}
-        className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-3 rounded-full py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isLoading ? (
-          <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            <span>Processing...</span>
-          </>
-        ) : (
-          <>
-            <span className="flex items-center gap-2">
-              <CardBrandIcon brand={cardBrand} className="h-5" />
-              <span>Pay with &bull;&bull;&bull;{cardLast4}</span>
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
-          </>
-        )}
-      </button>
-    ) : (
-      <button
-        type="button"
-        disabled={isLoading}
-        onClick={handlePlaceOrderPP}
-        className="group flex w-full items-center justify-center gap-3 rounded-full bg-[#E5521A] py-4 pr-5 pl-8 font-mono text-[0.7rem] tracking-[0.2em] text-white uppercase transition-all duration-300 hover:bg-[#cc4a17] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isLoading ? (
-          <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            <span>Processing...</span>
-          </>
-        ) : (
-          <>
-            <span className="flex items-center gap-2">
-              <img
-                src="/images/payment/precisionpay.png"
-                alt="PrecisionPay"
-                className="h-4 brightness-0 invert"
-              />
-              <span>Checkout</span>
-              {devBypass && (
-                <span className="ml-1 rounded bg-white/20 px-1.5 py-0.5 text-[0.5rem]">TEST</span>
-              )}
-            </span>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-white/20">
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
-              </svg>
-            </span>
-          </>
-        )}
-      </button>
-    );
+  const payButton = (
+    <button
+      type="button"
+      disabled={isLoading}
+      onClick={devBypass ? undefined : handlePlaceOrderCC}
+      className="group bg-secondary-900 hover:bg-secondary-800 flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold text-white uppercase transition-colors active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      aria-live="polite"
+    >
+      {isLoading ? (
+        <>
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          <span>Processing…</span>
+        </>
+      ) : (
+        <>
+          <span className="flex items-center gap-2">
+            <CardBrandIcon brand={cardBrand} className="h-5" />
+            <span>Pay with &bull;&bull;&bull;{cardLast4}</span>
+          </span>
+          <svg
+            className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
+          </svg>
+        </>
+      )}
+    </button>
+  );
 
   // ---- Main render (production / non-bypass) ----
   return (
@@ -548,17 +326,17 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           <div>
             <div className="mb-3 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-8" />
-              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+              <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                 Checkout
               </span>
             </div>
             <h1 className="font-display text-secondary-900 text-4xl font-bold tracking-tight sm:text-5xl">
-              Review Order
+              Review
             </h1>
           </div>
           <Link
             href="/checkout/payment"
-            className="text-secondary-400 hover:text-primary-600 hidden items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:flex"
+            className="text-secondary-500 hover:text-primary-600 hidden items-center gap-2 text-sm font-medium transition-colors sm:flex"
           >
             <svg
               className="h-4 w-4"
@@ -583,7 +361,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             {/* Back link mobile */}
             <Link
               href="/checkout/payment"
-              className="text-secondary-400 hover:text-primary-600 flex items-center gap-2 font-mono text-[0.65rem] tracking-[0.1em] uppercase transition-colors sm:hidden"
+              className="text-secondary-500 hover:text-primary-600 flex items-center gap-2 text-sm font-medium transition-colors sm:hidden"
             >
               <svg
                 className="h-4 w-4"
@@ -603,25 +381,29 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
             {/* Error */}
             {error && (
-              <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
+              <div
+                className="rounded-xl border border-red-200/80 bg-red-50 p-4"
+                role="alert"
+                aria-live="assertive"
+              >
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
 
             {/* Shipping Address card (read-only) — hidden for digital-only */}
             {!checkoutData.isDigitalOnly && (
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+              <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+                <div>
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary-500 h-px w-6" />
-                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                      <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                         Shipping Address
                       </span>
                     </div>
                     <Link
                       href="/checkout/shipping"
-                      className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
+                      className="text-primary-600 hover:text-primary-700 text-sm font-semibold underline decoration-primary-600/30 underline-offset-4 transition-colors hover:decoration-primary-600"
                     >
                       Edit
                     </Link>
@@ -658,18 +440,18 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
 
             {/* Shipping Method card (read-only) — hidden for digital-only */}
             {!checkoutData.isDigitalOnly && (
-              <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-                <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+              <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+                <div>
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary-500 h-px w-6" />
-                      <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                      <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                         Shipping Method
                       </span>
                     </div>
                     <Link
                       href="/checkout/shipping"
-                      className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
+                      className="text-primary-600 hover:text-primary-700 text-sm font-semibold underline decoration-primary-600/30 underline-offset-4 transition-colors hover:decoration-primary-600"
                     >
                       Edit
                     </Link>
@@ -689,8 +471,26 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                       />
                     </svg>
                     <div>
-                      <p className="text-secondary-900 font-medium">Standard</p>
-                      <p className="text-green-600">FREE</p>
+                      <p className="text-secondary-900 font-medium">
+                        {checkoutData.selectedShippingRate?.serviceName ??
+                          "Standard"}
+                      </p>
+                      {checkoutData.selectedShippingRate?.totalCents === 0 ||
+                      shippingCost === 0 ? (
+                        <p className="text-green-600">FREE</p>
+                      ) : (
+                        <p className="text-secondary-500">
+                          {formatCentsToDollars(shippingCost)}
+                          {checkoutData.selectedShippingRate?.deliveryDays
+                            ? ` · ${checkoutData.selectedShippingRate.deliveryDays} business day${
+                                checkoutData.selectedShippingRate
+                                  .deliveryDays === 1
+                                  ? ""
+                                  : "s"
+                              }`
+                            : ""}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -698,48 +498,38 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
             )}
 
             {/* Payment Method card (read-only) */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+            <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+              <div>
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary-500 h-px w-6" />
-                    <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                    <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                       Payment Method
                     </span>
                   </div>
                   <Link
                     href="/checkout/payment"
-                    className="text-primary-600 hover:text-primary-700 font-mono text-[0.6rem] tracking-[0.1em] uppercase transition-colors"
+                    className="text-primary-600 hover:text-primary-700 text-sm font-semibold underline decoration-primary-600/30 underline-offset-4 transition-colors hover:decoration-primary-600"
                   >
                     Edit
                   </Link>
                 </div>
 
-                {paymentMethod === "credit_card" && (
-                  <div className="text-secondary-700 flex items-center gap-3 text-sm">
-                    <CardBrandIcon brand={cardBrand} className="h-6" />
-                    <p className="text-secondary-900 font-medium">
-                      Card ending in {cardLast4}
-                    </p>
-                  </div>
-                )}
-
-                {paymentMethod === "precision_pay" && (
-                  <img
-                    src="/images/payment/precisionpay.png"
-                    alt="PrecisionPay"
-                    className="h-6"
-                  />
-                )}
+                <div className="text-secondary-700 flex items-center gap-3 text-sm">
+                  <CardBrandIcon brand={cardBrand} className="h-6" />
+                  <p className="text-secondary-900 font-medium">
+                    Card ending in {cardLast4}
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Order Items card */}
-            <div className="rounded-[2rem] bg-white p-1.5 ring-1 ring-black/[0.04]">
-              <div className="border-secondary-100/60 rounded-[calc(2rem-0.375rem)] border p-6 sm:p-8">
+            <div className="ring-secondary-100 rounded-2xl bg-white p-6 shadow-sm ring-1 sm:p-8">
+              <div>
                 <div className="mb-4 flex items-center gap-3">
                   <div className="bg-primary-500 h-px w-6" />
-                  <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                  <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
                     Order Items
                   </span>
                 </div>
@@ -778,25 +568,25 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
                           {item.name}
                         </p>
                         {item.packCount && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             Quantity: {item.packCount}
                           </p>
                         )}
                         {item.variation && !item.packCount && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             {item.variantType ? `${item.variantType}: ` : ""}
                             {item.variation}
                           </p>
                         )}
                         {item.variationTwo && (
-                          <p className="text-secondary-400 mt-0.5 font-mono text-[0.6rem] tracking-[0.3em] uppercase">
+                          <p className="text-secondary-500 mt-0.5 text-xs">
                             {item.variantTypeTwo
                               ? `${item.variantTypeTwo}: `
                               : ""}
                             {item.variationTwo}
                           </p>
                         )}
-                        <p className="text-secondary-400 font-mono text-[0.6rem]">
+                        <p className="text-secondary-500 mt-0.5 text-xs">
                           Qty {item.quantity}
                         </p>
                       </div>
@@ -811,7 +601,7 @@ export default function CheckoutConfirmClient({ devBypass }: Props) {
           </div>
 
           {/* Right column — Order summary */}
-          <div className="lg:col-span-1">
+          <div className="space-y-5 lg:col-span-1">
             <OrderSummary
               cart={cart}
               showItemDetails={false}

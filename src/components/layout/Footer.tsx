@@ -150,7 +150,7 @@ export default function Footer({
                 href="https://www.facebook.com/tntfirstaid/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-secondary-500 hover:text-primary-500 transition-colors"
+                className="text-secondary-300 hover:text-primary-500 transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -165,7 +165,7 @@ export default function Footer({
                 href="https://www.instagram.com/tntfirstaid/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-secondary-500 hover:text-primary-500 transition-colors"
+                className="text-secondary-300 hover:text-primary-500 transition-colors"
                 aria-label="Instagram"
               >
                 <svg
@@ -179,12 +179,12 @@ export default function Footer({
             </div>
 
             {/* Copyright */}
-            <p className="text-secondary-500 order-1 font-mono text-[0.6rem] tracking-[0.15em] sm:order-2">
+            <p className="text-secondary-300 order-1 font-mono text-[0.7rem] tracking-[0.15em] sm:order-2">
               &copy; {currentYear} {siteName}. All Rights Reserved.
             </p>
 
             {/* Made in USA badge */}
-            <p className="text-primary-500/40 order-3 font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+            <p className="text-primary-500/80 order-3 font-mono text-[0.7rem] tracking-[0.15em] uppercase">
               Made in USA
             </p>
           </div>
