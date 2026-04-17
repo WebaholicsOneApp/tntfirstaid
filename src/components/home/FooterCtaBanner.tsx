@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 const badges = [
@@ -10,23 +9,6 @@ const badges = [
 export default function FooterCtaBanner() {
   return (
     <section className="bg-secondary-950 relative overflow-hidden">
-      <Image
-        src="/images/old-site/hero-main.jpg"
-        alt=""
-        fill
-        className="object-contain opacity-30"
-        sizes="100vw"
-      />
-      {/* Dark overlay for text readability */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 50%, rgba(10,10,10,0.7) 100%)",
-        }}
-      />
-
       <div className="relative py-24 sm:py-32">
         <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
           <div className="mb-6 flex items-center justify-center gap-3">

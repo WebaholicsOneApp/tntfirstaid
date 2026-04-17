@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const SLIDES = [
-  "/images/old-site/hero-main.jpg",
-  "/images/old-site/hero-business-kits.jpg",
-  "/images/old-site/hero-services.jpg",
+  "/images/hero/hero-first-aid-group.jpg",
+  "/images/hero/hero-cpr-training.jpg",
+  "/images/hero/hero-cpr-group.jpg",
+  "/images/hero/hero-bandage.jpg",
 ];
 
 const SLIDE_INTERVAL_MS = 8000;
@@ -46,7 +47,7 @@ export default function HeroSection() {
               alt=""
               fill
               priority={i === 0}
-              className="object-contain"
+              className="object-cover"
               sizes="100vw"
             />
           </div>
@@ -73,7 +74,7 @@ export default function HeroSection() {
       />
 
       {/* Content */}
-      <div className="relative mx-auto flex min-h-[560px] max-w-7xl items-center px-6 py-24 sm:py-28 md:min-h-[640px] md:py-32 lg:px-8 lg:py-40">
+      <div className="relative flex min-h-[560px] items-center px-6 py-24 sm:py-28 md:min-h-[640px] md:py-32 lg:py-40 lg:pl-16 xl:pl-24">
         <div className="max-w-2xl text-center md:text-left">
           <div
             className={`mb-5 flex items-center justify-center gap-3 transition-all duration-700 md:justify-start ${loaded ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}

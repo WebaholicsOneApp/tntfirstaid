@@ -33,6 +33,8 @@ export const getStoreConfig = cache(async (): Promise<StoreConfig> => {
     ...(branding.overrideStoreInfo &&
       branding.storeAddress && { address: branding.storeAddress }),
     ...(branding.overrideStoreInfo &&
+      branding.storePhone && { phone: branding.storePhone }),
+    ...(branding.overrideStoreInfo &&
       branding.storeEmail && { email: branding.storeEmail }),
     ...(branding.overrideStoreInfo &&
       branding.supportEmail && { supportEmail: branding.supportEmail }),

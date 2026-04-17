@@ -4,6 +4,7 @@ import { DEMO_FEATURED_PRODUCTS } from "~/lib/demo-featured-products";
 import HeroSection from "~/components/home/HeroSection";
 import MarqueeBand from "~/components/home/MarqueeBand";
 import FeatureIconsSection from "~/components/home/FeatureIconsSection";
+import PromoBannersSection from "~/components/home/PromoBannersSection";
 import DataDrivenSection from "~/components/home/DataDrivenSection";
 import FeaturedProductsGrid from "~/components/home/FeaturedProductsGrid";
 import FooterCtaBanner from "~/components/home/FooterCtaBanner";
@@ -58,6 +59,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <MarqueeBand />
+      <PromoBannersSection />
       <FeatureIconsSection />
       <Suspense fallback={<FeaturedGridSkeleton />}>
         <FeaturedProductsLoader />

@@ -1,7 +1,8 @@
-# TNT First Aid - Old Website Content (Scraped from Wayback Machine)
+can # TNT First Aid - Old Website Content (Scraped from Wayback Machine + Live Site)
 
 Archived snapshot: December 11, 2025
 Source: https://web.archive.org/web/20251211202156/https://tntfirstaid.com/
+Live site re-scrape: 2026-04-17 from https://tntfirstaid.com/
 
 ---
 
@@ -14,7 +15,8 @@ Source: https://web.archive.org/web/20251211202156/https://tntfirstaid.com/
 - **Phone:** +800-TNT-4003 (800-868-4003)
 - **Email:** jeffm@tntfirstaid.com
 - **Working Hours:** Mon - Fri / 9:00 AM - 6:00 PM (also listed as Mon-Sun 9AM-5PM in schema)
-- **Founder/Contact:** Jeff (referenced in testimonial as the person who answers calls and develops products)
+- **Founder/Contact:** Jeff Midgley (answers calls, develops products; LinkedIn: jeff-midgley-61a61746)
+- **Physical Storefront:** None — the company explicitly states they operate without a physical storefront to keep costs lower for customers.
 - **Author/Admin:** Chad Marquez
 - **Copyright:** 2018 TNT First-Aid. All Rights Reserved.
 
@@ -28,9 +30,9 @@ Source: https://web.archive.org/web/20251211202156/https://tntfirstaid.com/
 
 ## Social Media
 
-- Facebook
-- Instagram (https://www.instagram.com/tntfirstaid/)
-- LinkedIn
+- Facebook: https://facebook.com/tntfirstaid/
+- Instagram: https://www.instagram.com/tntfirstaid/
+- LinkedIn (Jeff Midgley, founder): https://www.linkedin.com/in/jeff-midgley-61a61746/
 
 ---
 
@@ -155,6 +157,181 @@ TNT First-Aid has awesome first-aid products as well as several types of first-a
 - Covers all types of medical emergencies (nose bleeds to fractures/punctured lungs)
 - Available on iOS and Android
 - Also available: **Virtual Medic ASL** - all videos in sign language with subtitles
+- **Current iOS product:** Virtual Medic Pro — $7.99 one-time fee
+  - App ID: 6627343936
+  - Link: https://apps.apple.com/us/app/virtual-medic-pro/id6627343936?mt=8
+  - Marketing tagline: "Don't live without it"
+  - Contains over 30 high-resolution injury treatment videos
+
+---
+
+## Training Videos (YouTube + ASL)
+
+- Virtual Medic YouTube channel: "Over 30 injury treatment videos at your fingertips"
+- Dedicated ASL section (Training Videos in ASL)
+- Topics covered:
+  - Burn treatment (1st, 2nd, 3rd degree)
+  - Fracture and dislocation care
+  - Laceration and wound management
+  - Tourniquet application
+  - Eye injury treatment
+  - CPR instruction
+  - Chest wound management
+  - Specialized procedures (shoulder immobilization, carotid artery laceration)
+- No pricing shown on the training-videos page (videos appear free on YouTube; app is the paid product)
+
+---
+
+## Blog Posts
+
+- **Trauma Kit vs. First-Aid Kit** — July 23, 2018 — Author: Chad Marquez
+  - Compares trauma kits to first-aid kits using triage-style injury categorization; teases follow-up content on patient triage.
+
+(Only one post was visible on the live blog index.)
+
+---
+
+## Full Product Catalog (~80 products across 7 shop pages)
+
+### Gauze, Bandages & Wound Care
+| Product | Price | Notes |
+|---------|-------|-------|
+| 2 oz Antiseptic Spray | $5.00 | BZK — no alcohol sting |
+| 2″ Self Adhesive Coban | $2.00 | Won't stick to hair or wound |
+| 3″ Self Adhesive Coban | $3.00 | |
+| 2″ Sterile Elastic Ace Wrap | $1.50 | Reusable |
+| 3″ Sterile Elastic Ace Wrap | $2.00 | |
+| 2″ x 2″ Sterile Gauze Pad 10 ct. | $2.50 | |
+| 2″ x 2″ Sterile Gauze Pad 100 ct. | $10.50 | |
+| 2″ x 3″ Sterile Non Adherent Pad 10 ct. | $3.25 | |
+| 2″ x 3″ Sterile Non Adherent Pad 100 ct. | $15.00 | |
+| 3″ x 3″ Gauze Pad 100 ct. | $12.50 | |
+| 25 ct. Fabric Large Patch Bandage | $8.00 | |
+| 7/8″ Fabric Bandages 50 ct. | $7.50 | |
+| Fabric Fingertip Bandage 40 ct. | $7.50 | |
+| Fabric Knuckle Bandages 40 ct. | $7.50 | |
+| Fabric Xtra Long Bandage 40 ct. | $8.00 | |
+| Large Trauma Dressing Non Adherent | $5.00 | 10×30 sterile |
+| Steri Strip pack | $3.50 | Pre-glued |
+| Triangle Bandages (fabric) with safety pins | $2.50 | 2 pack |
+| Sali-jet 30 ml Wound Flush 2 pack | $5.50 | Sterile irrigation |
+| Wound Seal Vial Sterile | $17.00 | |
+| Wound Seal with Applicators | $13.50 | |
+| Clear Surgical Transparent Tape 1″ | $2.50 | |
+| Waterproof Adhesive Tape 1″ | $3.00 | |
+| Waterproof Tri-Cut Tape | $7.50 | 3 sizes on one spool |
+
+### Burn Products
+| Product | Price |
+|---------|-------|
+| Water-Jel 4 oz Burn Gel | $10.00 |
+| Water-Jel 4 x 4 Burn Dressing | $8.00 |
+| Water-Jel 12 x 16 Burn Face Dressing | $24.00 |
+| 25 ct. Hydrocortisone Cream | $8.00 |
+| 25 ct Triple Antibiotic Ointment | $8.00 |
+
+### Industrial Medications
+| Product | Price |
+|---------|-------|
+| Medique Extra Strength APAP 100 ct | $12.00 |
+| Medi-First Ibuprofen 100 ct. | $12.00 |
+| Medique Pain-Off 100 ct. | $12.00 |
+| Medique Loradamed 50 ct. | $36.00 |
+| Medique Medi-Lyte 100 ct. | $9.00 |
+| Medi-First Cherry Cough Drop 50 ct. | $8.00 |
+| Medi-First Cold Relief 100 ct. | $13.00 (out of stock) |
+| Antacid 100 ct. | $8.00 |
+| Arnica Oil | $10.00 |
+
+### Eye Wash
+| Product | Price |
+|---------|-------|
+| 4 oz Buffered Eye Wash Sterile | $5.50 |
+
+### First Aid Tools
+| Product | Price |
+|---------|-------|
+| Hemostats 5″ (German stainless) | $5.00 |
+| Trauma Shears 5″ | $7.50 |
+| Tweezers with Magnifying Glass | $6.00 |
+| Disposable Pen Light (pupil gauge) | $3.00 |
+| Foreign Object Removal Kit | $25.00 |
+| CPR Pocket Mask | $12.00 |
+| Adult Medium Blood Pressure Cuff | $15.00 |
+| Oralpharyngeal Airway Kit (OPA, infant–adult) | $12.00 (out of stock) |
+| Fracture Fork | $20.00 |
+| 36″ Stat Splint (X-ray through) | $13.00 |
+| Instant Ice Wrap (reusable with water) | $8.00 |
+
+### Advanced Trauma / Tactical
+| Product | Price |
+|---------|-------|
+| CAT 5 gen 7 Tourniquet (North American Rescue) | $31.95 (reg. $35.00) |
+| Rapid Application Tourniquet System "RATS" Gen 2 | $16.99 |
+| Quick Clot Gauze (Kaolin hemostatic) | $22.99 |
+| HyFin Vent Chest Seal – Individual | $11.99 |
+| Stop the Bleed – Bleeding control kit | $69.00 |
+
+### Pre-Built Kits / Backpacks
+| Product | Price | Notes |
+|---------|-------|-------|
+| Mini Red First Aid Kit | $15.00 | |
+| Mini Red First Aid Kit with Meds | $12.00 | |
+| Trauma Fanny Pack | $145.00 | 5★ |
+| Trauma Fanny Pack - Blue | $145.00 | |
+| IFAK Trauma Individual First-Aid Kit | $115.00 | |
+| K9FAK (Canine First-Aid Kit) | $120.00 (reg. $135.00) | First K9-specific trauma kit |
+| Deluxe Off-Road First-Aid Kit | $345.00 | |
+| Ultimate Water Sports Trauma Kit | $185.00 | Waterproof case |
+| Trauma Backpack Red | $395.00 | Fully stocked |
+| Trauma Backpack Blacked-Out | $395.00 (reg. $425.00) | 5★ |
+| Trauma Backpack Blackout - Best Seller | $525.00 | #1 seller |
+| Kemp USA Tarpaulin Rescue/Tactical Backpack Empty | $185.00 | |
+| Kemp USA Tarpaulin Rescue/Tactical Trauma Deluxe Backpack | $595.00 | Fully stocked, fluid resistant |
+| Trauma Deluxe Waterproof Case (wheels + handle) | $675.00 | |
+| 72 Hour First-Aid/Trauma/Survival Food Kit | $795.00 | Waterproof case |
+
+### Business / OSHA Kits
+| Product | Price |
+|---------|-------|
+| 2 Shelf Metal First-Aid Cabinet | $225.00 |
+| 3 Shelf Metal First-Aid Cabinet | $275.00 |
+| Industrial Truck Kit | $245.00 |
+
+### Fire & Safety
+| Product | Price |
+|---------|-------|
+| Fireade 2000 16 oz. | $25.00 |
+
+### Health & Wellness / COVID
+| Product | Price |
+|---------|-------|
+| 3M N95 Mask 8210 (no valve) 20 ct box | $30.00 |
+| KN95 Masks 5 pack | $21.99 |
+| KN95 Masks 10 pack | $39.95 |
+
+### Knives / Tactical Gear
+| Product | Price | Notes |
+|---------|-------|-------|
+| Normandy S Tanto 440c OTF Medium Black Knife | $120.00 | 3″ blade, made in Utah |
+| Normandy S Tanto 440c OTF Large Knife | $140.00 | 3.5″ blade, made in Utah |
+| RavenCrest Cerakote Titan Bravo Tactical OTF (Graphite Black) | $110.00 (reg. $158.99, −31%) | Out of stock |
+| RavenCrest Tactical Spear-Point Tactical OTF Knife | $110.00 | Out of stock |
+
+### AEDs
+| Product | Price |
+|---------|-------|
+| Zoll AED Plus | $2,199.00 |
+
+Notes on categorization: Many items are flagged **HSA & FSA Eligible** on the source site. Several products appear under multiple categories (e.g. backpacks listed under 72 Hour Kit, Business First-Aid Kits, Pre Built Trauma Kits, Tactical Gear).
+
+---
+
+## Pages That Returned 404 on Live Site
+- `/shipping-returns/`
+- `/return-refund-policy/`
+
+(Policy text was not recoverable from the live site during this scrape. The Wayback snapshot may hold it if needed — worth a follow-up fetch.)
 
 ---
 

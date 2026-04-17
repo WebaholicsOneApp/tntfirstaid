@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "~/components/products/ProductCard";
 import type { ProductListItem } from "~/types";
@@ -120,17 +121,6 @@ export default function FeaturedProductsGrid({ products }: Props) {
                     "radial-gradient(ellipse at 30% 20%, rgba(227,24,55,0.28) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(227,24,55,0.18) 0%, transparent 55%)",
                 }}
               />
-              {/* Subtle grid */}
-              <div
-                className="absolute inset-0 opacity-[0.06]"
-                style={{
-                  backgroundImage: `
-                    repeating-linear-gradient(0deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px),
-                    repeating-linear-gradient(90deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px)
-                  `,
-                }}
-              />
-
               <div className="relative flex h-full flex-col p-7 sm:p-8">
                 <h3 className="font-display text-2xl leading-tight font-bold text-white sm:text-3xl">
                   Industries We Are Proud To Serve
@@ -158,10 +148,29 @@ export default function FeaturedProductsGrid({ products }: Props) {
                   ))}
                 </div>
 
+                {/* Image fills the empty space between icons and CTA */}
+                <div className="relative mt-6 min-h-[140px] flex-1 overflow-hidden rounded-xl">
+                  <Image
+                    src="/images/hero/hero-bandage.jpg"
+                    alt="Applying a bandage"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 1024px) 33vw, 100vw"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(10,10,10,0.15) 0%, rgba(10,10,10,0.6) 100%)",
+                    }}
+                  />
+                </div>
+
                 {/* CTA */}
                 <Link
                   href="/contact"
-                  className="group bg-primary-500 hover:bg-primary-400 mt-auto inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors active:scale-[0.98]"
+                  className="group bg-primary-500 hover:bg-primary-400 mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide text-white uppercase transition-colors active:scale-[0.98]"
                 >
                   Learn About Custom Kitting
                   <svg
