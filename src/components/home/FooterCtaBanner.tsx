@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const badges = [
@@ -9,13 +10,20 @@ const badges = [
 export default function FooterCtaBanner() {
   return (
     <section className="bg-secondary-950 relative overflow-hidden">
-      {/* Red glow */}
+      <Image
+        src="/images/old-site/hero-main.jpg"
+        alt=""
+        fill
+        className="object-contain opacity-30"
+        sizes="100vw"
+      />
+      {/* Dark overlay for text readability */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 20% 20%, rgba(227,24,55,0.22) 0%, transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(227,24,55,0.14) 0%, transparent 55%)",
+            "linear-gradient(to bottom, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.5) 50%, rgba(10,10,10,0.7) 100%)",
         }}
       />
 

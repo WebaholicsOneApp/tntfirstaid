@@ -11,31 +11,29 @@ export default function DataDrivenSection() {
     <section className="bg-white py-16 lg:py-28">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-20">
-          {/* Left: brand panel */}
-          <div className="ring-secondary-100 bg-secondary-950 relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full">
+          {/* Left: image panel */}
+          <div className="ring-secondary-100 bg-secondary-950 relative aspect-[2/1] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full">
+            <Image
+              src="/images/old-site/hero-business-kits.jpg"
+              alt="TNT First Aid emergency backpacks"
+              fill
+              className="object-contain"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
             <div
               className="absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(ellipse at 30% 30%, rgba(227,24,55,0.28) 0%, transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+                  "linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 50%)",
               }}
             />
-            <div
-              className="absolute inset-0 opacity-[0.07]"
-              style={{
-                backgroundImage: `
-                  repeating-linear-gradient(0deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px),
-                  repeating-linear-gradient(90deg, transparent 0, transparent 39px, #ffffff 39px, #ffffff 40px)
-                `,
-              }}
-            />
-            <div className="relative flex h-full items-center justify-center p-10">
+            <div className="absolute bottom-6 left-6 right-6">
               <Image
                 src="/images/tnt-logo.png"
                 alt="TNT First Aid"
-                width={320}
-                height={320}
-                className="h-auto w-[180px] drop-shadow-[0_8px_30px_rgba(0,0,0,0.5)] sm:w-[240px] md:w-[280px]"
+                width={120}
+                height={120}
+                className="h-auto w-[80px] drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)] sm:w-[100px]"
               />
             </div>
           </div>

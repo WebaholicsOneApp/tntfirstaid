@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getStoreConfig } from "~/lib/store-config.server";
 
@@ -95,12 +96,20 @@ export default async function ServicesPage() {
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
+        <Image
+          src="/images/old-site/hero-business-kits.jpg"
+          alt=""
+          fill
+          priority
+          className="object-contain"
+          sizes="100vw"
+        />
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 40%, rgba(227,24,55,0.28) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+              "linear-gradient(100deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.75) 40%, rgba(20,6,10,0.5) 100%)",
           }}
         />
         <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">

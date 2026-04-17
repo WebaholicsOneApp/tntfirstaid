@@ -79,12 +79,20 @@ export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
+        <Image
+          src="/images/old-site/hero-services.jpg"
+          alt=""
+          fill
+          priority
+          className="object-contain"
+          sizes="100vw"
+        />
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 40%, rgba(227,24,55,0.28) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+              "linear-gradient(100deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.75) 40%, rgba(20,6,10,0.5) 100%)",
           }}
         />
         <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
@@ -240,49 +248,25 @@ export default async function AboutPage() {
                   aria-hidden
                   className="bg-primary-500/10 absolute -inset-4 rounded-3xl blur-2xl"
                 />
-                <div className="bg-secondary-950 border-secondary-800 relative overflow-hidden rounded-2xl border p-10 text-center">
-                  <div
-                    aria-hidden
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "radial-gradient(ellipse at 50% 30%, rgba(227,24,55,0.18) 0%, transparent 60%)",
-                    }}
+                <div className="relative overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/old-site/hero-app.jpg"
+                    alt="Virtual Medic App — video-based first aid for iOS and Android"
+                    width={870}
+                    height={412}
+                    className="w-full rounded-2xl"
                   />
-                  <div className="relative z-10">
-                    <div className="bg-primary-500/20 text-primary-400 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl">
-                      <svg
-                        className="h-8 w-8"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={1.5}
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="font-display mb-2 text-2xl font-bold text-white">
-                      Virtual Medic
-                    </h3>
-                    <p className="text-secondary-400 mb-6 text-sm">
-                      Works offline &middot; Under 30 MB
-                    </p>
-                    <div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
-                      <span className="border-secondary-700 text-secondary-200 rounded-full border px-4 py-2 text-xs font-semibold">
-                        iOS
-                      </span>
-                      <span className="border-secondary-700 text-secondary-200 rounded-full border px-4 py-2 text-xs font-semibold">
-                        Android
-                      </span>
-                      <span className="border-primary-500/40 text-primary-300 rounded-full border px-4 py-2 text-xs font-semibold">
-                        ASL Edition
-                      </span>
-                    </div>
-                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                  <span className="bg-secondary-100 text-secondary-700 rounded-full px-4 py-2 text-xs font-semibold">
+                    iOS
+                  </span>
+                  <span className="bg-secondary-100 text-secondary-700 rounded-full px-4 py-2 text-xs font-semibold">
+                    Android
+                  </span>
+                  <span className="bg-primary-500/10 text-primary-600 rounded-full px-4 py-2 text-xs font-semibold">
+                    ASL Edition
+                  </span>
                 </div>
               </div>
             </div>

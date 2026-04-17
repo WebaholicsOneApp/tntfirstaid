@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const SLIDES = [
-  "/images/hero/kit-full-spread.png",
-  "/images/hero/kit-red-bag.png",
-  "/images/hero/cpr-mask-kit.png",
+  "/images/old-site/hero-main.jpg",
+  "/images/old-site/hero-business-kits.jpg",
+  "/images/old-site/hero-services.jpg",
 ];
 
 const SLIDE_INTERVAL_MS = 8000;
@@ -35,7 +35,7 @@ export default function HeroSection() {
         {SLIDES.map((src, i) => (
           <div
             key={src}
-            className="absolute inset-0 transition-opacity ease-in-out"
+            className="absolute inset-0 flex items-center justify-center transition-opacity ease-in-out"
             style={{
               opacity: i === activeIdx ? 1 : 0,
               transitionDuration: `${FADE_MS}ms`,
@@ -46,7 +46,7 @@ export default function HeroSection() {
               alt=""
               fill
               priority={i === 0}
-              className="object-cover"
+              className="object-contain"
               sizes="100vw"
             />
           </div>
