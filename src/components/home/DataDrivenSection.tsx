@@ -12,20 +12,13 @@ export default function DataDrivenSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-20">
           {/* Left: image panel */}
-          <div className="ring-secondary-100 bg-secondary-950 relative aspect-[2/1] w-full overflow-hidden rounded-3xl shadow-lg ring-1 lg:aspect-auto lg:h-full">
+          <div className="ring-secondary-100 relative aspect-[2/1] w-full overflow-hidden rounded-3xl bg-white shadow-lg ring-1 lg:aspect-auto lg:h-full">
             <Image
               src="/images/old-site/hero-business-kits.jpg"
               alt="TNT First Aid emergency backpacks"
               fill
               className="object-contain"
               sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(10,10,10,0.6) 0%, transparent 50%)",
-              }}
             />
             <div className="absolute bottom-6 left-6 right-6">
               <Image
@@ -79,10 +72,10 @@ export default function DataDrivenSection() {
                 that the people using them know how.
               </p>
               <p>
-                Whether you need a 25-person OSHA-compliant workplace kit, an
-                AED for your office, or on-site Stop the Bleed training for
-                your team, we&rsquo;ll help you build the right solution and
-                keep it ready for the day you hope never comes.
+                Whether you need a 25-person workplace kit, an AED for your
+                office, or on-site CPR and First Aid training for your team,
+                we&rsquo;ll help you build the right solution and keep it
+                ready for the day you hope never comes.
               </p>
             </div>
           </div>

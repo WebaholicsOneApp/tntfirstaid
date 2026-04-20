@@ -30,6 +30,12 @@
   --color-secondary-950: var(--secondary-950, #0a0a0a);
 }
 
+/* Global display scale — renders the whole site zoomed out so the default 100%
+   browser zoom looks closer to 55% zoom. Tune this single value up/down to taste. */
+html {
+  zoom: 0.55;
+}
+
 /* Product description styles */
 .product-description h1, .product-description h2, .product-description h3 {
   @apply font-display font-bold text-secondary-800 mb-2 mt-4;
@@ -122,6 +128,147 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
   animation: marquee-scroll 35s linear infinite;
 }
 
+/* EKG heartbeat scroll — one pattern tile is 1500 user units wide (4 beats) */
+@keyframes ekg-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-1500px); }
+}
+.animate-ekg-scroll {
+  animation: ekg-scroll 9.6s linear infinite;
+}
+
+/* Glow pulse — flashes at each of the 4 irregular beat positions:
+   120/1500 = 8%, 480/1500 = 32%, 700/1500 = 47%, 1220/1500 = 81% */
+@keyframes ekg-pulse {
+  0%, 4%, 12%, 28%, 36%, 43%, 51%, 77%, 85%, 100% {
+    filter: drop-shadow(0 0 6px rgba(227,24,55,0.4)) drop-shadow(0 0 0 rgba(255,255,255,0));
+  }
+  8%  { filter: drop-shadow(0 0 18px rgba(227,24,55,0.95)) drop-shadow(0 0 2px rgba(255,255,255,0.6)); }
+  32% { filter: drop-shadow(0 0 18px rgba(227,24,55,0.95)) drop-shadow(0 0 2px rgba(255,255,255,0.6)); }
+  47% { filter: drop-shadow(0 0 16px rgba(227,24,55,0.85)) drop-shadow(0 0 2px rgba(255,255,255,0.5)); }
+  81% { filter: drop-shadow(0 0 24px rgba(227,24,55,1)) drop-shadow(0 0 3px rgba(255,255,255,0.7)); }
+}
+.animate-ekg-pulse {
+  animation: ekg-pulse 9.6s linear infinite;
+}
+
+/* Lite-YouTube play button — slow expanding ring */
+@keyframes video-play-ping {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+.animate-video-play-ping {
+  animation: video-play-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Defibrillator pulse — rings emanating from a medical cross */
+@keyframes defib-ring {
+  0%   { transform: scale(0.25); opacity: 0;    stroke-width: 3; }
+  5%   { opacity: 0.9; }
+  100% { transform: scale(4);    opacity: 0;    stroke-width: 0.5; }
+}
+.animate-defib-ring {
+  animation: defib-ring 6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Cross charges slowly, flashes bright at 0% (when a new ring fires), decays.
+   Runs on the ring-stagger period (3s) so every ring emission is punctuated. */
+@keyframes defib-cross-flash {
+  0%, 100% { opacity: 0.22; filter: drop-shadow(0 0 12px rgba(227,24,55,0.4)); }
+  2%       { opacity: 1;    filter: drop-shadow(0 0 36px rgba(227,24,55,1)) drop-shadow(0 0 8px rgba(255,255,255,0.9)); }
+  10%      { opacity: 0.5;  filter: drop-shadow(0 0 22px rgba(227,24,55,0.65)); }
+  70%      { opacity: 0.28; filter: drop-shadow(0 0 14px rgba(227,24,55,0.45)); }
+}
+.animate-defib-cross-flash {
+  animation: defib-cross-flash 3s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Lightning sparks — appear in the brief flash window, then disappear */
+@keyframes defib-spark {
+  0%, 1%   { opacity: 0; transform: scale(0.55); }
+  3%       { opacity: 1; transform: scale(1); }
+  12%      { opacity: 0; transform: scale(1.2); }
+  100%     { opacity: 0; transform: scale(0.55); }
+}
+.animate-defib-spark {
+  animation: defib-spark 3s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* About Us hero: small medical crosses drifting upward */
+@keyframes drift-up {
+  0%   { transform: translateY(0) rotate(0deg);   opacity: 0; }
+  14%  { opacity: var(--drift-opacity, 0.12); }
+  86%  { opacity: var(--drift-opacity, 0.12); }
+  100% { transform: translateY(-540px) rotate(10deg); opacity: 0; }
+}
+.animate-drift-up {
+  animation: drift-up var(--drift-duration, 28s) linear infinite;
+  animation-delay: var(--drift-delay, 0s);
+}
+
+/* About Us hero: giant "years in business" anchor number — breathing red glow */
+@keyframes hero-number-pulse {
+  0%, 100% { text-shadow: 0 0 32px rgba(227,24,55,0.25), 0 0 60px rgba(227,24,55,0.12); }
+  50%      { text-shadow: 0 0 60px rgba(227,24,55,0.6),  0 0 100px rgba(227,24,55,0.3); }
+}
+.animate-hero-number-pulse {
+  animation: hero-number-pulse 4.5s ease-in-out infinite;
+}
+
+/* Contact hero: radar sweep — rotating ray around a dispatcher console */
+@keyframes radar-rotate {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+.animate-radar-sweep {
+  animation: radar-rotate 5s linear infinite;
+  transform-box: view-box;
+  transform-origin: 200px 200px;
+}
+
+/* Radar blips — each flashes when the sweep passes its angle */
+@keyframes radar-blip {
+  0%   { opacity: 0;   transform: scale(0.6); }
+  2%   { opacity: 1;   transform: scale(1);   }
+  15%  { opacity: 0.5; transform: scale(1.4); }
+  30%  { opacity: 0;   transform: scale(1.8); }
+  100% { opacity: 0;   transform: scale(0.6); }
+}
+.animate-radar-blip {
+  animation: radar-blip 5s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* About Us hero: heritage timeline */
+@keyframes timeline-fill {
+  0%   { width: 0%; }
+  6%   { width: 0%; }
+  86%  { width: 100%; }
+  94%  { width: 100%; }
+  100% { width: 0%; }
+}
+.animate-timeline-fill {
+  animation: timeline-fill 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes timeline-dot-sweep {
+  0%   { left: 0%;   opacity: 0; }
+  6%   { left: 0%;   opacity: 1; }
+  86%  { left: 100%; opacity: 1; }
+  93%  { left: 100%; opacity: 0; }
+  100% { left: 0%;   opacity: 0; }
+}
+.animate-timeline-dot {
+  animation: timeline-dot-sweep 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Skeleton shimmer — brand-tinted loading sweep */
 @keyframes skeleton-shimmer {
   0% { background-position: -200% 0; }
@@ -155,6 +302,18 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
     clip-path: none;
   }
   .animate-marquee-scroll { animation-play-state: paused; }
+  .animate-ekg-scroll { animation: none; }
+  .animate-ekg-pulse { animation: none; filter: drop-shadow(0 0 6px rgba(227,24,55,0.5)); }
+  .animate-video-play-ping { animation: none; opacity: 0; }
+  .animate-defib-ring { animation: none; opacity: 0; }
+  .animate-defib-cross-flash { animation: none; opacity: 0.3; filter: drop-shadow(0 0 14px rgba(227,24,55,0.45)); }
+  .animate-defib-spark { animation: none; opacity: 0; }
+  .animate-drift-up { animation: none; opacity: 0; }
+  .animate-timeline-fill { animation: none; width: 100%; }
+  .animate-timeline-dot { animation: none; left: 100%; opacity: 1; }
+  .animate-hero-number-pulse { animation: none; text-shadow: 0 0 40px rgba(227,24,55,0.35); }
+  .animate-radar-sweep { animation: none; }
+  .animate-radar-blip { animation: none; opacity: 0.4; }
   /* Disable all custom transitions/animations for accessibility */
   *,
   *::before,

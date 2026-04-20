@@ -92,9 +92,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/news`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
+      url: `${baseUrl}/trauma-kit-vs-first-aid-kit`,
+      lastModified: new Date("2018-07-23"),
+      changeFrequency: "yearly",
       priority: 0.6,
     },
     {

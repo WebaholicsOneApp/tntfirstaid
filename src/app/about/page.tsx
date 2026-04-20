@@ -61,6 +61,36 @@ const values = [
   },
 ];
 
+const FOUNDING_YEAR = 2011;
+const TIMELINE_YEARS = [2011, 2014, 2017, 2020, 2023, 2026];
+
+const DRIFTING_CROSSES: Array<{
+  x: number;
+  size: number;
+  duration: number;
+  delay: number;
+  opacity: number;
+  tone: "white" | "red";
+}> = [
+  // Right-side prominent
+  { x: 48, size: 34, duration: 30, delay: 0, opacity: 0.18, tone: "white" },
+  { x: 55, size: 20, duration: 22, delay: 8, opacity: 0.28, tone: "red" },
+  { x: 62, size: 28, duration: 26, delay: 3, opacity: 0.15, tone: "white" },
+  { x: 70, size: 16, duration: 20, delay: 12, opacity: 0.32, tone: "red" },
+  { x: 77, size: 40, duration: 34, delay: 6, opacity: 0.13, tone: "white" },
+  { x: 84, size: 22, duration: 24, delay: 15, opacity: 0.22, tone: "white" },
+  { x: 92, size: 30, duration: 28, delay: 2, opacity: 0.16, tone: "red" },
+  { x: 97, size: 18, duration: 20, delay: 10, opacity: 0.25, tone: "white" },
+  { x: 58, size: 22, duration: 26, delay: 18, opacity: 0.18, tone: "white" },
+  { x: 81, size: 18, duration: 22, delay: 20, opacity: 0.22, tone: "red" },
+  { x: 66, size: 26, duration: 32, delay: 25, opacity: 0.14, tone: "white" },
+  // Left side (subtle, behind text — keep lighter)
+  { x: 8, size: 24, duration: 30, delay: 4, opacity: 0.08, tone: "white" },
+  { x: 20, size: 18, duration: 34, delay: 14, opacity: 0.06, tone: "white" },
+  { x: 14, size: 14, duration: 26, delay: 22, opacity: 0.1, tone: "red" },
+  { x: 32, size: 20, duration: 28, delay: 9, opacity: 0.08, tone: "white" },
+];
+
 const offerings = [
   "First-Aid Product Sales",
   "CPR / First Aid Training (American Heart Association)",
@@ -75,26 +105,120 @@ const offerings = [
 
 export default async function AboutPage() {
   const storeConfig = await getStoreConfig();
+  const yearsInBusiness = new Date().getFullYear() - FOUNDING_YEAR;
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
-        <Image
-          src="/images/old-site/hero-services.jpg"
-          alt=""
-          fill
-          priority
-          className="object-contain"
-          sizes="100vw"
-        />
+      <header className="bg-secondary-950 relative min-h-[320px] overflow-hidden md:min-h-[440px]">
+        {/* Stronger ambient red glow centered on the "15" anchor */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(100deg, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.75) 40%, rgba(20,6,10,0.5) 100%)",
+              "radial-gradient(ellipse 700px 500px at 78% 45%, rgba(227,24,55,0.35) 0%, transparent 60%), radial-gradient(ellipse 500px 400px at 20% 70%, rgba(227,24,55,0.16) 0%, transparent 55%)",
           }}
         />
+        {/* Drifting medical crosses */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          {DRIFTING_CROSSES.map((c, i) => (
+            <svg
+              key={i}
+              className={`animate-drift-up absolute ${c.tone === "red" ? "text-primary-500" : "text-white"}`}
+              style={
+                {
+                  left: `${c.x}%`,
+                  bottom: "-50px",
+                  width: `${c.size}px`,
+                  height: `${c.size}px`,
+                  "--drift-duration": `${c.duration}s`,
+                  "--drift-delay": `${c.delay}s`,
+                  "--drift-opacity": String(c.opacity),
+                  filter:
+                    c.tone === "red"
+                      ? "drop-shadow(0 0 8px rgba(227,24,55,0.7))"
+                      : "drop-shadow(0 0 4px rgba(255,255,255,0.25))",
+                } as React.CSSProperties
+              }
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M10 2h4v8h8v4h-8v8h-4v-8h-8v-4h8z"
+                fill="currentColor"
+              />
+            </svg>
+          ))}
+        </div>
+        {/* Big "years in business" anchor */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-1/2 right-[4%] hidden -translate-y-1/2 text-right md:block"
+        >
+          <div
+            className="animate-hero-number-pulse font-display text-[9rem] leading-none font-bold tracking-tighter md:text-[13rem]"
+            style={{ color: "rgba(255,255,255,0.11)" }}
+          >
+            {yearsInBusiness}
+          </div>
+          <div className="mt-2 flex items-center justify-end gap-3">
+            <div className="bg-primary-500/60 h-px w-10" />
+            <span className="text-primary-300 font-mono text-[0.7rem] tracking-[0.3em] uppercase">
+              Years · Est. {FOUNDING_YEAR}
+            </span>
+          </div>
+        </div>
+        {/* Heritage timeline (desktop+) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-10 bottom-8 hidden md:block"
+        >
+          <div className="relative h-14">
+            {/* Base line */}
+            <div className="absolute top-1/2 right-0 left-0 h-[2px] -translate-y-1/2 bg-white/20" />
+            {/* Progress fill */}
+            <div
+              className="animate-timeline-fill bg-primary-500 absolute top-1/2 left-0 h-[3px] -translate-y-1/2"
+              style={{ boxShadow: "0 0 12px rgba(227,24,55,0.75)" }}
+            />
+            {/* Year tick marks + labels */}
+            {TIMELINE_YEARS.map((year, i) => {
+              const pct = (i / (TIMELINE_YEARS.length - 1)) * 100;
+              const isEndpoint = i === 0 || i === TIMELINE_YEARS.length - 1;
+              return (
+                <div key={year}>
+                  <div
+                    className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${isEndpoint ? "bg-primary-400 h-3 w-3 ring-2 ring-white/20" : "h-2 w-2 bg-white/60"}`}
+                    style={{
+                      left: `${pct}%`,
+                      boxShadow: isEndpoint
+                        ? "0 0 10px rgba(227,24,55,0.8)"
+                        : undefined,
+                    }}
+                  />
+                  <div
+                    className={`absolute bottom-0 -translate-x-1/2 font-mono tracking-[0.2em] whitespace-nowrap ${isEndpoint ? "text-primary-200 text-[0.75rem] font-bold" : "text-[0.7rem] text-white/55"}`}
+                    style={{ left: `${pct}%` }}
+                  >
+                    {year}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Traveling dot */}
+            <div className="animate-timeline-dot absolute top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="relative h-5 w-5">
+                <div className="bg-primary-500/40 absolute inset-0 rounded-full blur-[6px]" />
+                <div
+                  className="bg-primary-500 absolute top-1/2 left-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white/40"
+                  style={{ boxShadow: "0 0 16px rgba(227,24,55,1)" }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">

@@ -3,6 +3,14 @@ import { getStoreConfig } from "~/lib/store-config.server";
 import ContactForm from "./ContactForm";
 import FaqAccordion from "../faq/FaqAccordion";
 
+const RADAR_BLIPS: Array<{ angle: number; radius: number }> = [
+  { angle: 50, radius: 115 },
+  { angle: 130, radius: 165 },
+  { angle: 195, radius: 85 },
+  { angle: 260, radius: 140 },
+  { angle: 320, radius: 100 },
+];
+
 const contactFaqs = [
   {
     q: "How do I schedule CPR or First Aid training for my team?",
@@ -43,15 +51,162 @@ export default async function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[400px]">
+      <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[440px]">
+        {/* Ambient red glow */}
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 20% 40%, rgba(227,24,55,0.28) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(227,24,55,0.15) 0%, transparent 55%)",
+              "radial-gradient(ellipse at 20% 45%, rgba(227,24,55,0.2) 0%, transparent 55%), radial-gradient(ellipse 700px 550px at 78% 50%, rgba(227,24,55,0.18) 0%, transparent 60%)",
           }}
         />
+        {/* Dispatcher radar */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          <svg
+            className="absolute top-1/2 right-[2%] h-[340px] w-[340px] -translate-y-1/2 md:right-[5%] md:h-[460px] md:w-[460px]"
+            viewBox="0 0 400 400"
+          >
+            <defs>
+              <radialGradient id="radarGlow">
+                <stop offset="0%" stopColor="rgba(227,24,55,0.25)" />
+                <stop offset="70%" stopColor="rgba(227,24,55,0)" />
+              </radialGradient>
+              <linearGradient
+                id="radarSweepGradient"
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="1"
+              >
+                <stop offset="0%" stopColor="rgba(227,24,55,0)" />
+                <stop offset="70%" stopColor="rgba(227,24,55,0.18)" />
+                <stop offset="100%" stopColor="rgba(227,24,55,0.6)" />
+              </linearGradient>
+            </defs>
+            {/* Ambient disc glow */}
+            <circle cx="200" cy="200" r="200" fill="url(#radarGlow)" />
+            {/* Concentric range rings */}
+            <circle
+              cx="200"
+              cy="200"
+              r="40"
+              fill="none"
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="90"
+              fill="none"
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="140"
+              fill="none"
+              stroke="rgba(255,255,255,0.14)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="200"
+              cy="200"
+              r="180"
+              fill="none"
+              stroke="rgba(255,255,255,0.22)"
+              strokeWidth="1.5"
+            />
+            {/* Crosshairs + diagonals */}
+            <line
+              x1="20"
+              y1="200"
+              x2="380"
+              y2="200"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="1"
+            />
+            <line
+              x1="200"
+              y1="20"
+              x2="200"
+              y2="380"
+              stroke="rgba(255,255,255,0.1)"
+              strokeWidth="1"
+            />
+            <line
+              x1="73"
+              y1="73"
+              x2="327"
+              y2="327"
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth="1"
+            />
+            <line
+              x1="73"
+              y1="327"
+              x2="327"
+              y2="73"
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth="1"
+            />
+            {/* Rotating sweep — wedge trail + bright leading ray */}
+            <g className="animate-radar-sweep">
+              <path
+                d="M 200 200 L 380 200 A 180 180 0 0 0 295 35 Z"
+                fill="url(#radarSweepGradient)"
+              />
+              <line
+                x1="200"
+                y1="200"
+                x2="380"
+                y2="200"
+                stroke="var(--color-primary-500)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                style={{
+                  filter: "drop-shadow(0 0 10px rgba(227,24,55,1))",
+                }}
+              />
+            </g>
+            {/* Contact blips — each flashes when the sweep crosses its angle */}
+            {RADAR_BLIPS.map((b, i) => {
+              const rad = (b.angle * Math.PI) / 180;
+              const x = 200 + b.radius * Math.cos(rad);
+              const y = 200 + b.radius * Math.sin(rad);
+              return (
+                <circle
+                  key={i}
+                  cx={x}
+                  cy={y}
+                  r="4"
+                  fill="var(--color-primary-500)"
+                  className="animate-radar-blip"
+                  style={{
+                    animationDelay: `${(b.angle / 360) * 5}s`,
+                    filter: "drop-shadow(0 0 8px rgba(227,24,55,1))",
+                    opacity: 0,
+                  }}
+                />
+              );
+            })}
+            {/* Center dot */}
+            <circle
+              cx="200"
+              cy="200"
+              r="3"
+              fill="var(--color-primary-500)"
+              style={{
+                filter: "drop-shadow(0 0 6px rgba(227,24,55,0.9))",
+              }}
+            />
+          </svg>
+        </div>
         <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">

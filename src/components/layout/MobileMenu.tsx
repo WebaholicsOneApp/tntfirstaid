@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { CategoryWithChildren } from "~/types";
 import { useAuth } from "~/lib/auth";
 
@@ -32,6 +33,9 @@ export default function MobileMenu({
   const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
   const [expandedCategory, setExpandedCategory] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const isActiveLink = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
   useEffect(() => {
     setMounted(true);
@@ -101,19 +105,26 @@ export default function MobileMenu({
             { href: "/services", label: "Services" },
             { href: "/training-videos", label: "Training Videos" },
             { href: "/about", label: "About Us" },
-            { href: "/news", label: "News" },
             { href: "/faq", label: "FAQ" },
             { href: "/contact", label: "Contact" },
-          ].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={onClose}
-              className="text-secondary-100 hover:text-primary-500 hover:bg-secondary-700 block px-5 py-3 text-sm font-medium tracking-wider uppercase transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+          ].map((link) => {
+            const active = isActiveLink(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={onClose}
+                aria-current={active ? "page" : undefined}
+                className={`relative block border-l-2 px-5 py-3 text-sm font-medium tracking-wider uppercase transition-colors ${
+                  active
+                    ? "border-primary-500 bg-secondary-700/50 text-primary-400"
+                    : "hover:text-primary-500 hover:bg-secondary-700 text-secondary-100 border-transparent"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
 
           {/* Account link — hidden when auth is disabled */}
           {customerAuthEnabled && !isAuthenticated && (

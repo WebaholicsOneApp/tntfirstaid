@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCart } from "~/lib/cart";
 import { useAuth } from "~/lib/auth";
 import type { CategoryWithChildren } from "~/types";
@@ -21,7 +22,6 @@ const navLinks = [
   { href: "/services", label: "Services" },
   { href: "/training-videos", label: "Training Videos" },
   { href: "/about", label: "About Us" },
-  { href: "/news", label: "News" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -45,6 +45,17 @@ export default function Header({
   > | null>(null);
   const { cart, openCart } = useCart();
   const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
+  const pathname = usePathname();
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
+  const isActiveLink = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
+  const isActiveOrPending = (href: string) =>
+    isActiveLink(href) || pendingHref === href;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -122,7 +133,10 @@ export default function Header({
           {/* Center: Desktop navigation */}
           <nav className="hidden items-center gap-8 lg:flex xl:gap-12">
             {navLinks.map((link) => {
+              const active = isActiveLink(link.href);
+              const activeOrPending = isActiveOrPending(link.href);
               if (link.href === "/shop") {
+                const shopActive = megaMenuOpen || activeOrPending;
                 return (
                   <div
                     key={link.href}
@@ -132,8 +146,10 @@ export default function Header({
                   >
                     <Link
                       href={link.href}
+                      onClick={() => setPendingHref(link.href)}
+                      aria-current={active ? "page" : undefined}
                       className={`relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px] ${
-                        megaMenuOpen
+                        shopActive
                           ? "text-secondary-900"
                           : "text-secondary-700 hover:text-secondary-900"
                       }`}
@@ -141,7 +157,7 @@ export default function Header({
                       {link.label}
                       <span
                         className={`bg-primary-500 absolute bottom-0 left-0 h-[2px] transition-[width] duration-300 ${
-                          megaMenuOpen ? "w-full" : "w-0 group-hover:w-full"
+                          shopActive ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       />
                     </Link>
@@ -152,10 +168,20 @@ export default function Header({
                 <div key={link.href} className="group relative">
                   <Link
                     href={link.href}
-                    className="text-secondary-700 hover:text-secondary-900 relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px]"
+                    onClick={() => setPendingHref(link.href)}
+                    aria-current={active ? "page" : undefined}
+                    className={`relative py-2 text-[12px] font-semibold tracking-[0.12em] whitespace-nowrap uppercase transition-colors xl:text-[13px] ${
+                      activeOrPending
+                        ? "text-secondary-900"
+                        : "text-secondary-700 hover:text-secondary-900"
+                    }`}
                   >
                     {link.label}
-                    <span className="bg-primary-500 absolute bottom-0 left-0 h-[2px] w-0 transition-[width] duration-300 group-hover:w-full" />
+                    <span
+                      className={`bg-primary-500 absolute bottom-0 left-0 h-[2px] transition-[width] duration-300 ${
+                        activeOrPending ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
                   </Link>
                 </div>
               );

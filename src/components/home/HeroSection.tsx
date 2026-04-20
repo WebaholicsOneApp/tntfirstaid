@@ -46,7 +46,8 @@ export default function HeroSection() {
               src={src}
               alt=""
               fill
-              priority={i === 0}
+              priority
+              fetchPriority={i === 0 ? "high" : "low"}
               className="object-cover"
               sizes="100vw"
             />
