@@ -17,6 +17,14 @@ const faqSections = [
     category: "Products & Kits",
     questions: [
       {
+        q: "What's the difference between a trauma kit and a first-aid kit?",
+        a: "First-aid kits are built for everyday injuries — cuts, scrapes, bandages, basic cleaning. Trauma kits go further, with supplies for life-threatening situations: tourniquets, chest seals, airway tools, wound-seal powder, and splints. A properly built trauma kit contains everything a first-aid kit has, plus the gear you'd want when the answer to \"can I stop major bleeding?\" has to be yes.",
+        link: {
+          label: "Read the full breakdown",
+          href: "/trauma-kit-vs-first-aid-kit",
+        },
+      },
+      {
         q: "Are your first aid kits OSHA compliant?",
         a: "Yes. Our workplace kits meet or exceed ANSI/ISEA Z308.1 Class A and Class B standards, which are the benchmarks OSHA references for workplace first aid supplies. Every kit lists the standard it complies with and the recommended team size.",
       },
@@ -35,16 +43,16 @@ const faqSections = [
     category: "Training & Certification",
     questions: [
       {
-        q: "What classes do you offer?",
-        a: "CPR/AED (adult, child, and infant), First Aid, Bloodborne Pathogens, and Stop the Bleed. Courses are available as stand-alone classes or combined into a single certification. All classes are taught by certified instructors.",
+        q: "What training do you offer?",
+        a: "CPR/First Aid training through the American Heart Association, OSHA training courses and safety inspections, a 16-hour Disaster Medicine course, Active Shooter training, Mass Casualty disaster drills, and Tool Box talks. Our trainers are professionals working in EMS and emergency care.",
       },
       {
         q: "Can you come train my team on-site?",
-        a: "Yes — that's what we do best. We travel to workplaces, schools, and community organizations across the region. Contact us with your location, group size, and preferred dates and we'll put together a quote.",
+        a: "Yes. Call us at 800-868-4003 with your location, group size, and the training you're interested in, and we'll put together pricing and scheduling for your session.",
       },
       {
-        q: "How long are certifications valid?",
-        a: "CPR, AED, and First Aid certifications are typically valid for 2 years. Bloodborne Pathogens certification is annual (required by OSHA for covered workers). We'll send a renewal reminder before your card expires.",
+        q: "Do you help with OSHA documentation?",
+        a: "Yes. We prepare OSHA written documents and programs, and we conduct OSHA safety inspections. Call 800-868-4003 for details.",
       },
     ],
   },

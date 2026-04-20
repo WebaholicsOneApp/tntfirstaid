@@ -101,7 +101,6 @@ export default function MobileMenu({
             { href: "/services", label: "Services" },
             { href: "/training-videos", label: "Training Videos" },
             { href: "/about", label: "About Us" },
-            { href: "/news", label: "News" },
             { href: "/faq", label: "FAQ" },
             { href: "/contact", label: "Contact" },
           ].map((link) => (

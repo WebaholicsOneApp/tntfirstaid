@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 interface FaqItem {
   q: string;
   a: string;
+  link?: { label: string; href: string };
 }
 
 interface FaqAccordionProps {
@@ -65,6 +67,15 @@ export default function FaqAccordion({ questions }: FaqAccordionProps) {
             {isOpen && (
               <div className="animate-fade-in px-6 pb-6 pl-14 md:px-8 md:pb-8 md:pl-16">
                 <p className="text-secondary-600 leading-relaxed">{faq.a}</p>
+                {faq.link && (
+                  <Link
+                    href={faq.link.href}
+                    className="text-primary-600 hover:text-primary-700 mt-3 inline-flex items-center gap-1 text-sm font-semibold transition-colors"
+                  >
+                    {faq.link.label}
+                    <span aria-hidden>→</span>
+                  </Link>
+                )}
               </div>
             )}
           </div>
