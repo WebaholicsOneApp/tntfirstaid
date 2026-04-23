@@ -130,7 +130,7 @@ export default function ProductCard({
             src={imageSrc}
             alt={product.name}
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 33vw"
             className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
             onError={() => setImgError(true)}
           />
@@ -154,11 +154,11 @@ export default function ProductCard({
       </div>
 
       {/* Content */}
-      <div className="p-2.5 sm:p-3.5">
+      <div className="p-3.5 sm:p-4">
         {/* Product name */}
         <h3
           className={cn(
-            "line-clamp-2 text-xs leading-snug font-medium transition-colors sm:text-sm",
+            "line-clamp-2 text-sm leading-snug font-medium transition-colors sm:text-base",
             isDark
               ? "text-secondary-100 group-hover:text-primary-400"
               : "text-secondary-800 group-hover:text-primary-600",
@@ -169,12 +169,12 @@ export default function ProductCard({
 
         {/* Star rating */}
         {product.totalReviews != null && product.totalReviews > 0 && (
-          <div className="mt-1 flex items-center gap-1">
+          <div className="mt-1.5 flex items-center gap-1">
             <div className="flex items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
-                  className="h-3 w-3"
+                  className="h-3.5 w-3.5"
                   viewBox="0 0 20 20"
                   fill="none"
                 >
@@ -194,7 +194,7 @@ export default function ProductCard({
             </div>
             <span
               className={cn(
-                "text-[10px]",
+                "text-xs",
                 isDark ? "text-secondary-500" : "text-secondary-400",
               )}
             >
@@ -204,10 +204,10 @@ export default function ProductCard({
         )}
 
         {/* Price row */}
-        <div className="mt-1.5 flex flex-wrap items-baseline gap-1.5">
+        <div className="mt-2 flex flex-wrap items-baseline gap-1.5">
           <p
             className={cn(
-              "text-sm font-bold sm:text-base",
+              "text-base font-bold sm:text-lg",
               isDark ? "text-primary-500" : "text-secondary-900",
             )}
           >
@@ -216,14 +216,14 @@ export default function ProductCard({
           {product.msrp != null &&
             product.price != null &&
             product.msrp > product.price && (
-              <p className="text-secondary-400 text-xs line-through">
+              <p className="text-secondary-400 text-sm line-through">
                 {formatCentsToDollars(product.msrp)}
               </p>
             )}
         </div>
 
         {/* Stock badge */}
-        <div className="mt-1.5">
+        <div className="mt-2">
           <StockBadge inStock={product.inStock} />
         </div>
 

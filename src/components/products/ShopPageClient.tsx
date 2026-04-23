@@ -92,7 +92,7 @@ export default function ShopPageClient({
         {/* Desktop filter toggle */}
         <button
           onClick={() => setFiltersVisible((v) => !v)}
-          className="bg-secondary-50 border-secondary-200 text-secondary-600 hover:bg-secondary-100 hidden cursor-pointer items-center gap-3 rounded-full border px-4 py-3 font-mono text-xs tracking-wider uppercase transition-colors duration-200 lg:flex"
+          className="bg-secondary-50 border-secondary-200 text-secondary-600 hover:bg-secondary-100 hidden cursor-pointer items-center gap-3 rounded-full border px-5 py-3 font-mono text-sm tracking-wider uppercase transition-colors duration-200 lg:flex"
         >
           {filterIcon}
           {filtersVisible ? "Hide Filters" : "Show Filters"}
@@ -131,12 +131,12 @@ export default function ShopPageClient({
         <div
           className="hidden flex-shrink-0 overflow-hidden transition-[width,margin] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] lg:block"
           style={{
-            width: filtersVisible ? "16rem" : "0px",
+            width: filtersVisible ? "18rem" : "0px",
             marginRight: filtersVisible ? "2rem" : "0px",
           }}
         >
           <div
-            className="w-64 transition-opacity duration-300"
+            className="w-72 transition-opacity duration-300"
             style={{ opacity: filtersVisible ? 1 : 0 }}
           >
             <FiltersWrapper
@@ -151,7 +151,7 @@ export default function ShopPageClient({
         <div className="min-w-0 flex-1">
           {/* Count + sort — desktop only */}
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-secondary-500 text-sm">
+            <p className="text-secondary-500 text-base">
               Showing {(page - 1) * pageSize + 1}–
               {Math.min(page * pageSize, totalCount)} of {totalCount} results
             </p>

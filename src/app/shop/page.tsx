@@ -8,6 +8,7 @@ import {
 } from "~/lib/data";
 import { convertDollarsToCents, getPaginationRange } from "~/lib/utils";
 import ShopPageClient from "~/components/products/ShopPageClient";
+import ShopHero from "~/components/shop/ShopHero";
 import Breadcrumbs from "~/components/common/Breadcrumbs";
 import Link from "next/link";
 
@@ -87,99 +88,131 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const { products, totalCount, totalPages } = result;
   const paginationRange = getPaginationRange(page, totalPages);
 
+  // Hero shows when the user is browsing the full catalog (page 1, no
+  // narrowing filters applied). Sort changes keep the hero — they reorder
+  // results without narrowing them. Pagination hides it so users on page 2+
+  // don't get bumped back to the top.
+  const isPristine =
+    !params.category &&
+    !params.minPrice &&
+    !params.maxPrice &&
+    !params.inStock &&
+    page === 1;
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Page heading */}
-      <div className="border-secondary-100 mb-10 border-b pb-8">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="bg-primary-500 h-px w-8" />
-          <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.35em] uppercase">
-            All Products
-          </span>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="font-display text-secondary-900 text-3xl font-bold tracking-tight sm:text-4xl">
-              Shop
-            </h1>
-            <Breadcrumbs
-              items={[{ label: "Home", href: "/" }, { label: "Shop" }]}
-              className="mt-2"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Shop content */}
-      <ShopPageClient
-        products={products}
-        totalCount={totalCount}
-        page={page}
-        pageSize={pageSize}
-        categories={categoryTree}
-        priceRange={{
-          min: Math.round(priceRange.min / 100),
-          max: Math.round(priceRange.max / 100),
-        }}
-      />
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <nav aria-label="Pagination" className="mt-12 flex justify-center">
-          <div className="flex items-center gap-1.5">
-            {/* Previous */}
-            {page > 1 && (
-              <PaginationLink page={page - 1} params={params} label="Previous">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </PaginationLink>
-            )}
-
-            {/* Page numbers */}
-            {paginationRange.map((pageNum) => (
-              <PaginationLink
-                key={pageNum}
-                page={pageNum}
-                params={params}
-                isActive={pageNum === page}
-                label={`Page ${pageNum}`}
-              >
-                {pageNum}
-              </PaginationLink>
-            ))}
-
-            {/* Next */}
-            {page < totalPages && (
-              <PaginationLink page={page + 1} params={params} label="Next">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </PaginationLink>
-            )}
-          </div>
-        </nav>
+    <div>
+      {isPristine && (
+        <ShopHero
+          categories={categoryTree}
+          totalProductCount={totalCount}
+        />
       )}
+
+      <div className="container mx-auto px-4 py-8" id="products">
+        {!isPristine && (
+          <div className="border-secondary-100 mb-10 border-b pb-8">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="bg-primary-500 h-px w-8" />
+              <span className="text-secondary-400 font-mono text-[0.6rem] tracking-[0.35em] uppercase">
+                All Products
+              </span>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h1 className="font-display text-secondary-900 text-3xl font-bold tracking-tight sm:text-4xl">
+                  Shop
+                </h1>
+                <Breadcrumbs
+                  items={[{ label: "Home", href: "/" }, { label: "Shop" }]}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isPristine && (
+          <Breadcrumbs
+            items={[{ label: "Home", href: "/" }, { label: "Shop" }]}
+            className="mb-6"
+          />
+        )}
+
+        {/* Shop content */}
+        <ShopPageClient
+          products={products}
+          totalCount={totalCount}
+          page={page}
+          pageSize={pageSize}
+          categories={categoryTree}
+          priceRange={{
+            min: Math.round(priceRange.min / 100),
+            max: Math.round(priceRange.max / 100),
+          }}
+        />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav aria-label="Pagination" className="mt-12 flex justify-center">
+            <div className="flex items-center gap-1.5">
+              {/* Previous */}
+              {page > 1 && (
+                <PaginationLink
+                  page={page - 1}
+                  params={params}
+                  label="Previous"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </PaginationLink>
+              )}
+
+              {/* Page numbers */}
+              {paginationRange.map((pageNum) => (
+                <PaginationLink
+                  key={pageNum}
+                  page={pageNum}
+                  params={params}
+                  isActive={pageNum === page}
+                  label={`Page ${pageNum}`}
+                >
+                  {pageNum}
+                </PaginationLink>
+              ))}
+
+              {/* Next */}
+              {page < totalPages && (
+                <PaginationLink page={page + 1} params={params} label="Next">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </PaginationLink>
+              )}
+            </div>
+          </nav>
+        )}
+      </div>
     </div>
   );
 }

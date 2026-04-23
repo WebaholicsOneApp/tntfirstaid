@@ -73,7 +73,7 @@ function CategoryItem({
             onNavigate(`/shop/${slug}`);
           }}
           className={cn(
-            "flex-1 py-1 text-sm transition-colors",
+            "flex-1 py-1.5 text-base transition-colors",
             isActive
               ? "text-primary-600 font-semibold"
               : "text-secondary-600 hover:text-primary-600",
@@ -82,7 +82,7 @@ function CategoryItem({
         >
           {category.categoryName}
           {category.productCount != null && (
-            <span className="text-secondary-300 ml-1 text-xs">
+            <span className="text-secondary-300 ml-1 text-sm">
               ({category.productCount})
             </span>
           )}
@@ -197,7 +197,7 @@ export default function ProductFilters({
     <aside className={cn("space-y-7", className)}>
       {/* Categories */}
       <div>
-        <h3 className="text-secondary-400 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-[10px] font-semibold tracking-widest uppercase">
+        <h3 className="text-secondary-500 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-xs font-semibold tracking-widest uppercase">
           <span className="bg-primary-500 inline-block h-px w-3" />
           Categories
         </h3>
@@ -210,7 +210,7 @@ export default function ProductFilters({
                 handleCategoryNavigate("/shop");
               }}
               className={cn(
-                "ml-5 block py-1 text-sm transition-colors",
+                "ml-5 block py-1.5 text-base transition-colors",
                 !currentCategorySlug
                   ? "text-primary-600 font-semibold"
                   : "text-secondary-500 hover:text-primary-600",
@@ -233,13 +233,13 @@ export default function ProductFilters({
 
       {/* Price Range */}
       <div>
-        <h3 className="text-secondary-400 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-[10px] font-semibold tracking-widest uppercase">
+        <h3 className="text-secondary-500 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-xs font-semibold tracking-widest uppercase">
           <span className="bg-primary-500 inline-block h-px w-3" />
           Price Range
         </h3>
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <span className="text-secondary-400 absolute top-1/2 left-3 -translate-y-1/2 text-sm">
+            <span className="text-secondary-400 absolute top-1/2 left-3 -translate-y-1/2 text-base">
               $
             </span>
             <input
@@ -248,12 +248,12 @@ export default function ProductFilters({
               placeholder="Min"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              className="border-secondary-200 focus:ring-primary-300 focus:border-primary-300 w-full [appearance:textfield] rounded-full border py-2 pr-2 pl-7 text-sm focus:ring-1 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="border-secondary-200 focus:ring-primary-300 focus:border-primary-300 w-full [appearance:textfield] rounded-full border py-2.5 pr-2 pl-7 text-base focus:ring-1 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
-          <span className="text-secondary-300 text-sm">–</span>
+          <span className="text-secondary-300 text-base">–</span>
           <div className="relative flex-1">
-            <span className="text-secondary-400 absolute top-1/2 left-3 -translate-y-1/2 text-sm">
+            <span className="text-secondary-400 absolute top-1/2 left-3 -translate-y-1/2 text-base">
               $
             </span>
             <input
@@ -262,14 +262,14 @@ export default function ProductFilters({
               placeholder="Max"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              className="border-secondary-200 focus:ring-primary-300 focus:border-primary-300 w-full [appearance:textfield] rounded-full border py-2 pr-2 pl-7 text-sm focus:ring-1 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              className="border-secondary-200 focus:ring-primary-300 focus:border-primary-300 w-full [appearance:textfield] rounded-full border py-2.5 pr-2 pl-7 text-base focus:ring-1 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
           </div>
         </div>
         <button
           onClick={applyFilters}
           disabled={isPending}
-          className="bg-primary-500 text-secondary-900 hover:bg-primary-400 mt-2 flex w-full items-center justify-center gap-2 rounded-full py-2 font-mono text-sm font-medium tracking-wide transition-colors disabled:opacity-70"
+          className="bg-primary-500 text-secondary-900 hover:bg-primary-400 mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 font-mono text-base font-medium tracking-wide transition-colors disabled:opacity-70"
         >
           {isPending && <Spinner />}
           {isPending ? "Applying…" : "Apply Price"}
@@ -278,7 +278,7 @@ export default function ProductFilters({
 
       {/* In Stock Toggle */}
       <div>
-        <h3 className="text-secondary-400 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-[10px] font-semibold tracking-widest uppercase">
+        <h3 className="text-secondary-500 border-secondary-100 mb-3 flex items-center gap-2 border-b pb-2 font-mono text-xs font-semibold tracking-widest uppercase">
           <span className="bg-primary-500 inline-block h-px w-3" />
           Availability
         </h3>
@@ -293,9 +293,9 @@ export default function ProductFilters({
             checked={inStock}
             onChange={handleInStockToggle}
             disabled={isPending}
-            className="border-secondary-300 text-primary-500 focus:ring-primary-300 h-4 w-4 rounded"
+            className="border-secondary-300 text-primary-500 focus:ring-primary-300 h-5 w-5 rounded"
           />
-          <span className="text-secondary-600 text-sm">In Stock Only</span>
+          <span className="text-secondary-600 text-base">In Stock Only</span>
         </label>
       </div>
 
@@ -304,7 +304,7 @@ export default function ProductFilters({
         <button
           onClick={resetFilters}
           disabled={isPending}
-          className="border-secondary-200 text-secondary-600 hover:bg-secondary-50 flex w-full items-center justify-center gap-2 rounded-full border py-2 text-sm transition-colors disabled:opacity-70"
+          className="border-secondary-200 text-secondary-600 hover:bg-secondary-50 flex w-full items-center justify-center gap-2 rounded-full border py-2.5 text-base transition-colors disabled:opacity-70"
         >
           {isPending && <Spinner />}
           Reset Filters

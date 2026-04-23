@@ -98,18 +98,18 @@ export default function ProductDetailClient({
       <div className="space-y-6">
         {/* Category */}
         {product.categoryName && (
-          <p className="text-primary-600 text-xs font-semibold tracking-wider uppercase">
+          <p className="text-primary-600 text-sm font-semibold tracking-wider uppercase">
             {product.categoryName}
           </p>
         )}
 
         {/* Product name + SKU */}
-        <div className="space-y-1">
-          <h1 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl">
+        <div className="space-y-2">
+          <h1 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl">
             {product.name}
           </h1>
           {selectedVariation?.manufacturerNo && (
-            <p className="inline-flex items-center gap-1.5 text-xs">
+            <p className="inline-flex items-center gap-1.5 text-sm">
               <span className="text-secondary-400 tracking-wider uppercase">
                 SKU
               </span>
@@ -132,7 +132,7 @@ export default function ProductDetailClient({
             className="flex items-center gap-2 transition-opacity hover:opacity-80"
           >
             <StarRating rating={reviewAggregate.averageRating} />
-            <span className="text-secondary-500 text-sm">
+            <span className="text-secondary-500 text-base">
               {reviewAggregate.averageRating.toFixed(1)} (
               {reviewAggregate.totalReviews} review
               {reviewAggregate.totalReviews !== 1 ? "s" : ""})
@@ -142,13 +142,13 @@ export default function ProductDetailClient({
 
         {/* Price */}
         <div className="flex items-baseline gap-3">
-          <span className="text-secondary-900 text-2xl font-bold">
+          <span className="text-secondary-900 text-3xl font-bold">
             {showRange
               ? `${formatCentsToDollars(priceRange.min)} – ${formatCentsToDollars(priceRange.max)}`
               : formatCentsToDollars(displayPrice)}
           </span>
           {!showRange && isOnSale && (
-            <span className="text-secondary-400 text-lg line-through">
+            <span className="text-secondary-400 text-xl line-through">
               {formatCentsToDollars(displayMsrp)}
             </span>
           )}
@@ -200,7 +200,7 @@ export default function ProductDetailClient({
 
         {/* Tags */}
         {product.keywords && (
-          <div className="text-secondary-500 text-sm">
+          <div className="text-secondary-500 text-base">
             <p>
               <span className="text-secondary-700 font-medium">Tags:</span>{" "}
               {product.keywords
@@ -214,14 +214,14 @@ export default function ProductDetailClient({
 
         {/* Feature bullet points (non-spec items only — specs go in Specifications tab) */}
         {features.length > 0 && (
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {features.map((point, i) => (
               <li
                 key={i}
-                className="text-secondary-600 flex items-start gap-2 text-sm"
+                className="text-secondary-600 flex items-start gap-2.5 text-base"
               >
                 <svg
-                  className="text-primary-500 mt-0.5 h-4 w-4 flex-shrink-0"
+                  className="text-primary-500 mt-1 h-5 w-5 flex-shrink-0"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -243,7 +243,7 @@ export default function ProductDetailClient({
             <button
               onClick={() => setActiveTab("description")}
               className={cn(
-                "-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors duration-75 active:scale-95",
+                "-mb-px border-b-2 px-5 py-3 text-base font-medium transition-colors duration-75 active:scale-95",
                 activeTab === "description"
                   ? "border-primary-500 text-primary-700"
                   : "text-secondary-500 hover:text-secondary-700 border-transparent",
@@ -254,7 +254,7 @@ export default function ProductDetailClient({
             <button
               onClick={() => setActiveTab("specifications")}
               className={cn(
-                "-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors duration-75 active:scale-95",
+                "-mb-px border-b-2 px-5 py-3 text-base font-medium transition-colors duration-75 active:scale-95",
                 activeTab === "specifications"
                   ? "border-primary-500 text-primary-700"
                   : "text-secondary-500 hover:text-secondary-700 border-transparent",
@@ -268,11 +268,11 @@ export default function ProductDetailClient({
             {activeTab === "description" &&
               (sanitizedDescription ? (
                 <div
-                  className="product-description prose prose-sm max-w-none"
+                  className="product-description prose prose-base max-w-none"
                   dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                 />
               ) : (
-                <p className="text-secondary-400 text-sm italic">
+                <p className="text-secondary-400 text-base italic">
                   No description available.
                 </p>
               ))}
@@ -319,7 +319,7 @@ export default function ProductDetailClient({
                 {specs.length === 0 &&
                   !product.categoryName &&
                   !selectedVariation && (
-                    <p className="text-secondary-400 text-sm italic">
+                    <p className="text-secondary-400 text-base italic">
                       No specifications available.
                     </p>
                   )}
@@ -363,11 +363,11 @@ export default function ProductDetailClient({
 
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-secondary-50 flex border-b pb-2">
-      <span className="text-secondary-500 w-36 flex-shrink-0 text-sm font-medium">
+    <div className="border-secondary-50 flex border-b pb-2.5">
+      <span className="text-secondary-500 w-40 flex-shrink-0 text-base font-medium">
         {label}
       </span>
-      <span className="text-secondary-800 text-sm">{value}</span>
+      <span className="text-secondary-800 text-base">{value}</span>
     </div>
   );
 }

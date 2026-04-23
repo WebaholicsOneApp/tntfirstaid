@@ -8,6 +8,11 @@
  */
 import { getApiClient } from "./api-client";
 import { getDownloadUrl, isKnownDownloadable } from "./downloads";
+import {
+  DEMO_CATEGORY_TREE,
+  DEMO_PRODUCT_LIST_ITEMS,
+  getDemoProductBySlug,
+} from "./demo-products";
 import type {
   ProductListItem,
   ProductDetail,
@@ -356,14 +361,15 @@ export async function getCategoryTreeForStorefront(): Promise<
       const api = getApiClient();
       const resp = await api.getCategoryTree<{ categories: any[] }>();
       const tree = (resp?.categories || []).map(toCategoryWithChildren);
-      setCache(cacheKey, tree);
-      return tree;
+      const result = tree.length > 0 ? tree : DEMO_CATEGORY_TREE;
+      setCache(cacheKey, result);
+      return result;
     } catch (err) {
       console.error(
         "[getCategoryTreeForStorefront] API call failed:",
         err instanceof Error ? err.message : err,
       );
-      return [];
+      return DEMO_CATEGORY_TREE;
     }
   });
 }
@@ -567,7 +573,10 @@ export async function getPriceRange(
         minPrice: number;
         maxPrice: number;
       }>(params);
-      const result = { min: data.minPrice ?? 0, max: data.maxPrice ?? 10000 };
+      const min = data.minPrice ?? 0;
+      const max = data.maxPrice ?? 0;
+      const result =
+        max > 0 ? { min, max } : demoPriceRangeFallback();
       setCache(cacheKey, result);
       return result;
     } catch (err) {
@@ -575,11 +584,19 @@ export async function getPriceRange(
         "[getPriceRange] API call failed:",
         err instanceof Error ? err.message : err,
       );
-      const fallback = { min: 0, max: 10000 };
+      const fallback = demoPriceRangeFallback();
       setCache(cacheKey, fallback);
       return fallback;
     }
   });
+}
+
+function demoPriceRangeFallback(): { min: number; max: number } {
+  const prices = DEMO_PRODUCT_LIST_ITEMS.map((p) => p.price ?? 0).filter(
+    (p) => p > 0,
+  );
+  if (prices.length === 0) return { min: 0, max: 10000 };
+  return { min: Math.min(...prices), max: Math.max(...prices) };
 }
 
 /**
@@ -641,18 +658,52 @@ export async function getProducts(
     }>(params);
 
     const products = (data.data || []).map(toProductListItem);
-    return {
-      products,
-      totalCount: data.pagination?.total ?? products.length,
-      totalPages: data.pagination?.totalPages ?? 1,
-    };
+    if (products.length > 0) {
+      return {
+        products,
+        totalCount: data.pagination?.total ?? products.length,
+        totalPages: data.pagination?.totalPages ?? 1,
+      };
+    }
+    return demoProductsFallback(filters, page, pageSize);
   } catch (err) {
     console.error(
       "[getProducts] API call failed:",
       err instanceof Error ? err.message : err,
     );
-    return { products: [], totalCount: 0, totalPages: 0 };
+    return demoProductsFallback(filters, page, pageSize);
   }
+}
+
+// Serve mock products when the API returns nothing — lets the shop layout
+// stay populated while the OneApp API has placeholder credentials.
+function demoProductsFallback(
+  filters: GetProductsFilters,
+  page: number,
+  pageSize: number,
+): { products: ProductListItem[]; totalCount: number; totalPages: number } {
+  const hasFilters =
+    !!filters.categoryId ||
+    !!filters.categoryIds?.length ||
+    !!filters.brandId ||
+    !!filters.brandIds?.length ||
+    !!filters.search ||
+    filters.minPrice != null ||
+    filters.maxPrice != null ||
+    !!filters.inStock ||
+    !!filters.onSale ||
+    !!filters.packAvailable ||
+    !!filters.productIds?.length;
+  if (hasFilters) return { products: [], totalCount: 0, totalPages: 0 };
+
+  const all = DEMO_PRODUCT_LIST_ITEMS;
+  const start = (page - 1) * pageSize;
+  const products = all.slice(start, start + pageSize);
+  return {
+    products,
+    totalCount: all.length,
+    totalPages: Math.max(1, Math.ceil(all.length / pageSize)),
+  };
 }
 
 /**
@@ -797,6 +848,11 @@ export async function getProductDetailBySlug(
       const response = await api.getProductBySlug<any>(slug);
       const data = response?.product ?? response;
       if (!data) {
+        const demo = getDemoProductBySlug(slug);
+        if (demo) {
+          setCache(cacheKey, demo);
+          return demo;
+        }
         setCache(missCacheKey, true);
         return null;
       }
@@ -820,6 +876,11 @@ export async function getProductDetailBySlug(
 
       // If no variations with valid prices, product cannot be displayed
       if (detail.variations.length === 0) {
+        const demo = getDemoProductBySlug(slug);
+        if (demo) {
+          setCache(cacheKey, demo);
+          return demo;
+        }
         setCache(missCacheKey, true);
         return null;
       }
@@ -827,6 +888,11 @@ export async function getProductDetailBySlug(
       setCache(cacheKey, detail);
       return detail;
     } catch {
+      const demo = getDemoProductBySlug(slug);
+      if (demo) {
+        setCache(cacheKey, demo);
+        return demo;
+      }
       setCache(missCacheKey, true);
       return null;
     }

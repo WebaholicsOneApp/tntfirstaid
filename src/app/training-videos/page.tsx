@@ -117,6 +117,11 @@ const videos: Video[] = [
     aslYoutubeId: "jR1nIZfVSY4",
   },
   {
+    title: "How To Treat A Carotid Artery Laceration With NU STAT",
+    category: "Bleeding Control",
+    youtubeId: "MXJNkjylFT0",
+  },
+  {
     title: "How To Treat A Head Wound With Wound Seal Powder",
     category: "Wounds & Lacerations",
     youtubeId: "1O7ikklV96U",
@@ -209,11 +214,6 @@ const videos: Video[] = [
     title: "How To Treat A Chest Wound With Non-Vented Chest Seal",
     category: "Chest Wounds",
     youtubeId: "O4FACKTM5V8",
-  },
-  {
-    title: "How To Treat A Carotid Artery Laceration With NU STAT",
-    category: "Bleeding Control",
-    youtubeId: "MXJNkjylFT0",
   },
 ];
 
@@ -380,7 +380,7 @@ export default async function TrainingVideosPage() {
                 Training Videos
               </h2>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:[&>article:last-child:nth-child(3n-2)]:col-start-2">
               {videos.map((video) => (
                 <VideoCard
                   key={video.youtubeId}
