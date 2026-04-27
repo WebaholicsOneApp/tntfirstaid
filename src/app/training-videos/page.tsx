@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LiteYouTube } from "~/components/ui/LiteYouTube";
 import { getStoreConfig } from "~/lib/store-config.server";
+import { VideoBrowser } from "./VideoBrowser";
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
@@ -227,13 +228,11 @@ const aslHelpTerms: { title: string; youtubeId: string }[] = [
   },
 ];
 
-function VideoCard({
+function HelpTermCard({
   title,
-  category,
   youtubeId,
 }: {
   title: string;
-  category: string;
   youtubeId: string;
 }) {
   return (
@@ -244,7 +243,7 @@ function VideoCard({
       <div className="p-6">
         <div className="mb-3">
           <span className="text-primary-600 bg-primary-500/10 rounded-full px-3 py-1 text-[0.55rem] font-bold tracking-[0.2em] uppercase">
-            {category}
+            Help Terms
           </span>
         </div>
         <h3 className="font-display text-secondary-900 group-hover:text-primary-600 text-lg font-bold transition-colors">
@@ -256,7 +255,13 @@ function VideoCard({
 }
 
 export default async function TrainingVideosPage() {
-  const aslTranslations = videos.filter((v) => v.aslYoutubeId);
+  const aslTranslations = videos
+    .filter((v) => v.aslYoutubeId)
+    .map((v) => ({
+      title: v.title,
+      category: v.category,
+      youtubeId: v.aslYoutubeId!,
+    }));
 
   return (
     <div className="min-h-screen bg-white">
@@ -380,16 +385,7 @@ export default async function TrainingVideosPage() {
                 Training Videos
               </h2>
             </div>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:[&>article:last-child:nth-child(3n-2)]:col-start-2">
-              {videos.map((video) => (
-                <VideoCard
-                  key={video.youtubeId}
-                  title={video.title}
-                  category={video.category}
-                  youtubeId={video.youtubeId}
-                />
-              ))}
-            </div>
+            <VideoBrowser videos={videos} idPrefix="videos" />
           </section>
 
           <section id="asl" className="mt-24 scroll-mt-24">
@@ -412,10 +408,9 @@ export default async function TrainingVideosPage() {
             </h3>
             <div className="mb-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {aslHelpTerms.map((term) => (
-                <VideoCard
+                <HelpTermCard
                   key={term.youtubeId}
                   title={term.title}
-                  category="Help Terms"
                   youtubeId={term.youtubeId}
                 />
               ))}
@@ -424,16 +419,11 @@ export default async function TrainingVideosPage() {
             <h3 className="font-display text-secondary-900 mb-6 text-lg font-bold">
               Treatment Videos
             </h3>
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {aslTranslations.map((video) => (
-                <VideoCard
-                  key={video.aslYoutubeId}
-                  title={video.title}
-                  category={video.category}
-                  youtubeId={video.aslYoutubeId!}
-                />
-              ))}
-            </div>
+            <VideoBrowser
+              videos={aslTranslations}
+              idPrefix="asl-videos"
+              searchPlaceholder="Search ASL videos by title or category…"
+            />
           </section>
         </div>
       </main>
