@@ -2,21 +2,39 @@ import Link from "next/link";
 import Image from "next/image";
 import type { CategoryWithChildren } from "~/types";
 
+// Order matters — first match wins. Put more-specific keywords before generic ones.
 const CATEGORY_IMAGE_MAP: { keyword: string; src: string }[] = [
+  { keyword: "gauze", src: "/images/hero/hero-bandage.jpg" },
+  { keyword: "bandage", src: "/images/hero/hero-bandage.jpg" },
+  { keyword: "dressing", src: "/images/hero/hero-bandage.jpg" },
   { keyword: "bleeding", src: "/images/hero/hero-bandage.jpg" },
+  { keyword: "advanced", src: "/images/hero/kit-contents.png" },
   { keyword: "training", src: "/images/hero/hero-cpr-training.jpg" },
-  { keyword: "trauma", src: "/images/hero/kit-contents.png" },
   { keyword: "cpr", src: "/images/hero/cpr-mask-kit.png" },
+  { keyword: "trauma", src: "/images/hero/kit-packed.png" },
+  { keyword: "ifak", src: "/images/hero/kit-packed.png" },
+  { keyword: "hsa", src: "/images/hero/hero-first-aid-group.jpg" },
+  { keyword: "fsa", src: "/images/hero/hero-first-aid-group.jpg" },
+  { keyword: "eligible", src: "/images/hero/hero-first-aid-group.jpg" },
   { keyword: "first aid", src: "/images/hero/kit-red-bag.png" },
+  { keyword: "kit", src: "/images/hero/kit-full-spread.png" },
 ];
-const DEFAULT_TILE_IMAGE = "/images/hero/kit-full-spread.png";
+const FALLBACK_IMAGES = [
+  "/images/hero/kit-full-spread.png",
+  "/images/hero/kit-red-bag.png",
+  "/images/hero/kit-contents.png",
+  "/images/hero/kit-packed.png",
+];
 
-function pickImage(name: string): string {
-  const lower = name.toLowerCase();
+function pickImage(name: string, index: number): string {
+  // Normalize: lowercase, replace hyphens/underscores with spaces so
+  // "First-Aid" matches the "first aid" keyword.
+  const lower = name.toLowerCase().replace(/[-_]/g, " ");
   for (const { keyword, src } of CATEGORY_IMAGE_MAP) {
     if (lower.includes(keyword)) return src;
   }
-  return DEFAULT_TILE_IMAGE;
+  // Stable per-tile fallback so adjacent unmatched tiles don't render the same image.
+  return FALLBACK_IMAGES[index % FALLBACK_IMAGES.length]!;
 }
 
 function slugify(text: string): string {
@@ -86,7 +104,7 @@ export default function ShopHero({
       </div>
 
 
-      <div className="relative z-10 container mx-auto max-w-6xl px-4 pt-16 pb-12 md:pt-24 md:pb-16">
+      <div className="relative z-10 container mx-auto max-w-6xl px-4 pt-10 pb-8 md:pt-14 md:pb-10">
         <div className="max-w-2xl">
           <div className="mb-5 flex items-center gap-3">
             <div className="bg-primary-500 h-px w-6" />
@@ -94,7 +112,7 @@ export default function ShopHero({
               Our Catalog &middot; {totalProductCount} Products
             </span>
           </div>
-          <h1 className="font-display mb-5 text-4xl leading-[1.05] font-bold text-white md:text-6xl">
+          <h1 className="font-display mb-5 text-3xl leading-[1.1] font-bold text-white md:text-5xl">
             Built for the worst day{" "}
             <span className="text-primary-400">on the job.</span>
           </h1>
@@ -130,9 +148,9 @@ export default function ShopHero({
             </span>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((cat) => {
+            {featured.map((cat, idx) => {
               const slug = slugify(cat.categoryName);
-              const img = pickImage(cat.categoryName);
+              const img = pickImage(cat.categoryName, idx);
               return (
                 <Link
                   key={cat.id}

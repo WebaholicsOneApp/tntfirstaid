@@ -4,17 +4,17 @@ const STROKE = "#C8102E";
 
 export default function FeatureIconsSection() {
   return (
-    <section className="relative overflow-hidden bg-white pb-20 sm:pb-28">
+    <section className="relative overflow-hidden bg-white pb-12 sm:pb-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-14 md:mb-18">
+        <div className="mb-10 md:mb-12">
           <div className="mb-4 flex items-center gap-3">
             <div className="bg-primary-500 h-px w-6" />
             <span className="text-primary-600 text-sm font-semibold tracking-wide uppercase">
               Why TNT First Aid
             </span>
           </div>
-          <h2 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">
+          <h2 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
             Ready When It Matters Most
           </h2>
         </div>
@@ -23,7 +23,7 @@ export default function FeatureIconsSection() {
 
         <div className="divide-secondary-100 grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
           {/* Training */}
-          <div className="flex flex-col items-center px-10 py-14 text-center">
+          <div className="flex flex-col items-center px-8 py-10 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Medical cross with pulse */}
               <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
@@ -58,7 +58,7 @@ export default function FeatureIconsSection() {
           </div>
 
           {/* Quality */}
-          <div className="flex flex-col items-center px-10 py-14 text-center">
+          <div className="flex flex-col items-center px-8 py-10 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Shield with check */}
               <svg width="52" height="56" viewBox="0 0 52 56" fill="none">
@@ -93,7 +93,7 @@ export default function FeatureIconsSection() {
           </div>
 
           {/* Support */}
-          <div className="flex flex-col items-center px-10 py-14 text-center">
+          <div className="flex flex-col items-center px-8 py-10 text-center">
             <div className="mb-6 flex h-16 items-center justify-center">
               {/* Heart with pulse line */}
               <svg width="64" height="52" viewBox="0 0 64 52" fill="none">

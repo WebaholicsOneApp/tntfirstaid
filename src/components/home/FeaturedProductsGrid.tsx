@@ -66,7 +66,7 @@ export default function FeaturedProductsGrid({ products }: Props) {
   const featured = products.slice(0, 4);
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-28">
+    <section className="relative overflow-hidden bg-white py-12 sm:py-16">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section header */}
         <div className="mb-10 flex items-end justify-between gap-6">
@@ -77,7 +77,7 @@ export default function FeaturedProductsGrid({ products }: Props) {
                 Featured
               </span>
             </div>
-            <h2 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">
+            <h2 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
               First Aid Essentials
             </h2>
           </div>

@@ -190,10 +190,10 @@ export default function ReviewsSection({
               <div className="border-secondary-100 rounded-2xl border bg-white p-5">
                 <div className="flex flex-col items-center text-center">
                   <div className="mb-2">
-                    <span className="text-secondary-900 text-5xl font-bold tracking-tighter">
+                    <span className="text-secondary-900 text-4xl font-bold tracking-tighter">
                       {Number(aggregate.averageRating).toFixed(1)}
                     </span>
-                    <span className="text-secondary-300 ml-0.5 text-xl">
+                    <span className="text-secondary-300 ml-0.5 text-lg">
                       /5
                     </span>
                   </div>

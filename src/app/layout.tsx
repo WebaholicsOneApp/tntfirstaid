@@ -1,8 +1,14 @@
 import "~/app/globals.css";
 
-import { type Metadata } from "next";
+import { type Metadata, type Viewport } from "next";
 
 export const revalidate = 300;
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 import {
   Playfair_Display,
   Inter,

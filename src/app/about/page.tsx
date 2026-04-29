@@ -64,6 +64,14 @@ const values = [
 const FOUNDING_YEAR = 2011;
 const TIMELINE_YEARS = [2011, 2014, 2017, 2020, 2023, 2026];
 
+// Sweep window is 6%→86% of the 24s loop = 1.44s to 20.64s. With linear easing,
+// the dot's position varies linearly with time, so each marker's blip delay is
+// just its position fraction along the sweep window.
+function ekgSpikeDelaySeconds(markerIndex: number, lastIndex: number): number {
+  const p = lastIndex === 0 ? 0 : markerIndex / lastIndex;
+  return 1.44 + p * 19.2;
+}
+
 const DRIFTING_CROSSES: Array<{
   x: number;
   size: number;
@@ -185,10 +193,13 @@ export default async function AboutPage() {
             />
             {/* Year tick marks + labels */}
             {TIMELINE_YEARS.map((year, i) => {
-              const pct = (i / (TIMELINE_YEARS.length - 1)) * 100;
-              const isEndpoint = i === 0 || i === TIMELINE_YEARS.length - 1;
+              const lastIdx = TIMELINE_YEARS.length - 1;
+              const pct = (i / lastIdx) * 100;
+              const isEndpoint = i === 0 || i === lastIdx;
+              const blipDelay = ekgSpikeDelaySeconds(i, lastIdx);
               return (
                 <div key={year}>
+                  {/* Static year dot on the line */}
                   <div
                     className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${isEndpoint ? "bg-primary-400 h-3 w-3 ring-2 ring-white/20" : "h-2 w-2 bg-white/60"}`}
                     style={{
@@ -198,11 +209,46 @@ export default async function AboutPage() {
                         : undefined,
                     }}
                   />
+                  {/* EKG spike — QRS + T waveform that shoots up when the sweeping dot crosses */}
                   <div
-                    className={`absolute bottom-0 -translate-x-1/2 font-mono tracking-[0.2em] whitespace-nowrap ${isEndpoint ? "text-primary-200 text-[0.75rem] font-bold" : "text-[0.7rem] text-white/55"}`}
+                    aria-hidden
+                    className="pointer-events-none absolute bottom-1/2 -translate-x-1/2"
                     style={{ left: `${pct}%` }}
                   >
-                    {year}
+                    <div
+                      className="animate-ekg-spike"
+                      style={{ animationDelay: `${blipDelay}s` }}
+                    >
+                      <svg
+                        viewBox="0 0 56 44"
+                        className="block h-11 w-14 overflow-visible"
+                      >
+                        <path
+                          d="M 0,38 L 9,38 L 12,40 L 15,4 L 18,46 L 21,36 L 26,38 L 31,22 L 36,38 L 56,38"
+                          stroke="rgb(227,24,55)"
+                          strokeWidth="2.25"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          fill="none"
+                          style={{
+                            filter:
+                              "drop-shadow(0 0 6px rgba(227,24,55,0.9)) drop-shadow(0 0 14px rgba(227,24,55,0.45))",
+                          }}
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  {/* Year label — flashes when its marker is crossed */}
+                  <div
+                    className="absolute bottom-0 -translate-x-1/2"
+                    style={{ left: `${pct}%` }}
+                  >
+                    <span
+                      className={`animate-label-flash font-mono tracking-[0.2em] whitespace-nowrap ${isEndpoint ? "text-primary-200 text-[0.75rem] font-bold" : "text-[0.7rem] text-white/55"}`}
+                      style={{ animationDelay: `${blipDelay}s` }}
+                    >
+                      {year}
+                    </span>
                   </div>
                 </div>
               );
@@ -219,7 +265,7 @@ export default async function AboutPage() {
             </div>
           </div>
         </div>
-        <div className="relative z-10 container mx-auto px-4 py-14 md:py-20">
+        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="max-w-xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6" />
@@ -227,7 +273,7 @@ export default async function AboutPage() {
                 Our Story
               </span>
             </div>
-            <h1 className="font-display mb-4 text-4xl font-bold text-white md:text-5xl">
+            <h1 className="font-display mb-4 text-3xl font-bold text-white md:text-4xl">
               About {storeConfig.siteName}
             </h1>
             <p className="max-w-lg text-sm leading-relaxed text-white/70">
@@ -241,7 +287,7 @@ export default async function AboutPage() {
 
       <main>
         {/* Who We Are */}
-        <section className="py-20 md:py-28">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-3xl">
               <div className="mb-3 flex items-center gap-3">
@@ -278,7 +324,7 @@ export default async function AboutPage() {
         </section>
 
         {/* What We Do */}
-        <section className="bg-secondary-50 py-20 md:py-28">
+        <section className="bg-secondary-50 py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-6xl">
               <div className="mb-10 text-center">
@@ -329,7 +375,7 @@ export default async function AboutPage() {
         </section>
 
         {/* Virtual Medic App */}
-        <section className="py-20 md:py-28">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto max-w-6xl px-4">
             <div className="grid items-center gap-12 md:grid-cols-2">
               <div>
@@ -398,7 +444,7 @@ export default async function AboutPage() {
         </section>
 
         {/* Mission */}
-        <section className="bg-secondary-950 relative overflow-hidden py-28 md:py-36">
+        <section className="bg-secondary-950 relative overflow-hidden py-16 md:py-24">
           <div
             aria-hidden
             className="absolute inset-0"
@@ -435,7 +481,7 @@ export default async function AboutPage() {
         </section>
 
         {/* Values */}
-        <section className="py-20 md:py-28">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto max-w-6xl px-4">
             <div className="mb-10 text-center">
               <div className="mb-3 flex items-center justify-center gap-3">
@@ -470,7 +516,7 @@ export default async function AboutPage() {
         </section>
 
         {/* Testimonial */}
-        <section className="bg-secondary-50 py-20 md:py-28">
+        <section className="bg-secondary-50 py-12 md:py-16">
           <div className="container mx-auto max-w-4xl px-4">
             <div className="mb-10 text-center">
               <div className="mb-3 flex items-center justify-center gap-3">
@@ -534,7 +580,7 @@ export default async function AboutPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 md:py-28">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto max-w-6xl px-4">
             <div className="bg-secondary-950 relative overflow-hidden rounded-2xl p-10 text-center md:p-16">
               <div

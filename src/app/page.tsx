@@ -3,6 +3,7 @@ import { getFeaturedProducts } from "~/lib/data";
 import { DEMO_FEATURED_PRODUCTS } from "~/lib/demo-featured-products";
 import HeroSection from "~/components/home/HeroSection";
 import MarqueeBand from "~/components/home/MarqueeBand";
+import TrustStrip from "~/components/home/TrustStrip";
 import FeatureIconsSection from "~/components/home/FeatureIconsSection";
 import PromoBannersSection from "~/components/home/PromoBannersSection";
 import DataDrivenSection from "~/components/home/DataDrivenSection";
@@ -59,6 +60,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <MarqueeBand />
+      <TrustStrip />
       <PromoBannersSection />
       <FeatureIconsSection />
       <Suspense fallback={<FeaturedGridSkeleton />}>

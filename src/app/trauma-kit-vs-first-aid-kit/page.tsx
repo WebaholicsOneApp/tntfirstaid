@@ -39,7 +39,7 @@ export default function TraumaKitVsFirstAidKitPage() {
               "radial-gradient(ellipse at 20% 30%, rgba(227,24,55,0.25) 0%, transparent 55%), radial-gradient(ellipse at 85% 80%, rgba(227,24,55,0.15) 0%, transparent 55%)",
           }}
         />
-        <div className="relative z-10 container mx-auto px-4 py-16 md:py-24">
+        <div className="relative z-10 container mx-auto px-4 py-10 md:py-14">
           <div className="mx-auto max-w-3xl">
             <div className="mb-4 flex items-center gap-3">
               <div className="bg-primary-500 h-px w-6" />
@@ -47,14 +47,14 @@ export default function TraumaKitVsFirstAidKitPage() {
                 Learn
               </span>
             </div>
-            <h1 className="font-display text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+            <h1 className="font-display text-3xl font-bold text-white md:text-4xl lg:text-5xl">
               Trauma Kit vs. First-Aid Kit
             </h1>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16 md:py-20">
+      <main className="container mx-auto px-4 py-10 md:py-14">
         <article className="mx-auto max-w-3xl">
           <div className="text-secondary-700 space-y-5 text-base leading-relaxed md:text-lg">
             <p>

@@ -12,6 +12,10 @@ import StockBadge from "./StockBadge";
 import ReviewsSection from "./ReviewsSection";
 import RecommendationGrid from "./RecommendationGrid";
 import StarRating from "./StarRating";
+import StickyMobileBuyBar from "./StickyMobileBuyBar";
+import TrustBadges from "~/components/checkout/TrustBadges";
+
+const INLINE_BUY_BOX_ID = "pdp-inline-buy-box";
 
 interface ProductDetailClientProps {
   product: ProductDetail;
@@ -190,13 +194,18 @@ export default function ProductDetailClient({
         )}
 
         {/* Add to cart */}
-        <AddToCartButton
-          productId={product.id}
-          productSlug={product.slug}
-          productName={product.name}
-          variation={selectedVariation}
-          productImage={product.primaryImage}
-        />
+        <div id={INLINE_BUY_BOX_ID}>
+          <AddToCartButton
+            productId={product.id}
+            productSlug={product.slug}
+            productName={product.name}
+            variation={selectedVariation}
+            productImage={product.primaryImage}
+          />
+        </div>
+
+        {/* Trust signals — under buy box */}
+        <TrustBadges variant="compact" />
 
         {/* Tags */}
         {product.keywords && (
@@ -356,6 +365,22 @@ export default function ProductDetailClient({
               .slice(0, 5)}
           />
         </div>
+      )}
+
+      {/* Sticky mobile buy bar — appears when inline button scrolls off screen */}
+      {!product.isDownloadable && (
+        <StickyMobileBuyBar
+          productId={product.id}
+          productSlug={product.slug}
+          productName={product.name}
+          variation={selectedVariation}
+          productImage={product.primaryImage}
+          displayPrice={
+            showRange ? priceRange.min : (displayPrice ?? null)
+          }
+          inlineButtonId={INLINE_BUY_BOX_ID}
+          hasMultipleVariations={product.variations.length > 1}
+        />
       )}
     </div>
   );

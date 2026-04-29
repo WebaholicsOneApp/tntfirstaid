@@ -61,7 +61,7 @@ export default function HeroSection() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(100deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.82) 38%, rgba(20,6,10,0.55) 70%, rgba(30,4,12,0.35) 100%)",
+            "linear-gradient(100deg, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0.65) 40%, rgba(20,6,10,0.30) 70%, rgba(30,4,12,0.10) 100%)",
         }}
       />
       {/* Soft red accent at bottom-right for depth */}
@@ -75,7 +75,7 @@ export default function HeroSection() {
       />
 
       {/* Content */}
-      <div className="relative flex min-h-[560px] items-center px-6 py-24 sm:py-28 md:min-h-[640px] md:py-32 lg:py-40 lg:pl-16 xl:pl-24">
+      <div className="relative flex min-h-[520px] items-center px-6 py-20 sm:py-24 md:min-h-[600px] md:py-28 lg:py-32 lg:pl-16 xl:pl-24">
         <div className="max-w-2xl text-center md:text-left">
           <div
             className={`mb-5 flex items-center justify-center gap-3 transition-all duration-700 md:justify-start ${loaded ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
@@ -87,7 +87,7 @@ export default function HeroSection() {
           </div>
 
           <h1
-            className={`font-display text-5xl leading-[1.05] font-bold text-white transition-all delay-75 duration-700 sm:text-6xl md:text-7xl lg:text-8xl ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+            className={`font-display text-3xl leading-[1.1] font-bold text-white transition-all delay-75 duration-700 sm:text-4xl md:text-5xl lg:text-6xl ${loaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
             style={{ textShadow: "0 2px 24px rgba(0,0,0,0.6)" }}
           >
             <span className="block">First Aid Gear</span>

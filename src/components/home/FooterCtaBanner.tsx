@@ -9,7 +9,7 @@ const badges = [
 export default function FooterCtaBanner() {
   return (
     <section className="bg-secondary-950 relative overflow-hidden">
-      <div className="relative py-24 sm:py-32">
+      <div className="relative py-16 sm:py-20">
         <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-8">
           <div className="mb-6 flex items-center justify-center gap-3">
             <div className="bg-primary-500/60 h-px w-6 shrink-0" />
@@ -19,7 +19,7 @@ export default function FooterCtaBanner() {
             <div className="bg-primary-500/60 h-px w-6 shrink-0" />
           </div>
 
-          <h2 className="font-display text-4xl leading-tight font-bold text-white sm:text-5xl lg:text-6xl">
+          <h2 className="font-display text-3xl leading-tight font-bold text-white sm:text-4xl lg:text-5xl">
             Equip Your Team.
             <br />
             <span className="text-primary-500">Train Your People.</span>

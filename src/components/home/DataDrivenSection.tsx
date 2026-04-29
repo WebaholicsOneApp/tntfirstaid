@@ -8,16 +8,16 @@ const stats = [
 
 export default function DataDrivenSection() {
   return (
-    <section className="bg-white py-16 lg:py-28">
+    <section className="bg-white py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:items-stretch lg:gap-20">
           {/* Left: image panel */}
-          <div className="ring-secondary-100 relative aspect-[2/1] w-full overflow-hidden rounded-3xl bg-white shadow-lg ring-1 lg:aspect-auto lg:h-full">
+          <div className="ring-secondary-100 relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-secondary-50 shadow-lg ring-1 lg:aspect-[5/4]">
             <Image
               src="/images/old-site/hero-business-kits.jpg"
               alt="TNT First Aid emergency backpacks"
               fill
-              className="object-contain"
+              className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
             <div className="absolute bottom-6 left-6 right-6">
@@ -40,7 +40,7 @@ export default function DataDrivenSection() {
               </span>
             </div>
 
-            <h2 className="font-display text-secondary-900 text-3xl leading-tight font-bold sm:text-4xl lg:text-5xl">
+            <h2 className="font-display text-secondary-900 text-2xl leading-tight font-bold sm:text-3xl lg:text-4xl">
               Training &amp; Supply You Can Count On
             </h2>
 
@@ -53,7 +53,7 @@ export default function DataDrivenSection() {
                   className={`pr-6 ${i > 0 ? "border-secondary-100 border-l pl-6" : ""}`}
                 >
                   <div className="bg-primary-500 mb-4 h-[2px] w-8" />
-                  <p className="font-display text-secondary-900 text-3xl leading-none font-bold tabular-nums sm:text-4xl lg:text-5xl">
+                  <p className="font-display text-secondary-900 text-2xl leading-none font-bold tabular-nums sm:text-3xl lg:text-4xl">
                     {value}
                   </p>
                   <p className="text-secondary-600 mt-2.5 text-xs font-medium tracking-wide uppercase">

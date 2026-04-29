@@ -1,11 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import type { ReactNode } from "react";
+
+type Variant = "card" | "compact" | "strip";
 
 interface Badge {
   title: string;
   desc: string;
   icon: ReactNode;
+  href?: string;
 }
 
 const BADGES: Badge[] = [
@@ -31,6 +35,7 @@ const BADGES: Badge[] = [
   {
     title: "30-Day Guarantee",
     desc: "Not satisfied? Send it back, no questions",
+    href: "/shipping-returns#returns",
     icon: (
       <svg
         className="h-4 w-4"
@@ -87,7 +92,89 @@ const BADGES: Badge[] = [
   },
 ];
 
-export default function TrustBadges() {
+interface TrustBadgesProps {
+  variant?: Variant;
+}
+
+export default function TrustBadges({ variant = "card" }: TrustBadgesProps) {
+  if (variant === "compact") {
+    return (
+      <div className="ring-secondary-100 bg-secondary-50/50 rounded-xl p-4 ring-1">
+        <ul className="grid grid-cols-2 gap-3">
+          {BADGES.map((b) => {
+            const inner = (
+              <>
+                <div className="bg-primary-500/10 text-primary-500 ring-primary-500/20 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ring-1">
+                  {b.icon}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-secondary-900 text-xs leading-tight font-semibold">
+                    {b.title}
+                  </p>
+                  <p className="text-secondary-500 mt-0.5 text-[0.7rem] leading-snug">
+                    {b.desc}
+                  </p>
+                </div>
+              </>
+            );
+            return (
+              <li key={b.title}>
+                {b.href ? (
+                  <Link
+                    href={b.href}
+                    className="hover:bg-white flex items-start gap-2.5 rounded-lg p-1 transition-colors"
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div className="flex items-start gap-2.5 p-1">{inner}</div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+
+  if (variant === "strip") {
+    return (
+      <ul className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+        {BADGES.map((b) => {
+          const inner = (
+            <>
+              <div className="bg-primary-500/10 text-primary-500 ring-primary-500/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-1">
+                {b.icon}
+              </div>
+              <div className="min-w-0">
+                <p className="text-secondary-900 text-sm leading-tight font-semibold">
+                  {b.title}
+                </p>
+                <p className="text-secondary-500 mt-1 text-xs leading-snug">
+                  {b.desc}
+                </p>
+              </div>
+            </>
+          );
+          return (
+            <li key={b.title}>
+              {b.href ? (
+                <Link
+                  href={b.href}
+                  className="group flex items-start gap-3 transition-opacity hover:opacity-80"
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div className="flex items-start gap-3">{inner}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
   return (
     <div className="ring-secondary-100 rounded-2xl bg-white p-5 shadow-sm ring-1 sm:p-6">
       <div>
@@ -98,21 +185,37 @@ export default function TrustBadges() {
           </span>
         </div>
         <ul className="space-y-3">
-          {BADGES.map((b) => (
-            <li key={b.title} className="flex items-start gap-3">
-              <div className="bg-primary-500/10 text-primary-500 ring-primary-500/20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1">
-                {b.icon}
-              </div>
-              <div className="min-w-0 pt-0.5">
-                <p className="text-secondary-900 text-sm leading-tight font-semibold">
-                  {b.title}
-                </p>
-                <p className="text-secondary-500 mt-0.5 text-xs leading-snug">
-                  {b.desc}
-                </p>
-              </div>
-            </li>
-          ))}
+          {BADGES.map((b) => {
+            const inner = (
+              <>
+                <div className="bg-primary-500/10 text-primary-500 ring-primary-500/20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-1">
+                  {b.icon}
+                </div>
+                <div className="min-w-0 pt-0.5">
+                  <p className="text-secondary-900 text-sm leading-tight font-semibold">
+                    {b.title}
+                  </p>
+                  <p className="text-secondary-500 mt-0.5 text-xs leading-snug">
+                    {b.desc}
+                  </p>
+                </div>
+              </>
+            );
+            return (
+              <li key={b.title}>
+                {b.href ? (
+                  <Link
+                    href={b.href}
+                    className="hover:bg-secondary-50 -m-1.5 flex items-start gap-3 rounded-lg p-1.5 transition-colors"
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div className="flex items-start gap-3">{inner}</div>
+                )}
+              </li>
+            );
+          })}
         </ul>
 
         {/* Accepted payments */}
