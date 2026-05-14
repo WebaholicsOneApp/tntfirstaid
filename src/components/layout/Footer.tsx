@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { StoreConfig } from "~/lib/store-config";
+import CardBrandIcon from "~/components/checkout/CardBrandIcon";
 
 interface FooterProps {
   siteName?: string;
@@ -161,6 +162,54 @@ export default function Footer({
                 </li>
               )}
             </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Trust + payment methods strip */}
+      <div className="border-primary-500/10 border-t">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col items-center justify-center gap-5 sm:flex-row sm:justify-between">
+            <div className="flex items-center gap-2 text-secondary-400">
+              <svg
+                className="text-primary-500/70 h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+              <span className="font-mono text-[0.65rem] tracking-[0.25em] uppercase">
+                Secure Checkout &middot; 256-bit SSL &middot; Powered by Stripe
+              </span>
+            </div>
+            <div
+              className="flex items-center gap-2.5"
+              aria-label="Accepted payment methods"
+            >
+              <CardBrandIcon brand="visa" className="h-6 rounded bg-white/95 p-0.5" />
+              <CardBrandIcon
+                brand="mastercard"
+                className="h-6 rounded bg-white/95 p-0.5"
+              />
+              <CardBrandIcon brand="amex" className="h-6 rounded bg-white/95 p-0.5" />
+              <CardBrandIcon
+                brand="discover"
+                className="h-6 rounded bg-white/95 p-0.5"
+              />
+              <span className="border-secondary-700 text-secondary-300 inline-flex h-6 items-center rounded border bg-white/[0.04] px-2 font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+                Apple&nbsp;Pay
+              </span>
+              <span className="border-secondary-700 text-secondary-300 inline-flex h-6 items-center rounded border bg-white/[0.04] px-2 font-mono text-[0.6rem] tracking-[0.15em] uppercase">
+                Google&nbsp;Pay
+              </span>
+            </div>
           </div>
         </div>
       </div>

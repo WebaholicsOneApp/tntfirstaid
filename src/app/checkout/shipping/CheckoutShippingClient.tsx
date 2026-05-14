@@ -453,6 +453,36 @@ export default function CheckoutShippingClient() {
                     {ratesError && !ratesLoading && (
                       <div className="rounded-xl border border-red-200/80 bg-red-50 p-4">
                         <p className="text-sm text-red-600">{ratesError}</p>
+                        <button
+                          type="button"
+                          onClick={() => fetchRates()}
+                          className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100"
+                        >
+                          <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          Try Again
+                        </button>
+                        <p className="mt-2 text-xs text-red-500/80">
+                          Still stuck? Email{" "}
+                          <a
+                            href="mailto:jeffm@tntfirstaid.com"
+                            className="underline hover:text-red-700"
+                          >
+                            jeffm@tntfirstaid.com
+                          </a>{" "}
+                          and we&apos;ll quote shipping for you.
+                        </p>
                       </div>
                     )}
 

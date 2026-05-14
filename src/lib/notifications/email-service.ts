@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { orderShippedTemplate } from "./templates/order-shipped";
 import { orderDeliveredTemplate } from "./templates/order-delivered";
 import { orderConfirmedTemplate } from "./templates/order-confirmed";
+import { abandonedCartTemplate } from "./templates/abandoned-cart";
 import type { FulfillmentStatus } from "~/types/fulfillment";
 
 // Lazy initialize Resend to avoid build-time errors
@@ -224,6 +225,85 @@ export async function sendOrderConfirmationEmail(
     return { success: true, messageId: result.data?.id };
   } catch (error: any) {
     console.error("[EMAIL] Error sending order confirmation email:", error);
+    return { success: false, error: error.message || "Unknown error" };
+  }
+}
+
+/**
+ * Abandoned cart recovery email data
+ */
+export interface AbandonedCartEmailData {
+  customerEmail: string;
+  customerName?: string;
+  items: {
+    name: string;
+    variationName?: string;
+    sku?: string;
+    imageUrl?: string;
+    quantity: number;
+    price: number; // cents
+    productSlug?: string;
+  }[];
+  subtotal: number; // cents
+  /** URL the customer should land on to resume checkout. */
+  recoveryUrl: string;
+  /** Optional discount code to incentivize completion. */
+  incentiveCode?: string;
+  incentiveDescription?: string;
+}
+
+/**
+ * Send abandoned-cart recovery email.
+ */
+export async function sendAbandonedCartEmail(
+  data: AbandonedCartEmailData,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const fromEmail = process.env.FROM_EMAIL || "onboarding@resend.dev";
+  const storeName = process.env.STORE_NAME || "TNT First Aid";
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || "https://tntfirstaid.com";
+
+  try {
+    const { subject, html, text } = abandonedCartTemplate({
+      customerName: data.customerName,
+      customerEmail: data.customerEmail,
+      items: data.items,
+      subtotal: data.subtotal,
+      recoveryUrl: data.recoveryUrl,
+      storeName,
+      siteUrl,
+      incentiveCode: data.incentiveCode,
+      incentiveDescription: data.incentiveDescription,
+    });
+
+    console.log(
+      `[EMAIL] Sending abandoned-cart email to ${data.customerEmail}`,
+    );
+
+    const result = await getResend().emails.send({
+      from: `${storeName} <${fromEmail}>`,
+      to: data.customerEmail,
+      subject,
+      html,
+      text,
+      headers: {
+        // Mark as transactional + give Gmail a tagged thread.
+        "X-Entity-Ref-ID": `abandoned-cart-${Date.now()}`,
+      },
+      tags: [{ name: "category", value: "abandoned_cart" }],
+    });
+
+    if (result.error) {
+      console.error("[EMAIL] Resend error (abandoned-cart):", result.error);
+      return { success: false, error: result.error.message };
+    }
+
+    console.log(
+      `[EMAIL] Abandoned-cart email sent successfully. ID: ${result.data?.id}`,
+    );
+    return { success: true, messageId: result.data?.id };
+  } catch (error: any) {
+    console.error("[EMAIL] Error sending abandoned-cart email:", error);
     return { success: false, error: error.message || "Unknown error" };
   }
 }

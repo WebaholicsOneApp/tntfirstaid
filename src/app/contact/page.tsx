@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getStoreConfig } from "~/lib/store-config.server";
 import ContactForm from "./ContactForm";
 import FaqAccordion from "../faq/FaqAccordion";
+import JsonLd from "~/components/common/JsonLd";
+import { buildLocalBusiness } from "~/lib/structured-data";
 
 const RADAR_BLIPS: Array<{ angle: number; radius: number }> = [
   { angle: 50, radius: 115 },
@@ -49,8 +51,29 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ContactPage() {
   const storeConfig = await getStoreConfig();
 
+  const localBusinessJsonLd = buildLocalBusiness({
+    config: storeConfig,
+    city: "Kaysville",
+    region: "UT",
+    country: "US",
+    openingHoursSpec: [
+      {
+        days: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+        ],
+        opens: "09:00",
+        closes: "18:00",
+      },
+    ],
+  });
+
   return (
     <div className="min-h-screen bg-white">
+      <JsonLd data={localBusinessJsonLd} />
       <header className="bg-secondary-950 relative min-h-[300px] overflow-hidden md:min-h-[440px]">
         {/* Ambient red glow */}
         <div

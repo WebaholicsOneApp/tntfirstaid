@@ -6,6 +6,8 @@ import Breadcrumbs from "~/components/common/Breadcrumbs";
 import JsonLd from "~/components/common/JsonLd";
 import ProductDetailClient from "~/components/products/ProductDetailClient";
 import type { BreadcrumbItem } from "~/components/common/Breadcrumbs";
+import { buildBreadcrumbList } from "~/lib/structured-data";
+import { storeConfig } from "~/lib/store-config";
 
 export const revalidate = 900;
 
@@ -125,9 +127,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     },
   };
 
+  const breadcrumbJsonLd = buildBreadcrumbList(
+    breadcrumbs.map((b) => ({ label: b.label, href: b.href })),
+    storeConfig.siteUrl,
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
 
       {/* Breadcrumbs */}
       <Breadcrumbs items={breadcrumbs} className="mb-6" />

@@ -50,8 +50,7 @@ export async function POST(request: Request) {
 
     // Minimal items validation — apply-discount only forwards
     // `variationId` + `quantity` downstream, so the full CheckoutItem shape
-    // that validateCheckoutItems requires is overkill. Matches the pattern
-    // in /api/authorize-net/charge/route.ts.
+    // that validateCheckoutItems requires is overkill.
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { message: "items is required and must not be empty" },

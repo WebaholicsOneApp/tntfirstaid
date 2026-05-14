@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "~/lib/cart";
 import { useAuth } from "~/lib/auth";
+import { useWishlist } from "~/lib/wishlist";
 import type { CategoryWithChildren } from "~/types";
 import MobileMenu from "./MobileMenu";
 import MegaMenu from "~/components/navigation/MegaMenu";
@@ -45,6 +46,7 @@ export default function Header({
   > | null>(null);
   const { cart, openCart } = useCart();
   const { isAuthenticated, customerAuthEnabled, logout } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const pathname = usePathname();
   const [pendingHref, setPendingHref] = useState<string | null>(null);
 
@@ -305,6 +307,38 @@ export default function Header({
                 )}
               </div>
             )}
+
+            {/* Wishlist icon */}
+            <Link
+              href="/wishlist"
+              className="text-secondary-700 hover:text-primary-600 relative hidden p-2 transition-colors sm:inline-flex"
+              aria-label={
+                wishlistCount > 0
+                  ? `Wishlist (${wishlistCount} saved)`
+                  : "Wishlist"
+              }
+              suppressHydrationWarning
+            >
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              {wishlistCount > 0 && (
+                <span
+                  className="bg-primary-500 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white"
+                  suppressHydrationWarning
+                >
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
 
             {/* Cart icon */}
             <button

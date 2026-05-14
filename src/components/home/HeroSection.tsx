@@ -23,10 +23,36 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setActiveIdx((i) => (i + 1) % SLIDES.length);
-    }, SLIDE_INTERVAL_MS);
-    return () => clearInterval(id);
+    // Honor prefers-reduced-motion: don't cycle, leave the first slide.
+    if (typeof window !== "undefined" && window.matchMedia) {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (mq.matches) return;
+    }
+
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => {
+      if (id !== null) return;
+      id = setInterval(() => {
+        setActiveIdx((i) => (i + 1) % SLIDES.length);
+      }, SLIDE_INTERVAL_MS);
+    };
+    const stop = () => {
+      if (id !== null) {
+        clearInterval(id);
+        id = null;
+      }
+    };
+    const onVisibility = () => {
+      if (document.hidden) stop();
+      else start();
+    };
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   return (

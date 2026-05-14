@@ -12,10 +12,6 @@ interface StorefrontCheckoutConfigResponse {
     status?: "ready" | "needs_action" | "not_configured";
     stripePublishableKey?: string | null;
     stripeConnectAccountId?: string | null;
-    authNetApiLoginId?: string | null;
-    authNetClientKey?: string | null;
-    authNetEnvironment?: string | null;
-    authNetAcceptJsUrl?: string | null;
     expressCheckoutEnabled?: boolean;
     checkoutMode?: string | null;
     supportedMethods?: string[];
@@ -31,15 +27,20 @@ export async function GET(request: Request) {
     const config =
       await getApiClient().getConfig<StorefrontCheckoutConfigResponse>();
 
+    // This storefront only supports Stripe. If OneApp reports a different
+    // provider, treat it as not configured rather than failing silently.
+    const rawProvider = config.payment?.providerType || null;
+    const providerType = rawProvider === "stripe_connect" ? rawProvider : null;
+    const status =
+      providerType === "stripe_connect"
+        ? config.payment?.status || "not_configured"
+        : "not_configured";
+
     return NextResponse.json({
-      providerType: config.payment?.providerType || null,
-      status: config.payment?.status || "not_configured",
+      providerType,
+      status,
       stripePublishableKey: config.payment?.stripePublishableKey || null,
       stripeConnectAccountId: config.payment?.stripeConnectAccountId || null,
-      authNetApiLoginId: config.payment?.authNetApiLoginId || null,
-      authNetClientKey: config.payment?.authNetClientKey || null,
-      authNetEnvironment: config.payment?.authNetEnvironment || null,
-      authNetAcceptJsUrl: config.payment?.authNetAcceptJsUrl || null,
       expressCheckoutEnabled: !!config.payment?.expressCheckoutEnabled,
       checkoutMode: config.payment?.checkoutMode || null,
       supportedMethods: config.payment?.supportedMethods || ["card"],

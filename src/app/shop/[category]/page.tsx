@@ -12,7 +12,10 @@ import {
 import { convertDollarsToCents, getPaginationRange } from "~/lib/utils";
 import ShopPageClient from "~/components/products/ShopPageClient";
 import Breadcrumbs from "~/components/common/Breadcrumbs";
+import JsonLd from "~/components/common/JsonLd";
 import type { BreadcrumbItem } from "~/components/common/Breadcrumbs";
+import { buildBreadcrumbList } from "~/lib/structured-data";
+import { storeConfig } from "~/lib/store-config";
 
 export const revalidate = 900;
 
@@ -124,8 +127,14 @@ export default async function CategoryShopPage({
     });
   }
 
+  const breadcrumbJsonLd = buildBreadcrumbList(
+    breadcrumbs.map((b) => ({ label: b.label, href: b.href })),
+    storeConfig.siteUrl,
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <JsonLd data={breadcrumbJsonLd} />
       {/* Breadcrumbs */}
       <Breadcrumbs items={breadcrumbs} className="mb-4" />
 

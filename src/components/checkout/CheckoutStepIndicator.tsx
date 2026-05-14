@@ -3,13 +3,12 @@
 import Link from "next/link";
 
 interface CheckoutStepIndicatorProps {
-  currentStep: 1 | 2 | 3;
+  currentStep: 1 | 2;
 }
 
 const STEPS = [
   { number: 1, label: "Shipping", href: "/checkout/shipping" },
-  { number: 2, label: "Payment", href: "/checkout/payment" },
-  { number: 3, label: "Review", href: "/checkout/confirm" },
+  { number: 2, label: "Payment & Review", href: "/checkout/payment" },
 ] as const;
 
 function CheckIcon() {

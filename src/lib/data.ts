@@ -13,6 +13,7 @@ import {
   DEMO_PRODUCT_LIST_ITEMS,
   getDemoProductBySlug,
 } from "./demo-products";
+import { isDemoFallbackAllowed, recordDemoFallback } from "./demo-fallback";
 import type {
   ProductListItem,
   ProductDetail,
@@ -153,7 +154,144 @@ export async function enrichProductList(
 // Adapter functions — transform API responses to TNT First Aid types
 // ============================================
 
+function extractImage(card: any): string | null {
+  // OneApp / supplier APIs use varying field names — try the common ones in
+  // order of specificity. First non-empty wins.
+  const candidates = [
+    card.imageUrl,
+    card.primaryImage,
+    card.image,
+    card.featuredImage,
+    card.featured_image,
+    card.mainImage,
+    card.thumbnail,
+    card.thumbnailUrl,
+    Array.isArray(card.images) ? card.images[0] : null,
+    Array.isArray(card.media) ? card.media[0]?.url ?? card.media[0] : null,
+  ];
+  for (const c of candidates) {
+    if (typeof c === "string" && c.length > 0) return c;
+  }
+  return null;
+}
+
+/**
+ * Best-effort cents parser. Returns null when value is missing/invalid.
+ * Heuristic: floats with decimals (e.g. 49.99) are treated as dollars and
+ * converted to cents. Integers (e.g. 4999) are assumed to already be in cents.
+ * Strings like "$49.99" / "49.99" are accepted.
+ */
+function toCents(v: unknown): number | null {
+  if (typeof v === "number") {
+    if (!isFinite(v) || v < 0) return null;
+    if (v === 0) return 0;
+    if (!Number.isInteger(v)) return Math.round(v * 100);
+    return v;
+  }
+  if (typeof v === "string") {
+    const cleaned = v.replace(/[^0-9.]/g, "");
+    if (!cleaned) return null;
+    const n = parseFloat(cleaned);
+    if (!isFinite(n) || n < 0) return null;
+    if (!Number.isInteger(n)) return Math.round(n * 100);
+    // Strings of pure digits like "4999" are ambiguous; trust as cents.
+    return n;
+  }
+  return null;
+}
+
+function extractPriceCents(card: any): number | null {
+  // Try direct fields in order of specificity. First non-null wins.
+  const directCandidates: unknown[] = [
+    card.price,
+    card.priceCents,
+    card.price_cents,
+    card.salePrice,
+    card.sale_price,
+    card.sellingPrice,
+    card.amount,
+    card.unitPrice,
+    card.unit_price,
+    card.currentPrice,
+  ];
+  for (const v of directCandidates) {
+    const c = toCents(v);
+    if (c != null) return c;
+  }
+  // Nested pricing object (common shape: { pricing: { amount: ... } })
+  const pricing = card.pricing;
+  if (pricing && typeof pricing === "object") {
+    const nested: unknown[] = [
+      pricing.price,
+      pricing.priceCents,
+      pricing.amount,
+      pricing.sale,
+      pricing.current,
+    ];
+    for (const v of nested) {
+      const c = toCents(v);
+      if (c != null) return c;
+    }
+  }
+  // Array of prices, first one's amount/price field
+  if (Array.isArray(card.prices) && card.prices.length > 0) {
+    const first = card.prices[0];
+    const c = toCents(first?.amount ?? first?.price ?? first);
+    if (c != null) return c;
+  }
+  // Fall back to the first variation that has a price (variations may differ
+  // from the product-level summary when OneApp omits the rollup).
+  if (Array.isArray(card.variations)) {
+    for (const v of card.variations) {
+      const c = toCents(v?.price ?? v?.priceCents ?? v?.amount);
+      if (c != null) return c;
+    }
+  }
+  return null;
+}
+
+function extractMaxPriceCents(card: any): number | null {
+  const direct = toCents(card.maxPrice ?? card.highPrice ?? card.high_price);
+  if (direct != null) return direct;
+  if (Array.isArray(card.variations) && card.variations.length > 0) {
+    let highest: number | null = null;
+    for (const v of card.variations) {
+      const c = toCents(v?.price ?? v?.priceCents ?? v?.amount);
+      if (c != null && (highest == null || c > highest)) highest = c;
+    }
+    return highest;
+  }
+  return null;
+}
+
+function extractMsrpCents(card: any): number | null {
+  return toCents(
+    card.msrp ??
+      card.compareAtPrice ??
+      card.compare_at_price ??
+      card.listPrice ??
+      card.list_price ??
+      card.regularPrice ??
+      card.regular_price,
+  );
+}
+
 function toProductListItem(card: any): ProductListItem {
+  const price = extractPriceCents(card);
+  const maxPrice = extractMaxPriceCents(card);
+  if (
+    price === null &&
+    process.env.NODE_ENV !== "production" &&
+    card?.id != null
+  ) {
+    // Helps diagnose adapter/API mismatches without spamming prod.
+    console.warn(
+      `[adapter] No price extracted for product id=${card.id} slug=${card.slug}. ` +
+        `Available numeric-ish keys: ${Object.keys(card)
+          .filter((k) => typeof card[k] === "number" || typeof card[k] === "string")
+          .join(", ")}`,
+    );
+  }
   return {
     id: card.id,
     slug: card.slug || slugify(card.name),
@@ -163,14 +301,14 @@ function toProductListItem(card: any): ProductListItem {
     brandId: card.brandId ?? null,
     categoryName: card.categoryName ?? null,
     categoryId: card.categoryId ?? null,
-    primaryImage: card.imageUrl ?? card.primaryImage ?? null,
+    primaryImage: extractImage(card),
     fallbackImage: card.fallbackImage ?? null,
-    price: card.price ?? null,
-    maxPrice: card.maxPrice ?? null,
-    msrp: card.msrp ?? card.compareAtPrice ?? null,
-    maxMsrp: card.maxMsrp ?? null,
-    map: card.map ?? null,
-    maxMap: card.maxMap ?? null,
+    price,
+    maxPrice,
+    msrp: extractMsrpCents(card),
+    maxMsrp: toCents(card.maxMsrp),
+    map: toCents(card.map),
+    maxMap: toCents(card.maxMap),
     inStock: card.inStock ?? false,
     variationCount: card.variationCount ?? 1,
     variationId: card.variationId ?? null,
@@ -192,9 +330,9 @@ function toVariationDetail(v: any): VariationDetail {
     variation: v.variation ?? v.name ?? null,
     variantTypeTwo: v.variantTypeTwo ?? null,
     variationTwo: v.variationTwo ?? null,
-    price: v.price ?? null,
-    msrp: v.msrp ?? v.compareAtPrice ?? null,
-    map: v.map ?? null,
+    price: extractPriceCents(v),
+    msrp: extractMsrpCents(v),
+    map: toCents(v.map),
     weight: v.weight ?? null,
     images: v.images ?? [],
     inStock: v.inStock ?? false,
@@ -361,15 +499,20 @@ export async function getCategoryTreeForStorefront(): Promise<
       const api = getApiClient();
       const resp = await api.getCategoryTree<{ categories: any[] }>();
       const tree = (resp?.categories || []).map(toCategoryWithChildren);
-      const result = tree.length > 0 ? tree : DEMO_CATEGORY_TREE;
-      setCache(cacheKey, result);
-      return result;
+      if (tree.length === 0) {
+        recordDemoFallback("getCategoryTree", "API returned empty tree");
+        const result = isDemoFallbackAllowed() ? DEMO_CATEGORY_TREE : [];
+        setCache(cacheKey, result);
+        return result;
+      }
+      setCache(cacheKey, tree);
+      return tree;
     } catch (err) {
-      console.error(
-        "[getCategoryTreeForStorefront] API call failed:",
-        err instanceof Error ? err.message : err,
+      recordDemoFallback(
+        "getCategoryTree",
+        err instanceof Error ? err.message : String(err),
       );
-      return DEMO_CATEGORY_TREE;
+      return isDemoFallbackAllowed() ? DEMO_CATEGORY_TREE : [];
     }
   });
 }
@@ -580,11 +723,13 @@ export async function getPriceRange(
       setCache(cacheKey, result);
       return result;
     } catch (err) {
-      console.error(
-        "[getPriceRange] API call failed:",
-        err instanceof Error ? err.message : err,
+      recordDemoFallback(
+        "getPriceRange",
+        err instanceof Error ? err.message : String(err),
       );
-      const fallback = demoPriceRangeFallback();
+      const fallback = isDemoFallbackAllowed()
+        ? demoPriceRangeFallback()
+        : { min: 0, max: 0 };
       setCache(cacheKey, fallback);
       return fallback;
     }
@@ -665,12 +810,19 @@ export async function getProducts(
         totalPages: data.pagination?.totalPages ?? 1,
       };
     }
+    recordDemoFallback("getProducts", "API returned 0 products");
+    if (!isDemoFallbackAllowed()) {
+      return { products: [], totalCount: 0, totalPages: 0 };
+    }
     return demoProductsFallback(filters, page, pageSize);
   } catch (err) {
-    console.error(
-      "[getProducts] API call failed:",
-      err instanceof Error ? err.message : err,
+    recordDemoFallback(
+      "getProducts",
+      err instanceof Error ? err.message : String(err),
     );
+    if (!isDemoFallbackAllowed()) {
+      return { products: [], totalCount: 0, totalPages: 0 };
+    }
     return demoProductsFallback(filters, page, pageSize);
   }
 }
@@ -848,10 +1000,13 @@ export async function getProductDetailBySlug(
       const response = await api.getProductBySlug<any>(slug);
       const data = response?.product ?? response;
       if (!data) {
-        const demo = getDemoProductBySlug(slug);
-        if (demo) {
-          setCache(cacheKey, demo);
-          return demo;
+        if (isDemoFallbackAllowed()) {
+          const demo = getDemoProductBySlug(slug);
+          if (demo) {
+            recordDemoFallback("getProductBySlug", `not found: ${slug}`);
+            setCache(cacheKey, demo);
+            return demo;
+          }
         }
         setCache(missCacheKey, true);
         return null;
@@ -876,10 +1031,16 @@ export async function getProductDetailBySlug(
 
       // If no variations with valid prices, product cannot be displayed
       if (detail.variations.length === 0) {
-        const demo = getDemoProductBySlug(slug);
-        if (demo) {
-          setCache(cacheKey, demo);
-          return demo;
+        if (isDemoFallbackAllowed()) {
+          const demo = getDemoProductBySlug(slug);
+          if (demo) {
+            recordDemoFallback(
+              "getProductBySlug",
+              `no priced variations: ${slug}`,
+            );
+            setCache(cacheKey, demo);
+            return demo;
+          }
         }
         setCache(missCacheKey, true);
         return null;
@@ -887,11 +1048,17 @@ export async function getProductDetailBySlug(
 
       setCache(cacheKey, detail);
       return detail;
-    } catch {
-      const demo = getDemoProductBySlug(slug);
-      if (demo) {
-        setCache(cacheKey, demo);
-        return demo;
+    } catch (err) {
+      recordDemoFallback(
+        "getProductBySlug",
+        err instanceof Error ? err.message : String(err),
+      );
+      if (isDemoFallbackAllowed()) {
+        const demo = getDemoProductBySlug(slug);
+        if (demo) {
+          setCache(cacheKey, demo);
+          return demo;
+        }
       }
       setCache(missCacheKey, true);
       return null;
@@ -1039,9 +1206,9 @@ export async function getSearchSuggestions(
           slug: p.slug || slugify(p.name),
           name: p.name,
           brandName: p.brandName ?? null,
-          primaryImage: p.primaryImage ?? p.imageUrl ?? null,
-          price: p.price ?? null,
-          maxPrice: p.maxPrice ?? null,
+          primaryImage: extractImage(p),
+          price: extractPriceCents(p),
+          maxPrice: extractMaxPriceCents(p),
           inStock: p.inStock ?? false,
         }),
       ),

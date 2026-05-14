@@ -4,7 +4,7 @@ import {
   getClientIp,
   rateLimitResponse,
 } from "~/lib/ratelimit";
-import { getApiClient } from "~/lib/api-client";
+import { ApiClientError, getApiClient } from "~/lib/api-client";
 import { env } from "~/env";
 
 const MOCK_RATES = [
@@ -95,13 +95,37 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error: unknown) {
     console.error("[shipping-rates proxy] Error:", error);
+
+    // ApiClientError surfaces OneApp's HTTP status. 4xx is usually a bad
+    // address — pass the message through so the user sees the actual reason.
+    if (error instanceof ApiClientError) {
+      if (error.status >= 400 && error.status < 500) {
+        return NextResponse.json(
+          { message: error.message || "Please double-check your address." },
+          { status: 400 },
+        );
+      }
+      return NextResponse.json(
+        {
+          message:
+            "Our shipping service is temporarily unavailable. Please try again in a moment.",
+        },
+        { status: 503 },
+      );
+    }
+
+    if (error instanceof Error && /timed out/i.test(error.message)) {
+      return NextResponse.json(
+        {
+          message:
+            "Shipping rates are taking longer than expected. Please try again.",
+        },
+        { status: 504 },
+      );
+    }
+
     return NextResponse.json(
-      {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch shipping rates. Please try again.",
-      },
+      { message: "Failed to fetch shipping rates. Please try again." },
       { status: 500 },
     );
   }

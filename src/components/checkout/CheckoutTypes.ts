@@ -46,20 +46,14 @@ export interface CheckoutSessionData {
     country?: string;
   };
   paymentMethod: PaymentMethod;
-  opaqueData?: { dataDescriptor: string; dataValue: string };
-  cardLast4?: string; // last 4 digits of card
-  cardBrand?: string; // "visa" | "mastercard" | "amex" | "discover"
   sendEmail: boolean;
 }
 
 export interface PaymentConfig {
-  providerType: "stripe_connect" | "authorize_net" | null;
+  providerType: "stripe_connect" | null;
   status: "ready" | "needs_action" | "not_configured";
   stripePublishableKey: string | null;
   stripeConnectAccountId: string | null;
-  authNetApiLoginId: string | null;
-  authNetClientKey: string | null;
-  authNetAcceptJsUrl: string | null;
   expressCheckoutEnabled: boolean;
   checkoutMode: string | null;
   supportedMethods: string[];

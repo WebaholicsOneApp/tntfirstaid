@@ -298,12 +298,16 @@ export default function CheckoutProductReviewPage() {
                   {!isDigitalOnly && (
                     <div className="flex justify-between">
                       <span className="text-secondary-500">Shipping</span>
-                      <span className="text-secondary-400">&mdash;</span>
+                      <span className="text-secondary-500 text-xs italic">
+                        Calculated next step
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-secondary-500">Tax</span>
-                    <span className="text-secondary-400">&mdash;</span>
+                    <span className="text-secondary-500 text-xs italic">
+                      Calculated at checkout
+                    </span>
                   </div>
                 </div>
 
@@ -316,6 +320,11 @@ export default function CheckoutProductReviewPage() {
                       {formatCentsToDollars(cart.subtotal)}
                     </span>
                   </div>
+                  <p className="text-secondary-500 mt-2 text-xs">
+                    {isDigitalOnly
+                      ? "Tax (if applicable) shown at payment."
+                      : "Shipping options appear after you enter an address. Tax is added at the payment step."}
+                  </p>
                 </div>
 
                 <div className="mt-6">

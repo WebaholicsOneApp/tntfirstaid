@@ -7,6 +7,7 @@ import { useCart } from "~/lib/cart/CartContext";
 import { useAuth } from "~/lib/auth";
 import RecommendationGrid from "~/components/products/RecommendationGrid";
 import { Spinner } from "~/components/ui/Spinner";
+import { ProductImage } from "~/components/ui/ProductImage";
 import { getDownloadUrlByName } from "~/lib/downloads";
 import { DISCOUNT_SESSION_KEY } from "~/components/checkout/CheckoutTypes";
 import type { ProductListItem } from "~/types";
@@ -92,13 +93,14 @@ function OrderDetailsCard({ orderInfo }: { orderInfo: OrderInfo }) {
       <ul className="divide-secondary-100 divide-y">
         {items.map((item, idx) => (
           <li key={idx} className="flex items-center gap-4 py-4 first:pt-0">
-            <div className="bg-secondary-50 flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-black/[0.04]">
+            <div className="bg-secondary-50 relative flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-black/[0.04]">
               {item.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <ProductImage
                   src={item.imageUrl}
                   alt={item.name}
-                  className="h-full w-full object-cover"
+                  fill
+                  sizes="56px"
+                  className="object-cover"
                 />
               ) : (
                 <svg

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getStoreConfig } from "~/lib/store-config.server";
 import FaqAccordion from "./FaqAccordion";
+import JsonLd from "~/components/common/JsonLd";
+import { buildFaqPage } from "~/lib/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getStoreConfig();
@@ -105,8 +107,15 @@ const faqSections = [
 ];
 
 export default async function FaqPage() {
+  const faqJsonLd = buildFaqPage(
+    faqSections.flatMap((section) =>
+      section.questions.map((q) => ({ q: q.q, a: q.a })),
+    ),
+  );
+
   return (
     <div className="min-h-screen bg-white">
+      <JsonLd data={faqJsonLd} />
       {/* Breadcrumbs */}
       <nav className="text-secondary-400 container mx-auto px-4 py-4 font-mono text-xs tracking-wider">
         <Link href="/" className="hover:text-primary-600 transition-colors">

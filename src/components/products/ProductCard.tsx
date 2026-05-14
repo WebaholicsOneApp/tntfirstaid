@@ -9,6 +9,7 @@ import StockBadge from "./StockBadge";
 import { useCart } from "~/lib/cart";
 import { Spinner } from "~/components/ui/Spinner";
 import { prefetchProduct } from "~/lib/product-prefetch";
+import WishlistButton from "./WishlistButton";
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -31,16 +32,21 @@ export default function ProductCard({
     ? product.fallbackImage
     : (product.primaryImage ?? product.fallbackImage);
 
+  const hasPrice = product.price != null && product.price > 0;
   const hasRange =
     product.maxPrice != null &&
     product.price != null &&
     product.maxPrice > product.price;
 
-  const priceDisplay = hasRange
-    ? `${formatCentsToDollars(product.price)} – ${formatCentsToDollars(product.maxPrice)}`
-    : formatCentsToDollars(product.price);
+  const priceDisplay = !hasPrice
+    ? "—"
+    : hasRange
+      ? `${formatCentsToDollars(product.price)} – ${formatCentsToDollars(product.maxPrice)}`
+      : formatCentsToDollars(product.price);
 
-  const isVariable = product.variationCount > 1;
+  // Force users to the PDP when we don't have a price — never let the cart
+  // see a $0 line item.
+  const isVariable = product.variationCount > 1 || !hasPrice;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -106,9 +112,23 @@ export default function ProductCard({
               Sale
             </div>
           )}
+        {/* Wishlist heart — top-right corner of image */}
+        <div className="absolute top-2 right-2 z-10">
+          <WishlistButton
+            item={{
+              productId: product.id,
+              productSlug: product.slug,
+              name: product.name,
+              price: product.price ?? null,
+              image: product.primaryImage ?? product.fallbackImage ?? null,
+              brandName: product.brandName ?? null,
+            }}
+            size="sm"
+          />
+        </div>
         {/* Digital download badge */}
         {product.isDownloadable && (
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-sky-700">
+          <div className="absolute top-2 right-12 z-10 flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-1.5 py-0.5 font-mono text-[10px] font-medium text-sky-700">
             <svg
               className="h-3 w-3"
               fill="none"

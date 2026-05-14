@@ -14,6 +14,12 @@ export const env = createEnv({
     ONEAPP_API_KEY: z.string().min(1),
     ONEAPP_WEBHOOK_SECRET: z.string().min(1),
 
+    // OneApp storefront identity — required for order creation via
+    // /api/express-checkout-order. OneApp uses these to attach incoming
+    // orders to the correct store/company.
+    STOREFRONT_COMPANY_ID: z.string().min(1),
+    STOREFRONT_STORE_ID: z.string().min(1),
+
     // Security
     ID_OBFUSCATION_SECRET: z.string().min(1),
 
@@ -31,6 +37,12 @@ export const env = createEnv({
     // Dev mock UPS rates (never enable in production) — bypasses OneApp call
     // and returns canned shipping options so checkout can be exercised end-to-end.
     DEV_FAKE_SHIPPING_RATES: z.string().optional(),
+
+    // Allow falling back to bundled demo products when the OneApp API is
+    // unreachable or returns nothing. Default: enabled in development,
+    // disabled in production (so customers see a maintenance state instead
+    // of fake products and the merchant notices the outage).
+    ALLOW_DEMO_FALLBACK: z.string().optional(),
   },
 
   client: {
@@ -46,6 +58,11 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_HOURS: z.string().optional(),
     NEXT_PUBLIC_MAPS_QUERY: z.string().optional(),
     NEXT_PUBLIC_LOGO_URL: z.string().optional(),
+
+    // Comma-separated list of additional image hosts to route through Vercel
+    // Image Optimization. Entries may be literal hostnames ("cdn.example.com")
+    // or wildcards ("*.example.com"). See src/lib/utils.ts.
+    NEXT_PUBLIC_OPTIMIZED_IMAGE_HOSTS: z.string().optional(),
   },
 
   runtimeEnv: {
@@ -61,6 +78,8 @@ export const env = createEnv({
     ONEAPP_API_URL: process.env.ONEAPP_API_URL,
     ONEAPP_API_KEY: process.env.ONEAPP_API_KEY,
     ONEAPP_WEBHOOK_SECRET: process.env.ONEAPP_WEBHOOK_SECRET,
+    STOREFRONT_COMPANY_ID: process.env.STOREFRONT_COMPANY_ID,
+    STOREFRONT_STORE_ID: process.env.STOREFRONT_STORE_ID,
 
     // Site
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -83,10 +102,13 @@ export const env = createEnv({
     NEXT_PUBLIC_STORE_HOURS: process.env.NEXT_PUBLIC_STORE_HOURS,
     NEXT_PUBLIC_MAPS_QUERY: process.env.NEXT_PUBLIC_MAPS_QUERY,
     NEXT_PUBLIC_LOGO_URL: process.env.NEXT_PUBLIC_LOGO_URL,
+    NEXT_PUBLIC_OPTIMIZED_IMAGE_HOSTS:
+      process.env.NEXT_PUBLIC_OPTIMIZED_IMAGE_HOSTS,
 
     // Dev checkout bypass
     DEV_CHECKOUT_BYPASS: process.env.DEV_CHECKOUT_BYPASS,
     DEV_FAKE_SHIPPING_RATES: process.env.DEV_FAKE_SHIPPING_RATES,
+    ALLOW_DEMO_FALLBACK: process.env.ALLOW_DEMO_FALLBACK,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

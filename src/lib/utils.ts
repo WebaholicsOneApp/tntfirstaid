@@ -187,6 +187,10 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 /**
  * Known high-volume CDN hosts that should go through Vercel Image Optimization.
  * Unknown hosts are served unoptimized (no cost, no errors).
+ *
+ * To add OneApp's image CDN (or any other host) without editing code, set
+ * NEXT_PUBLIC_OPTIMIZED_IMAGE_HOSTS to a comma-separated list of hostnames
+ * (each may be a literal "cdn.example.com" or wildcard "*.example.com").
  */
 const OPTIMIZED_IMAGE_HOSTS = new Set([
   "cdn.shopify.com",
@@ -199,12 +203,32 @@ const OPTIMIZED_IMAGE_HOSTS = new Set([
   "images.unsplash.com",
 ]);
 
+// Always-on wildcard suffixes — known multi-tenant storage hosts.
+const OPTIMIZED_HOST_SUFFIXES: string[] = [".blob.core.windows.net"];
+
+function getEnvHostMatchers(): { literal: Set<string>; suffix: string[] } {
+  const raw = process.env.NEXT_PUBLIC_OPTIMIZED_IMAGE_HOSTS;
+  if (!raw) return { literal: new Set(), suffix: [] };
+  const literal = new Set<string>();
+  const suffix: string[] = [];
+  for (const entry of raw.split(",")) {
+    const trimmed = entry.trim().toLowerCase();
+    if (!trimmed) continue;
+    if (trimmed.startsWith("*.")) suffix.push(trimmed.slice(1));
+    else literal.add(trimmed);
+  }
+  return { literal, suffix };
+}
+
 export function isOptimizedImageHost(url: string): boolean {
   try {
-    const hostname = new URL(url).hostname;
+    const hostname = new URL(url).hostname.toLowerCase();
     if (OPTIMIZED_IMAGE_HOSTS.has(hostname)) return true;
-    // Wildcard: *.blob.core.windows.net (Azure Blob Storage)
-    return hostname.endsWith(".blob.core.windows.net");
+    if (OPTIMIZED_HOST_SUFFIXES.some((s) => hostname.endsWith(s))) return true;
+    const env = getEnvHostMatchers();
+    if (env.literal.has(hostname)) return true;
+    if (env.suffix.some((s) => hostname.endsWith(s))) return true;
+    return false;
   } catch {
     return true; // relative paths are local — always optimized
   }

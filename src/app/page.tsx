@@ -1,6 +1,10 @@
 import { Suspense } from "react";
 import { getFeaturedProducts } from "~/lib/data";
 import { DEMO_FEATURED_PRODUCTS } from "~/lib/demo-featured-products";
+import {
+  isDemoFallbackAllowed,
+  recordDemoFallback,
+} from "~/lib/demo-fallback";
 import HeroSection from "~/components/home/HeroSection";
 import MarqueeBand from "~/components/home/MarqueeBand";
 import TrustStrip from "~/components/home/TrustStrip";
@@ -73,7 +77,19 @@ export default function HomePage() {
 }
 
 async function FeaturedProductsLoader() {
-  const products = await getFeaturedProducts(4).catch(() => []);
-  const display = products.length > 0 ? products : DEMO_FEATURED_PRODUCTS;
-  return <FeaturedProductsGrid products={display} />;
+  const products = await getFeaturedProducts(4).catch((err: unknown) => {
+    recordDemoFallback(
+      "getFeaturedProducts",
+      err instanceof Error ? err.message : String(err),
+    );
+    return [] as Awaited<ReturnType<typeof getFeaturedProducts>>;
+  });
+  if (products.length > 0) {
+    return <FeaturedProductsGrid products={products} />;
+  }
+  if (!isDemoFallbackAllowed()) {
+    recordDemoFallback("getFeaturedProducts", "API returned 0 featured");
+    return null;
+  }
+  return <FeaturedProductsGrid products={DEMO_FEATURED_PRODUCTS} />;
 }

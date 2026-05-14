@@ -30,6 +30,8 @@ import HeaderWrapper from "~/components/layout/HeaderWrapper";
 import Footer from "~/components/layout/Footer";
 import { CartDrawer } from "~/components/cart";
 import NewsletterPopup from "~/components/ui/NewsletterPopup";
+import JsonLd from "~/components/common/JsonLd";
+import { buildOrganization } from "~/lib/structured-data";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -70,18 +72,42 @@ const avenir = localFont({
 
 export async function generateMetadata(): Promise<Metadata> {
   const storeConfig = await getStoreConfig();
+  const description = `${storeConfig.siteName} — first aid kits, medical supplies, and CPR/first-aid training. ANSI-compliant kits, AEDs, and trauma supplies.`;
+  // Used as the default share image when a page doesn't override it.
+  const defaultOgImage = "/images/hero/hero-first-aid-group.jpg";
   return {
     title: {
       default: storeConfig.siteName,
       template: `%s | ${storeConfig.siteName}`,
     },
-    description: `${storeConfig.siteName} - First aid kits, medical supplies, and training`,
+    description,
     icons: [
       { rel: "icon", url: "/favicon.ico", sizes: "any" },
       { rel: "icon", url: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
     ],
     metadataBase: new URL(storeConfig.siteUrl),
+    openGraph: {
+      type: "website",
+      siteName: storeConfig.siteName,
+      title: storeConfig.siteName,
+      description,
+      url: storeConfig.siteUrl,
+      images: [
+        {
+          url: defaultOgImage,
+          width: 1200,
+          height: 630,
+          alt: storeConfig.siteName,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: storeConfig.siteName,
+      description,
+      images: [defaultOgImage],
+    },
   };
 }
 
@@ -112,6 +138,13 @@ export default async function RootLayout({
         className="text-secondary-800 flex min-h-screen flex-col bg-white font-sans antialiased"
         style={paletteStyle as React.CSSProperties}
       >
+        <JsonLd data={buildOrganization(storeConfig)} />
+        <a
+          href="#main-content"
+          className="bg-primary-500 sr-only z-[100] rounded-br-lg px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:top-0 focus:left-0"
+        >
+          Skip to main content
+        </a>
         <NextTopLoader color={storeConfig.primaryColor} showSpinner={false} />
         <NonceProvider nonce={nonce}>
           <AuthProvider initialCustomer={null} customerAuthEnabled={true}>
@@ -124,7 +157,9 @@ export default async function RootLayout({
                   />
                 </StickyHeader>
 
-                <main className="flex-1">{children}</main>
+                <main id="main-content" tabIndex={-1} className="flex-1">
+                  {children}
+                </main>
 
                 <Footer
                   siteName={storeConfig.siteName}

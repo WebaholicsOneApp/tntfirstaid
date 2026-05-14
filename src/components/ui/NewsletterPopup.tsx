@@ -10,10 +10,10 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 const LS_KEY = "alpha-newsletter-dismissed";
 const DISMISS_VERSION = 1;
-const SHOW_DELAY_MS = 3_000;
+const SHOW_DELAY_MS = 12_000;
 
 /** Routes where the popup should never appear */
-const BLOCKED_PREFIXES = ["/checkout", "/auth"];
+const BLOCKED_PREFIXES = ["/checkout", "/auth", "/account"];
 
 function isDismissed(): boolean {
   try {
@@ -52,9 +52,12 @@ export default function NewsletterPopup() {
   const [errorMessage, setErrorMessage] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Set<string>>(new Set());
 
-  // Determine if popup should show after delay
+  // Determine if popup should show after delay.
+  // Skips authenticated customers entirely — they're already in the funnel
+  // and likely already on the mailing list.
   useEffect(() => {
     if (BLOCKED_PREFIXES.some((p) => pathname.startsWith(p))) return;
+    if (customer) return;
     if (isDismissed()) return;
 
     const timer = setTimeout(() => {
@@ -62,7 +65,7 @@ export default function NewsletterPopup() {
     }, SHOW_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, customer]);
 
   // Pre-fill from authenticated customer
   useEffect(() => {

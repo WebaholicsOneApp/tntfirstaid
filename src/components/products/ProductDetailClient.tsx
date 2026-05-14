@@ -11,6 +11,7 @@ import AddToCartButton from "./AddToCartButton";
 import StockBadge from "./StockBadge";
 import ReviewsSection from "./ReviewsSection";
 import RecommendationGrid from "./RecommendationGrid";
+import WishlistButton from "./WishlistButton";
 import StarRating from "./StarRating";
 import StickyMobileBuyBar from "./StickyMobileBuyBar";
 import TrustBadges from "~/components/checkout/TrustBadges";
@@ -201,6 +202,21 @@ export default function ProductDetailClient({
             productName={product.name}
             variation={selectedVariation}
             productImage={product.primaryImage}
+          />
+        </div>
+
+        {/* Save for later */}
+        <div className="mt-3">
+          <WishlistButton
+            variant="labeled"
+            item={{
+              productId: product.id,
+              productSlug: product.slug,
+              name: product.name,
+              price: product.price ?? null,
+              image: product.primaryImage ?? product.fallbackImage ?? null,
+              brandName: product.brandName ?? null,
+            }}
           />
         </div>
 
