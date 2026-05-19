@@ -2,6 +2,12 @@ import Link from "next/link";
 
 const STROKE = "#C8102E";
 
+// Hand-tuned bar heights (in px) for the video-library audio visualizer.
+// Heights vary 8–24 so the wave reads as organic instead of mechanical.
+const AUDIO_BAR_HEIGHTS = [
+  8, 14, 20, 24, 16, 10, 22, 18, 12, 24, 20, 14, 22, 16, 24, 18, 12, 20, 14, 8,
+];
+
 export default function FeatureIconsSection() {
   return (
     <section className="relative overflow-hidden bg-white pb-12 sm:pb-16">
@@ -22,11 +28,61 @@ export default function FeatureIconsSection() {
         <div className="bg-primary-500/20 h-px w-full" />
 
         <div className="divide-secondary-100 grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0">
-          {/* Training */}
-          <div className="flex flex-col items-center px-8 py-10 text-center">
-            <div className="mb-6 flex h-16 items-center justify-center">
-              {/* Medical cross with pulse */}
-              <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          {/* Training — featured */}
+          <div className="relative flex flex-col items-center overflow-hidden px-8 pt-12 pb-14 text-center">
+            {/* Gradient background — soft red wash with depth */}
+            <div
+              aria-hidden
+              className="from-primary-50 via-primary-50/40 absolute inset-0 -z-10 bg-gradient-to-b to-white"
+            />
+
+            {/* Top accent bar */}
+            <div
+              aria-hidden
+              className="bg-primary-500 absolute inset-x-0 top-0 h-[3px]"
+            />
+
+            {/* Free + ASL stamp — top-right corner credential */}
+            <div
+              aria-hidden
+              className="absolute top-5 right-5 z-10 hidden sm:block"
+            >
+              <div className="border-primary-500/60 flex h-16 w-16 -rotate-[10deg] flex-col items-center justify-center rounded-full border-2 bg-white/85 shadow-[0_6px_18px_rgba(227,24,55,0.22)] backdrop-blur-sm">
+                <div className="text-primary-700 font-display text-[0.7rem] leading-none font-bold tracking-[0.15em]">
+                  FREE
+                </div>
+                <div className="bg-primary-500 my-1 h-px w-5" />
+                <div className="text-primary-600 font-mono text-[0.45rem] leading-none font-semibold tracking-[0.22em] uppercase">
+                  + ASL
+                </div>
+              </div>
+            </div>
+
+            {/* Audio waveform visualizer — animated "now playing" rhythm */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-3 flex h-6 items-end justify-center gap-[3px]"
+            >
+              {AUDIO_BAR_HEIGHTS.map((h, i) => (
+                <span
+                  key={i}
+                  className="bg-primary-500 animate-audio-bar w-[3px] rounded-full"
+                  style={{
+                    height: `${h}px`,
+                    animationDelay: `${(i * 80) % 1400}ms`,
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Icon with subtle red aura */}
+            <div className="relative mb-6 flex h-20 w-20 items-center justify-center">
+              <div
+                aria-hidden
+                className="bg-primary-500/15 absolute inset-0 -z-10 animate-pulse rounded-full blur-xl"
+                style={{ animationDuration: "3s" }}
+              />
+              <svg width="80" height="80" viewBox="0 0 56 56" fill="none">
                 <rect
                   x="3"
                   y="3"
@@ -44,17 +100,53 @@ export default function FeatureIconsSection() {
                 />
               </svg>
             </div>
-            <p className="text-primary-600 mb-3 text-xs font-semibold tracking-wider uppercase">
+
+            <p className="text-primary-700 mb-3 font-mono text-[0.65rem] font-semibold tracking-[0.3em] uppercase">
               Training
             </p>
             <h3 className="font-display text-secondary-900 mb-4 text-2xl leading-tight font-bold">
-              Hands-On CPR &amp; First Aid Certification
+              Free{" "}
+              <span className="text-primary-600 italic">CPR &amp; First Aid</span>{" "}
+              Video Library
             </h3>
-            <p className="text-secondary-600 text-base leading-relaxed">
-              Real instructors. Real practice. We teach CPR, AED use,
-              Stop&nbsp;the&nbsp;Bleed, and workplace first aid — onsite at
-              your facility or ours. Certifications recognized nationwide.
+            <p className="text-secondary-700 mb-6 text-base leading-relaxed">
+              Step-by-step walkthroughs — burns, bleeding control, CPR, eye
+              care, and more. Also available in American Sign Language.
             </p>
+
+            {/* Topic chips */}
+            <div className="mb-8 flex flex-wrap justify-center gap-1.5">
+              {["BURNS", "BLEEDING", "FRACTURES", "CPR"].map((c) => (
+                <span
+                  key={c}
+                  className="border-primary-500/30 text-primary-800 rounded-full border bg-white/70 px-2.5 py-1 font-mono text-[0.55rem] font-semibold tracking-[0.2em] uppercase"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-auto">
+              <Link
+                href="/training-videos"
+                className="group bg-primary-500 hover:bg-primary-600 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white uppercase shadow-[0_10px_36px_rgba(227,24,55,0.42)] transition-all hover:shadow-[0_14px_44px_rgba(227,24,55,0.55)] active:scale-[0.98]"
+              >
+                Watch Videos
+                <svg
+                  className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Quality */}

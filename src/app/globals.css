@@ -153,6 +153,19 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
   animation: ekg-pulse 9.6s linear infinite;
 }
 
+/* Audio waveform visualizer — vertical bars oscillating to suggest media
+   playback. Used on the homepage Training-videos card. transform-origin: bottom
+   so bars grow upward from their baseline. */
+@keyframes audio-bar {
+  0%, 100% { transform: scaleY(0.22); }
+  50%      { transform: scaleY(1);    }
+}
+.animate-audio-bar {
+  animation: audio-bar 1.4s ease-in-out infinite;
+  transform-origin: bottom;
+  will-change: transform;
+}
+
 /* Lite-YouTube play button — slow expanding ring */
 @keyframes video-play-ping {
   0%   { transform: scale(1);   opacity: 0.55; }
@@ -359,6 +372,7 @@ html:hover { scrollbar-color: var(--primary-500) transparent; }
   .animate-marquee-scroll { animation-play-state: paused; }
   .animate-ekg-scroll { animation: none; }
   .animate-ekg-pulse { animation: none; filter: drop-shadow(0 0 6px rgba(227,24,55,0.5)); }
+  .animate-audio-bar { animation: none; transform: scaleY(0.6); }
   .animate-video-play-ping { animation: none; opacity: 0; }
   .animate-defib-ring { animation: none; opacity: 0; }
   .animate-defib-cross-flash { animation: none; opacity: 0.3; filter: drop-shadow(0 0 14px rgba(227,24,55,0.45)); }

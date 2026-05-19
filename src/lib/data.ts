@@ -154,25 +154,105 @@ export async function enrichProductList(
 // Adapter functions — transform API responses to TNT First Aid types
 // ============================================
 
+function pickImageString(v: unknown): string | null {
+  if (typeof v === "string" && v.length > 0) return v;
+  if (v && typeof v === "object") {
+    // Common object shapes: { url }, { src }, { href }, { path }, { secure_url }
+    const o = v as Record<string, unknown>;
+    for (const k of ["url", "src", "href", "path", "secure_url", "secureUrl"]) {
+      const s = o[k];
+      if (typeof s === "string" && s.length > 0) return s;
+    }
+  }
+  return null;
+}
+
+function pickImageFromArray(arr: unknown): string | null {
+  if (!Array.isArray(arr)) return null;
+  for (const item of arr) {
+    const s = pickImageString(item);
+    if (s) return s;
+  }
+  return null;
+}
+
+function looksLikeImageUrl(s: string): boolean {
+  if (s.length < 2 || s.length > 2000) return false;
+  if (/\.(png|jpe?g|webp|gif|svg|avif)(\?|#|$)/i.test(s)) return true;
+  if (/^https?:\/\//i.test(s) && /(image|img|photo|media|cdn|upload|asset)/i.test(s))
+    return true;
+  if (/^\/(images?|media|uploads?|assets?)\//i.test(s)) return true;
+  return false;
+}
+
+function deepFindImage(obj: unknown, depth = 0): string | null {
+  if (depth > 5 || obj == null) return null;
+  const direct = pickImageString(obj);
+  if (direct && looksLikeImageUrl(direct)) return direct;
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const found = deepFindImage(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof obj !== "object") return null;
+  // Try image-named keys first so we don't accidentally pick a logo/icon
+  // from somewhere random in the payload.
+  const entries = Object.entries(obj as Record<string, unknown>);
+  const isImageKey = (k: string) =>
+    /(image|img|photo|picture|thumb|media|gallery)/i.test(k);
+  entries.sort(
+    ([a], [b]) => (isImageKey(b) ? 1 : 0) - (isImageKey(a) ? 1 : 0),
+  );
+  for (const [, v] of entries) {
+    const found = deepFindImage(v, depth + 1);
+    if (found) return found;
+  }
+  return null;
+}
+
 function extractImage(card: any): string | null {
   // OneApp / supplier APIs use varying field names — try the common ones in
   // order of specificity. First non-empty wins.
   const candidates = [
-    card.imageUrl,
-    card.primaryImage,
-    card.image,
-    card.featuredImage,
-    card.featured_image,
-    card.mainImage,
-    card.thumbnail,
-    card.thumbnailUrl,
-    Array.isArray(card.images) ? card.images[0] : null,
-    Array.isArray(card.media) ? card.media[0]?.url ?? card.media[0] : null,
+    pickImageString(card.imageUrl),
+    pickImageString(card.image_url),
+    pickImageString(card.primaryImage),
+    pickImageString(card.primary_image),
+    pickImageString(card.image),
+    pickImageString(card.featuredImage),
+    pickImageString(card.featured_image),
+    pickImageString(card.mainImage),
+    pickImageString(card.main_image),
+    pickImageString(card.thumbnail),
+    pickImageString(card.thumbnailUrl),
+    pickImageString(card.thumbnail_url),
+    pickImageString(card.picture),
+    pickImageFromArray(card.images),
+    pickImageFromArray(card.media),
+    pickImageFromArray(card.gallery),
+    pickImageFromArray(card.photos),
   ];
   for (const c of candidates) {
-    if (typeof c === "string" && c.length > 0) return c;
+    if (c) return c;
   }
-  return null;
+  // Variations / variants may carry the only image
+  for (const arrKey of ["variations", "variants"]) {
+    const arr = (card as Record<string, unknown>)[arrKey];
+    if (Array.isArray(arr)) {
+      for (const v of arr) {
+        const s =
+          pickImageString((v as any)?.image) ??
+          pickImageString((v as any)?.imageUrl) ??
+          pickImageString((v as any)?.image_url) ??
+          pickImageFromArray((v as any)?.images);
+        if (s) return s;
+      }
+    }
+  }
+  // Last resort: walk the object looking for anything that smells like an image URL.
+  return deepFindImage(card);
 }
 
 /**
@@ -200,6 +280,78 @@ function toCents(v: unknown): number | null {
   return null;
 }
 
+// Keys that look pricey but mean something else — skip these during deep search
+// so we don't accidentally treat shipping cost or quantity tiers as the price.
+const NON_PRICE_KEY = /(min|max|tier|discount|shipping|ship_|tax|deposit|refund|original|compare|msrp|list|regular|map_|map$|fee|quantity|count|stock)/i;
+const PRICE_KEY = /(price|amount|cost|sale|sellingp?rice|current|net|gross|total)/i;
+
+function variationLikePriceCents(v: any): number | null {
+  if (!v || typeof v !== "object") return null;
+  const candidates: unknown[] = [
+    v.price,
+    v.priceCents,
+    v.price_cents,
+    v.salePrice,
+    v.sale_price,
+    v.sellingPrice,
+    v.selling_price,
+    v.amount,
+    v.unitPrice,
+    v.unit_price,
+    v.currentPrice,
+    v.current_price,
+    v.cost,
+    v.netPrice,
+    v.net_price,
+  ];
+  for (const x of candidates) {
+    const c = toCents(x);
+    if (c != null) return c;
+  }
+  // Nested pricing on the variant itself
+  if (v.pricing && typeof v.pricing === "object") {
+    for (const x of [
+      v.pricing.price,
+      v.pricing.amount,
+      v.pricing.current,
+      v.pricing.sale,
+    ]) {
+      const c = toCents(x);
+      if (c != null) return c;
+    }
+  }
+  return null;
+}
+
+function deepFindPriceCents(obj: unknown, depth = 0): number | null {
+  if (obj == null || depth > 5) return null;
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const c = deepFindPriceCents(item, depth + 1);
+      if (c != null) return c;
+    }
+    return null;
+  }
+  if (typeof obj !== "object") return null;
+  const o = obj as Record<string, unknown>;
+  // First pass: keys at this level whose name explicitly looks like a price.
+  for (const [k, v] of Object.entries(o)) {
+    if (NON_PRICE_KEY.test(k)) continue;
+    if (PRICE_KEY.test(k)) {
+      const c = toCents(v);
+      if (c != null && c > 0) return c;
+    }
+  }
+  // Second pass: recurse into nested objects/arrays.
+  for (const [k, v] of Object.entries(o)) {
+    if (v && typeof v === "object" && !NON_PRICE_KEY.test(k)) {
+      const c = deepFindPriceCents(v, depth + 1);
+      if (c != null) return c;
+    }
+  }
+  return null;
+}
+
 function extractPriceCents(card: any): number | null {
   // Try direct fields in order of specificity. First non-null wins.
   const directCandidates: unknown[] = [
@@ -209,10 +361,21 @@ function extractPriceCents(card: any): number | null {
     card.salePrice,
     card.sale_price,
     card.sellingPrice,
+    card.selling_price,
     card.amount,
     card.unitPrice,
     card.unit_price,
     card.currentPrice,
+    card.current_price,
+    card.cost,
+    card.netPrice,
+    card.net_price,
+    card.minPrice,
+    card.min_price,
+    card.lowPrice,
+    card.low_price,
+    card.fromPrice,
+    card.from_price,
   ];
   for (const v of directCandidates) {
     const c = toCents(v);
@@ -224,9 +387,15 @@ function extractPriceCents(card: any): number | null {
     const nested: unknown[] = [
       pricing.price,
       pricing.priceCents,
+      pricing.price_cents,
       pricing.amount,
       pricing.sale,
+      pricing.salePrice,
       pricing.current,
+      pricing.currentPrice,
+      pricing.net,
+      pricing.from,
+      pricing.min,
     ];
     for (const v of nested) {
       const c = toCents(v);
@@ -239,27 +408,40 @@ function extractPriceCents(card: any): number | null {
     const c = toCents(first?.amount ?? first?.price ?? first);
     if (c != null) return c;
   }
-  // Fall back to the first variation that has a price (variations may differ
-  // from the product-level summary when OneApp omits the rollup).
-  if (Array.isArray(card.variations)) {
-    for (const v of card.variations) {
-      const c = toCents(v?.price ?? v?.priceCents ?? v?.amount);
-      if (c != null) return c;
+  // Fall back to the first variation/variant that has a price.
+  for (const arrKey of ["variations", "variants"]) {
+    const arr = (card as Record<string, unknown>)[arrKey];
+    if (Array.isArray(arr)) {
+      for (const v of arr) {
+        const c = variationLikePriceCents(v);
+        if (c != null) return c;
+      }
     }
   }
-  return null;
+  // Last resort: walk the object looking for any price-named numeric field.
+  return deepFindPriceCents(card);
 }
 
 function extractMaxPriceCents(card: any): number | null {
-  const direct = toCents(card.maxPrice ?? card.highPrice ?? card.high_price);
+  const direct = toCents(
+    card.maxPrice ??
+      card.max_price ??
+      card.highPrice ??
+      card.high_price ??
+      card.toPrice ??
+      card.to_price,
+  );
   if (direct != null) return direct;
-  if (Array.isArray(card.variations) && card.variations.length > 0) {
-    let highest: number | null = null;
-    for (const v of card.variations) {
-      const c = toCents(v?.price ?? v?.priceCents ?? v?.amount);
-      if (c != null && (highest == null || c > highest)) highest = c;
+  for (const arrKey of ["variations", "variants"]) {
+    const arr = (card as Record<string, unknown>)[arrKey];
+    if (Array.isArray(arr) && arr.length > 0) {
+      let highest: number | null = null;
+      for (const v of arr) {
+        const c = variationLikePriceCents(v);
+        if (c != null && (highest == null || c > highest)) highest = c;
+      }
+      if (highest != null) return highest;
     }
-    return highest;
   }
   return null;
 }
